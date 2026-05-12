@@ -150,6 +150,8 @@ export default function App() {
     try { return JSON.parse(localStorage.getItem('historico_precos') || '[]') } catch { return [] }
   })
   const [novaObs, setNovaObs] = useState('')
+  const [pedidoGerado, setPedidoGerado] = useState(false)
+  const [ultimoPedidoNum, setUltimoPedidoNum] = useState(null)
 
   const formatPreco = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
@@ -215,6 +217,24 @@ export default function App() {
     <button onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#c0392b;color:white;border:none;border-radius:5px;font-size:16px">🖨️ Imprimir / Salvar PDF</button>
     </body></html>`)
     win.document.close()
+    setUltimoPedidoNum(numPedido)
+    setPedidoGerado(true)
+  }
+
+  const compartilharWhatsapp = () => {
+    const numPedido = ultimoPedidoNum
+    const data = new Date().toLocaleDateString('pt-BR')
+    const linhasTexto = carrinho.map(item =>
+      `  • ${item.nome} (${item.porcao}) x${item.quantidade} = ${formatPreco(item.preco * item.quantidade)}`
+    ).join('\n')
+    const msg = `🔥 *CANDEIA JR — PEDIDO #${numPedido}*\n\n`
+      + `👤 *Franqueado:* ${franqueado.nome || '-'}\n`
+      + `🏪 *Unidade:* ${franqueado.unidade || '-'}\n`
+      + `📅 *Data:* ${data}\n\n`
+      + `📋 *Itens do Pedido:*\n${linhasTexto}\n\n`
+      + `💰 *TOTAL: ${formatPreco(total)}*`
+    const url = `https://wa.me/?text=${encodeURIComponent(msg)}`
+    window.open(url, '_blank')
   }
 
   const loginAdmin = () => {
@@ -407,8 +427,17 @@ export default function App() {
                 </div>
                 <button onClick={gerarPDF} style={{
                   width: '100%', padding: 14, background: 'linear-gradient(135deg, #c0392b, #e74c3c)',
-                  color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer'
+                  color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10
                 }}>📄 Gerar PDF do Pedido</button>
+                {pedidoGerado && (
+                  <button onClick={compartilharWhatsapp} style={{
+                    width: '100%', padding: 14, background: 'linear-gradient(135deg, #25d366, #128c7e)',
+                    color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                  }}>
+                    <span style={{ fontSize: 20 }}>💬</span> Compartilhar via WhatsApp
+                  </button>
+                )}
               </div>
             </>
           )}
