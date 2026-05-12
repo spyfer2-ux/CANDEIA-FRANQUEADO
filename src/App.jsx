@@ -121,12 +121,28 @@ const CATEGORIAS = {
   }
 }
 
+// Todos os itens em lista plana para busca
+const TODOS_ITENS = Object.entries(CATEGORIAS).flatMap(([catKey, cat]) =>
+  cat.itens.map(item => ({ ...item, catKey, catNome: cat.nome, catCor: cat.cor }))
+)
+
+// Gera próximo número de pedido sequencial a partir de 10002
+function proximoNumeroPedido() {
+  try {
+    const ultimo = parseInt(localStorage.getItem('ultimo_pedido') || '10001')
+    const proximo = ultimo + 1
+    localStorage.setItem('ultimo_pedido', String(proximo))
+    return proximo
+  } catch { return 10002 }
+}
+
 export default function App() {
   const [aba, setAba] = useState('pedido')
   const [franqueado, setFranqueado] = useState({ nome: '', unidade: '', telefone: '' })
   const [carrinho, setCarrinho] = useState([])
   const [categoriaAtiva, setCategoriaAtiva] = useState('carnes')
   const [quantidades, setQuantidades] = useState({})
+  const [busca, setBusca] = useState('')
   const [adminPin, setAdminPin] = useState('')
   const [adminLogado, setAdminLogado] = useState(false)
   const [pinErro, setPinErro] = useState(false)
@@ -137,16 +153,24 @@ export default function App() {
 
   const formatPreco = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-  const adicionarAoCarrinho = (item, cat) => {
+  // Itens filtrados pela busca
+  const itensBusca = busca.trim().length >= 2
+    ? TODOS_ITENS.filter(item =>
+        item.nome.toLowerCase().includes(busca.toLowerCase()) ||
+        item.catNome.toLowerCase().includes(busca.toLowerCase())
+      )
+    : []
+
+  const adicionarAoCarrinho = (item, catKey) => {
     const qty = quantidades[item.id] || 1
     if (qty <= 0) return
-    const catInfo = CATEGORIAS[cat]
-    const existente = carrinho.find(c => c.id === item.id + '-' + cat)
+    const catInfo = CATEGORIAS[catKey]
+    const existente = carrinho.find(c => c.id === item.id + '-' + catKey)
     if (existente) {
-      setCarrinho(carrinho.map(c => c.id === item.id + '-' + cat ? { ...c, quantidade: c.quantidade + qty } : c))
+      setCarrinho(carrinho.map(c => c.id === item.id + '-' + catKey ? { ...c, quantidade: c.quantidade + qty } : c))
     } else {
       setCarrinho([...carrinho, {
-        id: item.id + '-' + cat,
+        id: item.id + '-' + catKey,
         nome: item.nome,
         porcao: item.porcao,
         preco: item.preco,
@@ -167,18 +191,21 @@ export default function App() {
   const total = carrinho.reduce((acc, item) => acc + item.preco * item.quantidade, 0)
 
   const gerarPDF = () => {
+    const numPedido = proximoNumeroPedido()
     const win = window.open('', '_blank')
     const linhas = carrinho.map(item =>
       `<tr><td>${item.categoria}</td><td>${item.nome} (${item.porcao})</td><td>${item.quantidade}</td><td>${formatPreco(item.preco)}</td><td>${formatPreco(item.preco * item.quantidade)}</td></tr>`
     ).join('')
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Pedido Candeia Jr</title>
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Pedido #${numPedido} — Candeia Jr</title>
     <style>body{font-family:Arial,sans-serif;padding:20px}h1{color:#c0392b}h2{color:#555}
+    .num-pedido{font-size:14px;color:#888;margin-bottom:4px}
     table{width:100%;border-collapse:collapse;margin-top:20px}
     th{background:#c0392b;color:white;padding:8px;text-align:left}
     td{padding:8px;border-bottom:1px solid #ddd}
     .total{font-size:18px;font-weight:bold;text-align:right;margin-top:20px;color:#c0392b}
     @media print{button{display:none}}</style></head>
     <body>
+    <div class="num-pedido">Pedido Nº <strong>#${numPedido}</strong></div>
     <h1>🔥 Candeia Jr — Portal do Franqueado</h1>
     <h2>Pedido de: ${franqueado.nome || 'Franqueado'} | Unidade: ${franqueado.unidade || '-'} | Tel: ${franqueado.telefone || '-'}</h2>
     <p>Data: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}</p>
@@ -237,6 +264,60 @@ export default function App() {
             </div>
           </div>
 
+          {/* Campo de busca */}
+          <div style={{ background: 'white', padding: '12px 16px', borderRadius: 8, marginBottom: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+            <div style={{ position: 'relative' }}>
+              <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: '#aaa' }}>🔍</span>
+              <input
+                type="text"
+                placeholder="Buscar item em todas as categorias..."
+                value={busca}
+                onChange={e => setBusca(e.target.value)}
+                style={{ width: '100%', padding: '10px 12px 10px 40px', border: '2px solid #e74c3c', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', outline: 'none' }}
+              />
+              {busca && (
+                <button onClick={() => setBusca('')} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: 18, color: '#aaa', cursor: 'pointer' }}>✕</button>
+              )}
+            </div>
+            {/* Resultados da busca */}
+            {busca.trim().length >= 2 && (
+              <div style={{ marginTop: 10 }}>
+                {itensBusca.length === 0 ? (
+                  <p style={{ color: '#888', textAlign: 'center', padding: '10px 0', fontSize: 14 }}>Nenhum item encontrado para "{busca}"</p>
+                ) : (
+                  <>
+                    <p style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>{itensBusca.length} resultado(s) encontrado(s)</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
+                      {itensBusca.map(item => (
+                        <div key={item.id + item.catKey} style={{
+                          background: '#fafafa', borderRadius: 8, padding: 12,
+                          borderLeft: `4px solid ${item.catCor}`, boxShadow: '0 1px 4px rgba(0,0,0,0.06)'
+                        }}>
+                          <div style={{ fontWeight: 'bold', fontSize: 14 }}>{item.nome}</div>
+                          <div style={{ fontSize: 11, color: '#888', marginBottom: 6 }}>{item.catNome} · {item.porcao}</div>
+                          <div style={{ fontSize: 16, fontWeight: 'bold', color: item.catCor, marginBottom: 8 }}>{formatPreco(item.preco)}</div>
+                          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                            <button onClick={() => setQuantidades({...quantidades, [item.id]: Math.max(1,(quantidades[item.id]||1)-1)})}
+                              style={{ width: 28, height: 28, border: `1px solid ${item.catCor}`, borderRadius: 4, background: 'white', color: item.catCor, fontWeight: 'bold' }}>-</button>
+                            <input type="number" min="1" value={quantidades[item.id] || 1}
+                              onChange={e => setQuantidades({...quantidades, [item.id]: Math.max(1, parseInt(e.target.value)||1)})}
+                              style={{ width: 44, textAlign: 'center', padding: '3px', border: '1px solid #ddd', borderRadius: 4, fontSize: 13 }}/>
+                            <button onClick={() => setQuantidades({...quantidades, [item.id]: (quantidades[item.id]||1)+1})}
+                              style={{ width: 28, height: 28, border: `1px solid ${item.catCor}`, borderRadius: 4, background: 'white', color: item.catCor, fontWeight: 'bold' }}>+</button>
+                            <button onClick={() => { adicionarAoCarrinho(item, item.catKey); setBusca('') }} style={{
+                              flex: 1, padding: '6px', background: item.catCor, color: 'white',
+                              border: 'none', borderRadius: 6, fontWeight: 'bold', fontSize: 12, cursor: 'pointer'
+                            }}>Adicionar</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Categorias nav */}
           <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 16, paddingBottom: 4 }}>
             {catKeys.map(cat => {
@@ -246,7 +327,7 @@ export default function App() {
                   padding: '8px 14px', borderRadius: 20, border: `2px solid ${c.cor}`,
                   background: categoriaAtiva === cat ? c.cor : 'white',
                   color: categoriaAtiva === cat ? 'white' : c.cor,
-                  fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: 13, transition: 'all 0.2s'
+                  fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: 13, transition: 'all 0.2s', cursor: 'pointer'
                 }}>{c.nome}</button>
               )
             })}
@@ -266,15 +347,15 @@ export default function App() {
                   <div style={{ fontSize: 18, fontWeight: 'bold', color: cat.cor, marginBottom: 10 }}>{formatPreco(item.preco)}</div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     <button onClick={() => setQuantidades({...quantidades, [item.id]: Math.max(1,(quantidades[item.id]||1)-1)})}
-                      style={{ width: 32, height: 32, border: `1px solid ${cat.cor}`, borderRadius: 4, background: 'white', color: cat.cor, fontWeight: 'bold', fontSize: 16 }}>-</button>
+                      style={{ width: 32, height: 32, border: `1px solid ${cat.cor}`, borderRadius: 4, background: 'white', color: cat.cor, fontWeight: 'bold', fontSize: 16, cursor: 'pointer' }}>-</button>
                     <input type="number" min="1" value={quantidades[item.id] || 1}
                       onChange={e => setQuantidades({...quantidades, [item.id]: Math.max(1, parseInt(e.target.value)||1)})}
                       style={{ width: 50, textAlign: 'center', padding: '4px', border: '1px solid #ddd', borderRadius: 4 }}/>
                     <button onClick={() => setQuantidades({...quantidades, [item.id]: (quantidades[item.id]||1)+1})}
-                      style={{ width: 32, height: 32, border: `1px solid ${cat.cor}`, borderRadius: 4, background: 'white', color: cat.cor, fontWeight: 'bold', fontSize: 16 }}>+</button>
+                      style={{ width: 32, height: 32, border: `1px solid ${cat.cor}`, borderRadius: 4, background: 'white', color: cat.cor, fontWeight: 'bold', fontSize: 16, cursor: 'pointer' }}>+</button>
                     <button onClick={() => adicionarAoCarrinho(item, categoriaAtiva)} style={{
                       flex: 1, padding: '8px', background: cat.cor, color: 'white', border: 'none',
-                      borderRadius: 6, fontWeight: 'bold', fontSize: 13
+                      borderRadius: 6, fontWeight: 'bold', fontSize: 13, cursor: 'pointer'
                     }}>Adicionar</button>
                   </div>
                 </div>
