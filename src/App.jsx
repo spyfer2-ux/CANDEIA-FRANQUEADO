@@ -133,12 +133,18 @@ function proximoNumeroPedido() {
     const proximo = ultimo + 1
     localStorage.setItem('ultimo_pedido', String(proximo))
     return proximo
-  } catch { return 10002 }
+  } catch {
+    return 10002
+  }
 }
+
+const UNIDADES = [
+  "Jd Vila Formosa",
+]
 
 export default function App() {
   const [aba, setAba] = useState('pedido')
-  const [franqueado, setFranqueado] = useState({ nome: '', unidade: '', telefone: '' })
+  const [franqueado, setFranqueado] = useState({ nome: '', unidade: 'Jd Vila Formosa' })
   const [carrinho, setCarrinho] = useState([])
   const [categoriaAtiva, setCategoriaAtiva] = useState('carnes')
   const [quantidades, setQuantidades] = useState({})
@@ -147,7 +153,8 @@ export default function App() {
   const [adminLogado, setAdminLogado] = useState(false)
   const [pinErro, setPinErro] = useState(false)
   const [historico, setHistorico] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('historico_precos') || '[]') } catch { return [] }
+    try { return JSON.parse(localStorage.getItem('historico_precos') || '[]') }
+    catch { return [] }
   })
   const [novaObs, setNovaObs] = useState('')
   const [pedidoGerado, setPedidoGerado] = useState(false)
@@ -155,7 +162,6 @@ export default function App() {
 
   const formatPreco = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-  // Itens filtrados pela busca
   const itensBusca = busca.trim().length >= 2
     ? TODOS_ITENS.filter(item =>
         item.nome.toLowerCase().includes(busca.toLowerCase()) ||
@@ -171,14 +177,7 @@ export default function App() {
     if (existente) {
       setCarrinho(carrinho.map(c => c.id === item.id + '-' + catKey ? { ...c, quantidade: c.quantidade + qty } : c))
     } else {
-      setCarrinho([...carrinho, {
-        id: item.id + '-' + catKey,
-        nome: item.nome,
-        porcao: item.porcao,
-        preco: item.preco,
-        quantidade: qty,
-        categoria: catInfo.nome
-      }])
+      setCarrinho([...carrinho, { id: item.id + '-' + catKey, nome: item.nome, porcao: item.porcao, preco: item.preco, quantidade: qty, categoria: catInfo.nome }])
     }
     setQuantidades({ ...quantidades, [item.id]: 1 })
   }
@@ -199,23 +198,23 @@ export default function App() {
       `<tr><td>${item.categoria}</td><td>${item.nome} (${item.porcao})</td><td>${item.quantidade}</td><td>${formatPreco(item.preco)}</td><td>${formatPreco(item.preco * item.quantidade)}</td></tr>`
     ).join('')
     win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Pedido #${numPedido} — Candeia Jr</title>
-    <style>body{font-family:Arial,sans-serif;padding:20px}h1{color:#c0392b}h2{color:#555}
-    .num-pedido{font-size:14px;color:#888;margin-bottom:4px}
-    table{width:100%;border-collapse:collapse;margin-top:20px}
-    th{background:#c0392b;color:white;padding:8px;text-align:left}
-    td{padding:8px;border-bottom:1px solid #ddd}
-    .total{font-size:18px;font-weight:bold;text-align:right;margin-top:20px;color:#c0392b}
-    @media print{button{display:none}}</style></head>
-    <body>
-    <div class="num-pedido">Pedido Nº <strong>#${numPedido}</strong></div>
-    <h1>🔥 Candeia Jr — Portal do Franqueado</h1>
-    <h2>Pedido de: ${franqueado.nome || 'Franqueado'} | Unidade: ${franqueado.unidade || '-'} | Tel: ${franqueado.telefone || '-'}</h2>
-    <p>Data: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}</p>
-    <table><thead><tr><th>Categoria</th><th>Item</th><th>Qtd</th><th>Preço Un.</th><th>Subtotal</th></tr></thead>
-    <tbody>${linhas}</tbody></table>
-    <div class="total">TOTAL: ${formatPreco(total)}</div>
-    <button onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#c0392b;color:white;border:none;border-radius:5px;font-size:16px">🖨️ Imprimir / Salvar PDF</button>
-    </body></html>`)
+<style>body{font-family:Arial,sans-serif;padding:20px}h1{color:#c0392b}h2{color:#555}
+.num-pedido{font-size:14px;color:#888;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th{background:#c0392b;color:white;padding:8px;text-align:left}
+td{padding:8px;border-bottom:1px solid #ddd}
+.total{font-size:18px;font-weight:bold;text-align:right;margin-top:20px;color:#c0392b}
+@media print{button{display:none}}</style></head>
+<body>
+<div class="num-pedido">Pedido Nº <strong>#${numPedido}</strong></div>
+<h1>🔥 Candeia Jr — Portal do Franqueado</h1>
+<h2>Pedido de: ${franqueado.nome || 'Franqueado'} | Unidade: ${franqueado.unidade || '-'}</h2>
+<p>Data: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}</p>
+<table><thead><tr><th>Categoria</th><th>Item</th><th>Qtd</th><th>Preço Un.</th><th>Subtotal</th></tr></thead>
+<tbody>${linhas}</tbody></table>
+<div class="total">TOTAL: ${formatPreco(total)}</div>
+<button onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#c0392b;color:white;border:none;border-radius:5px;font-size:16px">🖨️ Imprimir / Salvar PDF</button>
+</body></html>`)
     win.document.close()
     setUltimoPedidoNum(numPedido)
     setPedidoGerado(true)
@@ -225,14 +224,14 @@ export default function App() {
     const numPedido = ultimoPedidoNum
     const data = new Date().toLocaleDateString('pt-BR')
     const linhasTexto = carrinho.map(item =>
-      `  • ${item.nome} (${item.porcao}) x${item.quantidade} = ${formatPreco(item.preco * item.quantidade)}`
+      ` • ${item.nome} (${item.porcao}) x${item.quantidade} = ${formatPreco(item.preco * item.quantidade)}`
     ).join('\n')
-    const msg = `🔥 *CANDEIA JR — PEDIDO #${numPedido}*\n\n`
-      + `👤 *Franqueado:* ${franqueado.nome || '-'}\n`
-      + `🏪 *Unidade:* ${franqueado.unidade || '-'}\n`
-      + `📅 *Data:* ${data}\n\n`
-      + `📋 *Itens do Pedido:*\n${linhasTexto}\n\n`
-      + `💰 *TOTAL: ${formatPreco(total)}*`
+    const msg = `🔥 *CANDEIA JR — PEDIDO #${numPedido}*\n\n` +
+      `👤 *Franqueado:* ${franqueado.nome || '-'}\n` +
+      `🏪 *Unidade:* ${franqueado.unidade || '-'}\n` +
+      `📅 *Data:* ${data}\n\n` +
+      `📋 *Itens do Pedido:*\n${linhasTexto}\n\n` +
+      `💰 *TOTAL: ${formatPreco(total)}*`
     const url = `https://wa.me/?text=${encodeURIComponent(msg)}`
     window.open(url, '_blank')
   }
@@ -262,10 +261,7 @@ export default function App() {
       {/* Tabs */}
       <div style={{ display: 'flex', borderBottom: '2px solid #e74c3c', background: 'white' }}>
         {[['pedido','📋 Pedido'],['carrinho',`🛒 Carrinho (${carrinho.length})`],['admin','⚙️ Admin']].map(([key,label]) => (
-          <button key={key} onClick={() => setAba(key)} style={{
-            flex: 1, padding: '12px', border: 'none', background: aba === key ? '#e74c3c' : 'white',
-            color: aba === key ? 'white' : '#333', fontWeight: 'bold', fontSize: 14, transition: 'all 0.2s'
-          }}>{label}</button>
+          <button key={key} onClick={() => setAba(key)} style={{ flex: 1, padding: '12px', border: 'none', background: aba === key ? '#e74c3c' : 'white', color: aba === key ? 'white' : '#333', fontWeight: 'bold', fontSize: 14, transition: 'all 0.2s' }}>{label}</button>
         ))}
       </div>
 
@@ -276,30 +272,31 @@ export default function App() {
           <div style={{ background: 'white', padding: 16, borderRadius: 8, marginBottom: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
             <h3 style={{ marginBottom: 12, color: '#c0392b' }}>Seus dados</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
-              {[['nome','Nome completo'],['unidade','Unidade/Loja'],['telefone','Telefone']].map(([key,label]) => (
-                <input key={key} placeholder={label} value={franqueado[key]}
-                  onChange={e => setFranqueado({...franqueado, [key]: e.target.value})}
-                  style={{ padding: '10px 12px', border: '1px solid #ddd', borderRadius: 6, fontSize: 14 }}/>
-              ))}
+              <input
+                placeholder="Nome do Franqueado"
+                value={franqueado.nome}
+                onChange={e => setFranqueado({...franqueado, nome: e.target.value})}
+                style={{ padding: '10px 12px', border: '1px solid #ddd', borderRadius: 6, fontSize: 14 }}
+              />
+              <select
+                value={franqueado.unidade}
+                onChange={e => setFranqueado({...franqueado, unidade: e.target.value})}
+                style={{ padding: '10px 12px', border: '1px solid #ddd', borderRadius: 6, fontSize: 14, background: 'white' }}
+              >
+                {UNIDADES.map(u => <option key={u} value={u}>{u}</option>)}
+              </select>
             </div>
           </div>
-
           {/* Campo de busca */}
           <div style={{ background: 'white', padding: '12px 16px', borderRadius: 8, marginBottom: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
             <div style={{ position: 'relative' }}>
               <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: '#aaa' }}>🔍</span>
-              <input
-                type="text"
-                placeholder="Buscar item em todas as categorias..."
-                value={busca}
-                onChange={e => setBusca(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px 10px 40px', border: '2px solid #e74c3c', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', outline: 'none' }}
-              />
+              <input type="text" placeholder="Buscar item em todas as categorias..." value={busca} onChange={e => setBusca(e.target.value)}
+                style={{ width: '100%', padding: '10px 12px 10px 40px', border: '2px solid #e74c3c', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', outline: 'none' }} />
               {busca && (
                 <button onClick={() => setBusca('')} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: 18, color: '#aaa', cursor: 'pointer' }}>✕</button>
               )}
             </div>
-            {/* Resultados da busca */}
             {busca.trim().length >= 2 && (
               <div style={{ marginTop: 10 }}>
                 {itensBusca.length === 0 ? (
@@ -309,25 +306,15 @@ export default function App() {
                     <p style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>{itensBusca.length} resultado(s) encontrado(s)</p>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
                       {itensBusca.map(item => (
-                        <div key={item.id + item.catKey} style={{
-                          background: '#fafafa', borderRadius: 8, padding: 12,
-                          borderLeft: `4px solid ${item.catCor}`, boxShadow: '0 1px 4px rgba(0,0,0,0.06)'
-                        }}>
+                        <div key={item.id + item.catKey} style={{ background: '#fafafa', borderRadius: 8, padding: 12, borderLeft: `4px solid ${item.catCor}`, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
                           <div style={{ fontWeight: 'bold', fontSize: 14 }}>{item.nome}</div>
                           <div style={{ fontSize: 11, color: '#888', marginBottom: 6 }}>{item.catNome} · {item.porcao}</div>
                           <div style={{ fontSize: 16, fontWeight: 'bold', color: item.catCor, marginBottom: 8 }}>{formatPreco(item.preco)}</div>
                           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                            <button onClick={() => setQuantidades({...quantidades, [item.id]: Math.max(1,(quantidades[item.id]||1)-1)})}
-                              style={{ width: 28, height: 28, border: `1px solid ${item.catCor}`, borderRadius: 4, background: 'white', color: item.catCor, fontWeight: 'bold' }}>-</button>
-                            <input type="number" min="1" value={quantidades[item.id] || 1}
-                              onChange={e => setQuantidades({...quantidades, [item.id]: Math.max(1, parseInt(e.target.value)||1)})}
-                              style={{ width: 44, textAlign: 'center', padding: '3px', border: '1px solid #ddd', borderRadius: 4, fontSize: 13 }}/>
-                            <button onClick={() => setQuantidades({...quantidades, [item.id]: (quantidades[item.id]||1)+1})}
-                              style={{ width: 28, height: 28, border: `1px solid ${item.catCor}`, borderRadius: 4, background: 'white', color: item.catCor, fontWeight: 'bold' }}>+</button>
-                            <button onClick={() => { adicionarAoCarrinho(item, item.catKey); setBusca('') }} style={{
-                              flex: 1, padding: '6px', background: item.catCor, color: 'white',
-                              border: 'none', borderRadius: 6, fontWeight: 'bold', fontSize: 12, cursor: 'pointer'
-                            }}>Adicionar</button>
+                            <button onClick={() => setQuantidades({...quantidades, [item.id]: Math.max(1,(quantidades[item.id]||1)-1)})} style={{ width: 28, height: 28, border: `1px solid ${item.catCor}`, borderRadius: 4, background: 'white', color: item.catCor, fontWeight: 'bold' }}>-</button>
+                            <input type="number" min="1" value={quantidades[item.id] || 1} onChange={e => setQuantidades({...quantidades, [item.id]: Math.max(1, parseInt(e.target.value)||1)})} style={{ width: 44, textAlign: 'center', padding: '3px', border: '1px solid #ddd', borderRadius: 4, fontSize: 13 }}/>
+                            <button onClick={() => setQuantidades({...quantidades, [item.id]: (quantidades[item.id]||1)+1})} style={{ width: 28, height: 28, border: `1px solid ${item.catCor}`, borderRadius: 4, background: 'white', color: item.catCor, fontWeight: 'bold' }}>+</button>
+                            <button onClick={() => { adicionarAoCarrinho(item, item.catKey); setBusca('') }} style={{ flex: 1, padding: '6px', background: item.catCor, color: 'white', border: 'none', borderRadius: 6, fontWeight: 'bold', fontSize: 12, cursor: 'pointer' }}>Adicionar</button>
                           </div>
                         </div>
                       ))}
@@ -343,12 +330,7 @@ export default function App() {
             {catKeys.map(cat => {
               const c = CATEGORIAS[cat]
               return (
-                <button key={cat} onClick={() => setCategoriaAtiva(cat)} style={{
-                  padding: '8px 14px', borderRadius: 20, border: `2px solid ${c.cor}`,
-                  background: categoriaAtiva === cat ? c.cor : 'white',
-                  color: categoriaAtiva === cat ? 'white' : c.cor,
-                  fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: 13, transition: 'all 0.2s', cursor: 'pointer'
-                }}>{c.nome}</button>
+                <button key={cat} onClick={() => setCategoriaAtiva(cat)} style={{ padding: '8px 14px', borderRadius: 20, border: `2px solid ${c.cor}`, background: categoriaAtiva === cat ? c.cor : 'white', color: categoriaAtiva === cat ? 'white' : c.cor, fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: 13, transition: 'all 0.2s', cursor: 'pointer' }}>{c.nome}</button>
               )
             })}
           </div>
@@ -358,25 +340,15 @@ export default function App() {
             {CATEGORIAS[categoriaAtiva].itens.map(item => {
               const cat = CATEGORIAS[categoriaAtiva]
               return (
-                <div key={item.id} style={{
-                  background: 'white', borderRadius: 10, padding: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  borderLeft: `4px solid ${cat.cor}`
-                }}>
+                <div key={item.id} style={{ background: 'white', borderRadius: 10, padding: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderLeft: `4px solid ${cat.cor}` }}>
                   <div style={{ fontWeight: 'bold', marginBottom: 4, color: '#222' }}>{item.nome}</div>
                   <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>Embalagem: {item.porcao}</div>
                   <div style={{ fontSize: 18, fontWeight: 'bold', color: cat.cor, marginBottom: 10 }}>{formatPreco(item.preco)}</div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <button onClick={() => setQuantidades({...quantidades, [item.id]: Math.max(1,(quantidades[item.id]||1)-1)})}
-                      style={{ width: 32, height: 32, border: `1px solid ${cat.cor}`, borderRadius: 4, background: 'white', color: cat.cor, fontWeight: 'bold', fontSize: 16, cursor: 'pointer' }}>-</button>
-                    <input type="number" min="1" value={quantidades[item.id] || 1}
-                      onChange={e => setQuantidades({...quantidades, [item.id]: Math.max(1, parseInt(e.target.value)||1)})}
-                      style={{ width: 50, textAlign: 'center', padding: '4px', border: '1px solid #ddd', borderRadius: 4 }}/>
-                    <button onClick={() => setQuantidades({...quantidades, [item.id]: (quantidades[item.id]||1)+1})}
-                      style={{ width: 32, height: 32, border: `1px solid ${cat.cor}`, borderRadius: 4, background: 'white', color: cat.cor, fontWeight: 'bold', fontSize: 16, cursor: 'pointer' }}>+</button>
-                    <button onClick={() => adicionarAoCarrinho(item, categoriaAtiva)} style={{
-                      flex: 1, padding: '8px', background: cat.cor, color: 'white', border: 'none',
-                      borderRadius: 6, fontWeight: 'bold', fontSize: 13, cursor: 'pointer'
-                    }}>Adicionar</button>
+                    <button onClick={() => setQuantidades({...quantidades, [item.id]: Math.max(1,(quantidades[item.id]||1)-1)})} style={{ width: 32, height: 32, border: `1px solid ${cat.cor}`, borderRadius: 4, background: 'white', color: cat.cor, fontWeight: 'bold', fontSize: 16, cursor: 'pointer' }}>-</button>
+                    <input type="number" min="1" value={quantidades[item.id] || 1} onChange={e => setQuantidades({...quantidades, [item.id]: Math.max(1, parseInt(e.target.value)||1)})} style={{ width: 50, textAlign: 'center', padding: '4px', border: '1px solid #ddd', borderRadius: 4 }}/>
+                    <button onClick={() => setQuantidades({...quantidades, [item.id]: (quantidades[item.id]||1)+1})} style={{ width: 32, height: 32, border: `1px solid ${cat.cor}`, borderRadius: 4, background: 'white', color: cat.cor, fontWeight: 'bold', fontSize: 16, cursor: 'pointer' }}>+</button>
+                    <button onClick={() => adicionarAoCarrinho(item, categoriaAtiva)} style={{ flex: 1, padding: '8px', background: cat.cor, color: 'white', border: 'none', borderRadius: 6, fontWeight: 'bold', fontSize: 13, cursor: 'pointer' }}>Adicionar</button>
                   </div>
                 </div>
               )
@@ -397,26 +369,20 @@ export default function App() {
             <>
               <div style={{ background: 'white', borderRadius: 10, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
                 {carrinho.map((item, i) => (
-                  <div key={item.id} style={{
-                    display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
-                    borderBottom: i < carrinho.length-1 ? '1px solid #f0f0f0' : 'none'
-                  }}>
+                  <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: i < carrinho.length-1 ? '1px solid #f0f0f0' : 'none' }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 'bold', fontSize: 14 }}>{item.nome}</div>
                       <div style={{ fontSize: 12, color: '#888' }}>{item.categoria} · {item.porcao} · {formatPreco(item.preco)}/un</div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <button onClick={() => atualizarQtd(item.id, item.quantidade-1)}
-                        style={{ width: 28, height: 28, border: '1px solid #ddd', borderRadius: 4, background: 'white', cursor: 'pointer' }}>-</button>
+                      <button onClick={() => atualizarQtd(item.id, item.quantidade-1)} style={{ width: 28, height: 28, border: '1px solid #ddd', borderRadius: 4, background: 'white', cursor: 'pointer' }}>-</button>
                       <span style={{ minWidth: 24, textAlign: 'center', fontWeight: 'bold' }}>{item.quantidade}</span>
-                      <button onClick={() => atualizarQtd(item.id, item.quantidade+1)}
-                        style={{ width: 28, height: 28, border: '1px solid #ddd', borderRadius: 4, background: 'white', cursor: 'pointer' }}>+</button>
+                      <button onClick={() => atualizarQtd(item.id, item.quantidade+1)} style={{ width: 28, height: 28, border: '1px solid #ddd', borderRadius: 4, background: 'white', cursor: 'pointer' }}>+</button>
                     </div>
                     <div style={{ fontWeight: 'bold', minWidth: 80, textAlign: 'right', color: '#c0392b' }}>
                       {formatPreco(item.preco * item.quantidade)}
                     </div>
-                    <button onClick={() => removerDoCarrinho(item.id)}
-                      style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: 18, cursor: 'pointer' }}>✕</button>
+                    <button onClick={() => removerDoCarrinho(item.id)} style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: 18, cursor: 'pointer' }}>✕</button>
                   </div>
                 ))}
               </div>
@@ -425,16 +391,9 @@ export default function App() {
                   <span>Total</span>
                   <span style={{ color: '#c0392b' }}>{formatPreco(total)}</span>
                 </div>
-                <button onClick={gerarPDF} style={{
-                  width: '100%', padding: 14, background: 'linear-gradient(135deg, #c0392b, #e74c3c)',
-                  color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10
-                }}>📄 Gerar PDF do Pedido</button>
+                <button onClick={gerarPDF} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>📄 Gerar PDF do Pedido</button>
                 {pedidoGerado && (
-                  <button onClick={compartilharWhatsapp} style={{
-                    width: '100%', padding: 14, background: 'linear-gradient(135deg, #25d366, #128c7e)',
-                    color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
-                  }}>
+                  <button onClick={compartilharWhatsapp} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #25d366, #128c7e)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                     <span style={{ fontSize: 20 }}>💬</span> Compartilhar via WhatsApp
                   </button>
                 )}
@@ -450,27 +409,18 @@ export default function App() {
           {!adminLogado ? (
             <div style={{ maxWidth: 360, margin: '40px auto', background: 'white', padding: 24, borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }}>
               <h3 style={{ textAlign: 'center', marginBottom: 20, color: '#c0392b' }}>🔒 Área Admin</h3>
-              <input type="password" placeholder="PIN de acesso" value={adminPin}
-                onChange={e => setAdminPin(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' && loginAdmin()}
+              <input type="password" placeholder="PIN de acesso" value={adminPin} onChange={e => setAdminPin(e.target.value)} onKeyPress={e => e.key === 'Enter' && loginAdmin()}
                 style={{ width: '100%', padding: 12, border: `1px solid ${pinErro ? '#e74c3c' : '#ddd'}`, borderRadius: 6, fontSize: 16, marginBottom: 8, boxSizing: 'border-box' }}/>
               {pinErro && <p style={{ color: '#e74c3c', fontSize: 13, marginBottom: 8 }}>PIN incorreto</p>}
-              <button onClick={loginAdmin} style={{
-                width: '100%', padding: 12, background: '#c0392b', color: 'white',
-                border: 'none', borderRadius: 6, fontSize: 16, fontWeight: 'bold', cursor: 'pointer'
-              }}>Entrar</button>
+              <button onClick={loginAdmin} style={{ width: '100%', padding: 12, background: '#c0392b', color: 'white', border: 'none', borderRadius: 6, fontSize: 16, fontWeight: 'bold', cursor: 'pointer' }}>Entrar</button>
             </div>
           ) : (
             <div>
               <div style={{ background: 'white', padding: 16, borderRadius: 10, marginBottom: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
                 <h3 style={{ color: '#c0392b', marginBottom: 12 }}>📝 Registrar Atualização de Preços</h3>
-                <textarea placeholder="Observação (ex: Reajuste de 10% em carnes)" value={novaObs}
-                  onChange={e => setNovaObs(e.target.value)}
+                <textarea placeholder="Observação (ex: Reajuste de 10% em carnes)" value={novaObs} onChange={e => setNovaObs(e.target.value)}
                   style={{ width: '100%', padding: 10, border: '1px solid #ddd', borderRadius: 6, minHeight: 80, marginBottom: 8, boxSizing: 'border-box', resize: 'vertical' }}/>
-                <button onClick={registrarAtualizacao} style={{
-                  padding: '10px 20px', background: '#27ae60', color: 'white',
-                  border: 'none', borderRadius: 6, fontWeight: 'bold', cursor: 'pointer'
-                }}>Registrar</button>
+                <button onClick={registrarAtualizacao} style={{ padding: '10px 20px', background: '#27ae60', color: 'white', border: 'none', borderRadius: 6, fontWeight: 'bold', cursor: 'pointer' }}>Registrar</button>
               </div>
               <div style={{ background: 'white', padding: 16, borderRadius: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
                 <h3 style={{ color: '#c0392b', marginBottom: 12 }}>📅 Histórico de Atualizações</h3>
@@ -491,4 +441,4 @@ export default function App() {
       )}
     </div>
   )
-}
+       }
