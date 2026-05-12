@@ -208,9 +208,8 @@ export default function App() {
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', minHeight: '100vh' }}>
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', padding: '20px', textAlign: 'center' }}>
-        <h1 style={{ fontSize: 28, marginBottom: 4 }}>🔥 Candeia Jr</h1>
-        <p style={{ opacity: 0.9 }}>Portal do Franqueado</p>
+      <div style={{ background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', padding: '16px 20px', textAlign: 'center' }}>
+        <img src="/CANDEIA-FRANQUEADO/logo.png" alt="Candeia Jr" style={{ height: 110, objectFit: 'contain', display: 'block', margin: '0 auto' }} />
       </div>
 
       {/* Tabs */}
