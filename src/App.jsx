@@ -157,6 +157,11 @@ export default function App() {
     catch { return [] }
   })
   const [novaObs, setNovaObs] = useState('')
+  const [orcamentosSalvos, setOrcamentosSalvos] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('orcamentos_salvos') || '[]') }
+    catch { return [] }
+  })
+  const [orcamentoSalvoMsg, setOrcamentoSalvoMsg] = useState(false)
   const [pedidoGerado, setPedidoGerado] = useState(false)
   const [ultimoPedidoNum, setUltimoPedidoNum] = useState(null)
 
@@ -247,6 +252,29 @@ td{padding:8px;border-bottom:1px solid #ddd}
     setHistorico(novoHistorico)
     localStorage.setItem('historico_precos', JSON.stringify(novoHistorico))
     setNovaObs('')
+  }
+
+  const salvarOrcamento = () => {
+    if (carrinho.length === 0) return
+    const orcamento = {
+      id: Date.now(),
+      data: new Date().toLocaleString('pt-BR'),
+      franqueado: franqueado.nome || 'Sem nome',
+      unidade: franqueado.unidade || '-',
+      itens: [...carrinho],
+      total
+    }
+    const novos = [orcamento, ...orcamentosSalvos]
+    setOrcamentosSalvos(novos)
+    localStorage.setItem('orcamentos_salvos', JSON.stringify(novos))
+    setOrcamentoSalvoMsg(true)
+    setTimeout(() => setOrcamentoSalvoMsg(false), 3000)
+  }
+
+  const excluirOrcamento = (id) => {
+    const novos = orcamentosSalvos.filter(o => o.id !== id)
+    setOrcamentosSalvos(novos)
+    localStorage.setItem('orcamentos_salvos', JSON.stringify(novos))
   }
 
   const catKeys = Object.keys(CATEGORIAS)
@@ -392,6 +420,12 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   <span style={{ color: '#c0392b' }}>{formatPreco(total)}</span>
                 </div>
                 <button onClick={gerarPDF} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>📄 Gerar PDF do Pedido</button>
+                <button onClick={salvarOrcamento} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #2c3e50, #3d5166)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>💾 Salvar Orçamento</button>
+                {orcamentoSalvoMsg && (
+                  <div style={{ background: '#eafaf1', border: '1px solid #27ae60', borderRadius: 8, padding: '10px 14px', color: '#27ae60', fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>
+                    ✅ Orçamento salvo com sucesso!
+                  </div>
+                )}
                 {pedidoGerado && (
                   <button onClick={compartilharWhatsapp} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #25d366, #128c7e)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                     <span style={{ fontSize: 20 }}>💬</span> Compartilhar via WhatsApp
@@ -431,6 +465,46 @@ td{padding:8px;border-bottom:1px solid #ddd}
                     <div key={h.numero} style={{ padding: '10px 0', borderBottom: '1px solid #f0f0f0' }}>
                       <div style={{ fontWeight: 'bold', color: '#c0392b' }}>#{h.numero} — {h.data}</div>
                       <div style={{ color: '#555', marginTop: 4 }}>{h.obs || 'Sem observação'}</div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* ORÇAMENTOS SALVOS */}
+              <div style={{ background: 'white', padding: 16, borderRadius: 10, marginTop: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                  <h3 style={{ color: '#c0392b', margin: 0 }}>💾 Orçamentos Salvos ({orcamentosSalvos.length})</h3>
+                  {orcamentosSalvos.length > 0 && (
+                    <button onClick={() => { setOrcamentosSalvos([]); localStorage.removeItem('orcamentos_salvos') }}
+                      style={{ padding: '4px 12px', background: '#fee', color: '#c0392b', border: '1px solid #f5c6c6', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}>
+                      Limpar tudo
+                    </button>
+                  )}
+                </div>
+                {orcamentosSalvos.length === 0 ? (
+                  <p style={{ color: '#888', textAlign: 'center', padding: 20 }}>Nenhum orçamento salvo ainda.</p>
+                ) : (
+                  orcamentosSalvos.map(o => (
+                    <div key={o.id} style={{ border: '1px solid #f0f0f0', borderRadius: 8, marginBottom: 12, overflow: 'hidden' }}>
+                      <div style={{ background: '#fdf0ef', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <div style={{ fontWeight: 'bold', color: '#c0392b' }}>👤 {o.franqueado} — {o.unidade}</div>
+                          <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>🕐 {o.data}</div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div style={{ fontWeight: 'bold', color: '#c0392b', fontSize: 16 }}>{o.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                          <button onClick={() => excluirOrcamento(o.id)}
+                            style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}>✕</button>
+                        </div>
+                      </div>
+                      <div style={{ padding: '10px 14px' }}>
+                        {o.itens.map((item, i) => (
+                          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '3px 0', borderBottom: i < o.itens.length - 1 ? '1px solid #f9f9f9' : 'none' }}>
+                            <span style={{ color: '#444' }}>{item.nome} ({item.porcao}) × {item.quantidade}</span>
+                            <span style={{ fontWeight: 'bold', color: '#555' }}>{(item.preco * item.quantidade).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ))
                 )}
