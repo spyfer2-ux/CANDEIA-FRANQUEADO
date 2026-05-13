@@ -7,7 +7,7 @@ const ADMIN_PIN = "1234"
 
 const CATEGORIAS = {
   carnes: {
-    nome: "ð¥© Carnes",
+    nome: "🥩 Carnes",
     cor: "#e74c3c",
     corBg: "#fdf2f2",
     unidade: "gramas",
@@ -32,7 +32,7 @@ const CATEGORIAS = {
     ]
   },
   frios: {
-    nome: "ð§ Frios",
+    nome: "🧀 Frios",
     cor: "#f39c12",
     corBg: "#fef9f0",
     unidade: "gramas",
@@ -46,7 +46,7 @@ const CATEGORIAS = {
     ]
   },
   vegetais: {
-    nome: "ð¥¦ Vegetais",
+    nome: "🥦 Vegetais",
     cor: "#27ae60",
     corBg: "#f2fdf5",
     unidade: "gramas",
@@ -55,7 +55,7 @@ const CATEGORIAS = {
     ]
   },
   massas: {
-    nome: "ð¥ Massas",
+    nome: "🥔 Massas",
     cor: "#8e44ad",
     corBg: "#faf2fe",
     unidade: "pacote",
@@ -63,11 +63,11 @@ const CATEGORIAS = {
       { id: "massa-pastel", nome: "Massa de Pastel", preco: 9.40, porcao: "1kg" },
       { id: "batata-congelada-350", nome: "Batata Congelada", preco: 4.62, porcao: "350g" },
       { id: "batata-congelada-625", nome: "Batata Congelada", preco: 8.25, porcao: "625g" },
-      { id: "pure", nome: "PurÃª", preco: 8.45, porcao: "500g" },
+      { id: "pure", nome: "Purê", preco: 8.45, porcao: "500g" },
     ]
   },
   doces: {
-    nome: "ð¯ Doces",
+    nome: "🍯 Doces",
     cor: "#e67e22",
     corBg: "#fef5ec",
     unidade: "unidade",
@@ -86,7 +86,7 @@ const CATEGORIAS = {
     ]
   },
   salgados: {
-    nome: "ð¥§ Salgados",
+    nome: "🥧 Salgados",
     cor: "#c0392b",
     corBg: "#fdf0ef",
     unidade: "unidade",
@@ -104,7 +104,7 @@ const CATEGORIAS = {
     ]
   },
   embalagens: {
-    nome: "ð¦ Embalagens",
+    nome: "📦 Embalagens",
     cor: "#2980b9",
     corBg: "#f0f7ff",
     unidade: "unidade",
@@ -118,7 +118,7 @@ const CATEGORIAS = {
       { id: "toalha-americana", nome: "Toalha Americana", preco: 26.18, porcao: "pct" },
       { id: "copo-300", nome: "Copo 300ml", preco: 7.81, porcao: "pct" },
       { id: "copo-180", nome: "Copo 180ml", preco: 4.18, porcao: "pct" },
-      { id: "caixa-media", nome: "Caixa MÃ©dia", preco: 2.09, porcao: "un" },
+      { id: "caixa-media", nome: "Caixa Média", preco: 2.09, porcao: "un" },
       { id: "caixa-grande", nome: "Caixa Grande", preco: 2.46, porcao: "un" },
     ]
   }
@@ -129,7 +129,7 @@ const TODOS_ITENS = Object.entries(CATEGORIAS).flatMap(([catKey, cat]) =>
   cat.itens.map(item => ({ ...item, catKey, catNome: cat.nome, catCor: cat.cor }))
 )
 
-// Gera prÃ³ximo nÃºmero de pedido sequencial a partir de 10002
+// Gera próximo número de pedido sequencial a partir de 10002
 function proximoNumeroPedido() {
   try {
     const ultimo = parseInt(localStorage.getItem('ultimo_pedido') || '10001')
@@ -174,13 +174,13 @@ export default function App() {
       setUsuario(user)
       setLoadingAuth(false)
       if (user) {
-        // Carrega orçamentos do Firestore
+        // Carrega or�amentos do Firestore
         try {
           const q = query(collection(db, 'orcamentos'), where('uid', '==', user.uid), orderBy('id', 'desc'))
           const snap = await getDocs(q)
           const lista = snap.docs.map(d => ({ docId: d.id, ...d.data() }))
           setOrcamentosSalvos(lista)
-        } catch(e) { /* índice ainda criando */ }
+        } catch(e) { /* �ndice ainda criando */ }
       } else {
         setOrcamentosSalvos([])
       }
@@ -227,7 +227,7 @@ export default function App() {
     const linhas = carrinho.map(item =>
       `<tr><td>${item.categoria}</td><td>${item.nome} (${item.porcao})</td><td>${item.quantidade}</td><td>${formatPreco(item.preco)}</td><td>${formatPreco(item.preco * item.quantidade)}</td></tr>`
     ).join('')
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Pedido #${numPedido} â Candeia Jr</title>
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Pedido #${numPedido} — Candeia Jr</title>
 <style>body{font-family:Arial,sans-serif;padding:20px}h1{color:#c0392b}h2{color:#555}
 .num-pedido{font-size:14px;color:#888;margin-bottom:4px}
 table{width:100%;border-collapse:collapse;margin-top:20px}
@@ -236,14 +236,14 @@ td{padding:8px;border-bottom:1px solid #ddd}
 .total{font-size:18px;font-weight:bold;text-align:right;margin-top:20px;color:#c0392b}
 @media print{button{display:none}}</style></head>
 <body>
-<div class="num-pedido">Pedido NÂº <strong>#${numPedido}</strong></div>
-<h1>ð¥ Candeia Jr â Portal do Franqueado</h1>
+<div class="num-pedido">Pedido Nº <strong>#${numPedido}</strong></div>
+<h1>🔥 Candeia Jr — Portal do Franqueado</h1>
 <h2>Pedido de: ${franqueado.nome || 'Franqueado'} | Unidade: ${franqueado.unidade || '-'}</h2>
 <p>Data: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}</p>
-<table><thead><tr><th>Categoria</th><th>Item</th><th>Qtd</th><th>PreÃ§o Un.</th><th>Subtotal</th></tr></thead>
+<table><thead><tr><th>Categoria</th><th>Item</th><th>Qtd</th><th>Preço Un.</th><th>Subtotal</th></tr></thead>
 <tbody>${linhas}</tbody></table>
 <div class="total">TOTAL: ${formatPreco(total)}</div>
-<button onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#c0392b;color:white;border:none;border-radius:5px;font-size:16px">ð¨ï¸ Imprimir / Salvar PDF</button>
+<button onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#c0392b;color:white;border:none;border-radius:5px;font-size:16px">🖨️ Imprimir / Salvar PDF</button>
 </body></html>`)
     win.document.close()
     setUltimoPedidoNum(numPedido)
@@ -254,14 +254,14 @@ td{padding:8px;border-bottom:1px solid #ddd}
     const numPedido = ultimoPedidoNum
     const data = new Date().toLocaleDateString('pt-BR')
     const linhasTexto = carrinho.map(item =>
-      ` â¢ ${item.nome} (${item.porcao}) x${item.quantidade} = ${formatPreco(item.preco * item.quantidade)}`
+      ` • ${item.nome} (${item.porcao}) x${item.quantidade} = ${formatPreco(item.preco * item.quantidade)}`
     ).join('\n')
-    const msg = `ð¥ *CANDEIA JR â PEDIDO #${numPedido}*\n\n` +
-      `ð¤ *Franqueado:* ${franqueado.nome || '-'}\n` +
-      `ðª *Unidade:* ${franqueado.unidade || '-'}\n` +
-      `ð *Data:* ${data}\n\n` +
-      `ð *Itens do Pedido:*\n${linhasTexto}\n\n` +
-      `ð° *TOTAL: ${formatPreco(total)}*`
+    const msg = `🔥 *CANDEIA JR — PEDIDO #${numPedido}*\n\n` +
+      `👤 *Franqueado:* ${franqueado.nome || '-'}\n` +
+      `🏪 *Unidade:* ${franqueado.unidade || '-'}\n` +
+      `📅 *Data:* ${data}\n\n` +
+      `📋 *Itens do Pedido:*\n${linhasTexto}\n\n` +
+      `💰 *TOTAL: ${formatPreco(total)}*`
     const url = `https://wa.me/?text=${encodeURIComponent(msg)}`
     window.open(url, '_blank')
   }
@@ -337,7 +337,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
 
       {/* Tabs */}
       <div style={{ display: 'flex', borderBottom: '2px solid #e74c3c', background: 'white' }}>
-        {[['pedido','ð Pedido'],['carrinho',`ð Carrinho (${carrinho.length})`],['admin','âï¸ Admin']].map(([key,label]) => (
+        {[['pedido','📋 Pedido'],['carrinho',`🛒 Carrinho (${carrinho.length})`],['admin','⚙️ Admin']].map(([key,label]) => (
           <button key={key} onClick={() => setAba(key)} style={{ flex: 1, padding: '12px', border: 'none', background: aba === key ? '#e74c3c' : 'white', color: aba === key ? 'white' : '#333', fontWeight: 'bold', fontSize: 14, transition: 'all 0.2s' }}>{label}</button>
         ))}
       </div>
@@ -367,11 +367,11 @@ td{padding:8px;border-bottom:1px solid #ddd}
           {/* Campo de busca */}
           <div style={{ background: 'white', padding: '12px 16px', borderRadius: 8, marginBottom: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
             <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: '#aaa' }}>ð</span>
+              <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: '#aaa' }}>🔍</span>
               <input type="text" placeholder="Buscar item em todas as categorias..." value={busca} onChange={e => setBusca(e.target.value)}
                 style={{ width: '100%', padding: '10px 12px 10px 40px', border: '2px solid #e74c3c', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', outline: 'none' }} />
               {busca && (
-                <button onClick={() => setBusca('')} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: 18, color: '#aaa', cursor: 'pointer' }}>â</button>
+                <button onClick={() => setBusca('')} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: 18, color: '#aaa', cursor: 'pointer' }}>✕</button>
               )}
             </div>
             {busca.trim().length >= 2 && (
@@ -385,7 +385,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                       {itensBusca.map(item => (
                         <div key={item.id + item.catKey} style={{ background: '#fafafa', borderRadius: 8, padding: 12, borderLeft: `4px solid ${item.catCor}`, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
                           <div style={{ fontWeight: 'bold', fontSize: 14 }}>{item.nome}</div>
-                          <div style={{ fontSize: 11, color: '#888', marginBottom: 6 }}>{item.catNome} Â· {item.porcao}</div>
+                          <div style={{ fontSize: 11, color: '#888', marginBottom: 6 }}>{item.catNome} · {item.porcao}</div>
                           <div style={{ fontSize: 16, fontWeight: 'bold', color: item.catCor, marginBottom: 8 }}>{formatPreco(item.preco)}</div>
                           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                             <button onClick={() => setQuantidades({...quantidades, [item.id]: Math.max(1,(quantidades[item.id]||1)-1)})} style={{ width: 28, height: 28, border: `1px solid ${item.catCor}`, borderRadius: 4, background: 'white', color: item.catCor, fontWeight: 'bold' }}>-</button>
@@ -439,7 +439,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
         <div style={{ padding: 16 }}>
           {carrinho.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>ð</div>
+              <div style={{ fontSize: 48, marginBottom: 12 }}>🛒</div>
               <p>Carrinho vazio. Adicione itens na aba Pedido.</p>
             </div>
           ) : (
@@ -449,7 +449,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: i < carrinho.length-1 ? '1px solid #f0f0f0' : 'none' }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 'bold', fontSize: 14 }}>{item.nome}</div>
-                      <div style={{ fontSize: 12, color: '#888' }}>{item.categoria} Â· {item.porcao} Â· {formatPreco(item.preco)}/un</div>
+                      <div style={{ fontSize: 12, color: '#888' }}>{item.categoria} · {item.porcao} · {formatPreco(item.preco)}/un</div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <button onClick={() => atualizarQtd(item.id, item.quantidade-1)} style={{ width: 28, height: 28, border: '1px solid #ddd', borderRadius: 4, background: 'white', cursor: 'pointer' }}>-</button>
@@ -459,7 +459,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                     <div style={{ fontWeight: 'bold', minWidth: 80, textAlign: 'right', color: '#c0392b' }}>
                       {formatPreco(item.preco * item.quantidade)}
                     </div>
-                    <button onClick={() => removerDoCarrinho(item.id)} style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: 18, cursor: 'pointer' }}>â</button>
+                    <button onClick={() => removerDoCarrinho(item.id)} style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: 18, cursor: 'pointer' }}>✕</button>
                   </div>
                 ))}
               </div>
@@ -468,16 +468,16 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   <span>Total</span>
                   <span style={{ color: '#c0392b' }}>{formatPreco(total)}</span>
                 </div>
-                <button onClick={gerarPDF} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>ð Gerar PDF do Pedido</button>
-                <button onClick={salvarOrcamento} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #2c3e50, #3d5166)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>ð¾ Salvar OrÃ§amento</button>
+                <button onClick={gerarPDF} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>📄 Gerar PDF do Pedido</button>
+                <button onClick={salvarOrcamento} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #2c3e50, #3d5166)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>💾 Salvar Orçamento</button>
                 {orcamentoSalvoMsg && (
                   <div style={{ background: '#eafaf1', border: '1px solid #27ae60', borderRadius: 8, padding: '10px 14px', color: '#27ae60', fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>
-                    â OrÃ§amento salvo com sucesso!
+                    ✅ Orçamento salvo com sucesso!
                   </div>
                 )}
                 {pedidoGerado && (
                   <button onClick={compartilharWhatsapp} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #25d366, #128c7e)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 20 }}>ð¬</span> Compartilhar via WhatsApp
+                    <span style={{ fontSize: 20 }}>💬</span> Compartilhar via WhatsApp
                   </button>
                 )}
               </div>
@@ -491,7 +491,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
         <div style={{ padding: 16 }}>
           {!adminLogado ? (
             <div style={{ maxWidth: 360, margin: '40px auto', background: 'white', padding: 24, borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }}>
-              <h3 style={{ textAlign: 'center', marginBottom: 20, color: '#c0392b' }}>ð Ãrea Admin</h3>
+              <h3 style={{ textAlign: 'center', marginBottom: 20, color: '#c0392b' }}>🔒 Área Admin</h3>
               <input type="password" placeholder="PIN de acesso" value={adminPin} onChange={e => setAdminPin(e.target.value)} onKeyPress={e => e.key === 'Enter' && loginAdmin()}
                 style={{ width: '100%', padding: 12, border: `1px solid ${pinErro ? '#e74c3c' : '#ddd'}`, borderRadius: 6, fontSize: 16, marginBottom: 8, boxSizing: 'border-box' }}/>
               {pinErro && <p style={{ color: '#e74c3c', fontSize: 13, marginBottom: 8 }}>PIN incorreto</p>}
@@ -500,29 +500,29 @@ td{padding:8px;border-bottom:1px solid #ddd}
           ) : (
             <div>
               <div style={{ background: 'white', padding: 16, borderRadius: 10, marginBottom: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                <h3 style={{ color: '#c0392b', marginBottom: 12 }}>ð Registrar AtualizaÃ§Ã£o de PreÃ§os</h3>
-                <textarea placeholder="ObservaÃ§Ã£o (ex: Reajuste de 10% em carnes)" value={novaObs} onChange={e => setNovaObs(e.target.value)}
+                <h3 style={{ color: '#c0392b', marginBottom: 12 }}>📝 Registrar Atualização de Preços</h3>
+                <textarea placeholder="Observação (ex: Reajuste de 10% em carnes)" value={novaObs} onChange={e => setNovaObs(e.target.value)}
                   style={{ width: '100%', padding: 10, border: '1px solid #ddd', borderRadius: 6, minHeight: 80, marginBottom: 8, boxSizing: 'border-box', resize: 'vertical' }}/>
                 <button onClick={registrarAtualizacao} style={{ padding: '10px 20px', background: '#27ae60', color: 'white', border: 'none', borderRadius: 6, fontWeight: 'bold', cursor: 'pointer' }}>Registrar</button>
               </div>
               <div style={{ background: 'white', padding: 16, borderRadius: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                <h3 style={{ color: '#c0392b', marginBottom: 12 }}>ð HistÃ³rico de AtualizaÃ§Ãµes</h3>
+                <h3 style={{ color: '#c0392b', marginBottom: 12 }}>📅 Histórico de Atualizações</h3>
                 {historico.length === 0 ? (
-                  <p style={{ color: '#888', textAlign: 'center', padding: 20 }}>Nenhuma atualizaÃ§Ã£o registrada ainda.</p>
+                  <p style={{ color: '#888', textAlign: 'center', padding: 20 }}>Nenhuma atualização registrada ainda.</p>
                 ) : (
                   [...historico].reverse().map(h => (
                     <div key={h.numero} style={{ padding: '10px 0', borderBottom: '1px solid #f0f0f0' }}>
-                      <div style={{ fontWeight: 'bold', color: '#c0392b' }}>#{h.numero} â {h.data}</div>
-                      <div style={{ color: '#555', marginTop: 4 }}>{h.obs || 'Sem observaÃ§Ã£o'}</div>
+                      <div style={{ fontWeight: 'bold', color: '#c0392b' }}>#{h.numero} — {h.data}</div>
+                      <div style={{ color: '#555', marginTop: 4 }}>{h.obs || 'Sem observação'}</div>
                     </div>
                   ))
                 )}
               </div>
 
-              {/* ORÃAMENTOS SALVOS */}
+              {/* ORÇAMENTOS SALVOS */}
               <div style={{ background: 'white', padding: 16, borderRadius: 10, marginTop: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                  <h3 style={{ color: '#c0392b', margin: 0 }}>ð¾ OrÃ§amentos Salvos ({orcamentosSalvos.length})</h3>
+                  <h3 style={{ color: '#c0392b', margin: 0 }}>💾 Orçamentos Salvos ({orcamentosSalvos.length})</h3>
                   {orcamentosSalvos.length > 0 && (
                     <button onClick={() => { setOrcamentosSalvos([]); localStorage.removeItem('orcamentos_salvos') }}
                       style={{ padding: '4px 12px', background: '#fee', color: '#c0392b', border: '1px solid #f5c6c6', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}>
@@ -531,25 +531,25 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   )}
                 </div>
                 {orcamentosSalvos.length === 0 ? (
-                  <p style={{ color: '#888', textAlign: 'center', padding: 20 }}>Nenhum orÃ§amento salvo ainda.</p>
+                  <p style={{ color: '#888', textAlign: 'center', padding: 20 }}>Nenhum orçamento salvo ainda.</p>
                 ) : (
                   orcamentosSalvos.map(o => (
                     <div key={o.id} style={{ border: '1px solid #f0f0f0', borderRadius: 8, marginBottom: 12, overflow: 'hidden' }}>
                       <div style={{ background: '#fdf0ef', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                          <div style={{ fontWeight: 'bold', color: '#c0392b' }}>ð¤ {o.franqueado} â {o.unidade}</div>
-                          <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>ð {o.data}</div>
+                          <div style={{ fontWeight: 'bold', color: '#c0392b' }}>👤 {o.franqueado} — {o.unidade}</div>
+                          <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>🕐 {o.data}</div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           <div style={{ fontWeight: 'bold', color: '#c0392b', fontSize: 16 }}>{o.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                           <button onClick={() => excluirOrcamento(o.id, o.docId)}
-                            style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}>â</button>
+                            style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}>✕</button>
                         </div>
                       </div>
                       <div style={{ padding: '10px 14px' }}>
                         {o.itens.map((item, i) => (
                           <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '3px 0', borderBottom: i < o.itens.length - 1 ? '1px solid #f9f9f9' : 'none' }}>
-                            <span style={{ color: '#444' }}>{item.nome} ({item.porcao}) Ã {item.quantidade}</span>
+                            <span style={{ color: '#444' }}>{item.nome} ({item.porcao}) × {item.quantidade}</span>
                             <span style={{ fontWeight: 'bold', color: '#555' }}>{(item.preco * item.quantidade).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                           </div>
                         ))}
