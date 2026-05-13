@@ -176,13 +176,19 @@ export default function App() {
       if (user) {
         // Carrega or�amentos do Firestore
         try {
-          const q = query(collection(db, 'orcamentos'), where('uid', '==', user.uid), orderBy('id', 'desc'))
+          const q = query(collection(db, 'orcamentos'), where('uid', '==', user.uid))
           const snap = await getDocs(q)
           const lista = snap.docs.map(d => ({ docId: d.id, ...d.data() }))
+          // Ordenar por id (timestamp) decrescente no cliente
+          lista.sort((a, b) => b.id - a.id)
           setOrcamentosSalvos(lista)
-        } catch(e) { /* �ndice ainda criando */ }
+        } catch(e) { console.error('Firestore error:', e) }
       } else {
-        setOrcamentosSalvos([])
+        // Sem login: carregar do localStorage
+        try {
+          const local = JSON.parse(localStorage.getItem('orcamentos_salvos') || '[]')
+          setOrcamentosSalvos(local)
+        } catch(e) { setOrcamentosSalvos([]) }
       }
     })
     return () => unsub()
