@@ -41,7 +41,8 @@ const CATEGORIAS = {
       { id: "provolone", nome: "Provolone", preco: 5.00, porcao: "100g" },
       { id: "queijo-prato", nome: "Queijo Prato", preco: 4.20, porcao: "100g" },
       { id: "cheddar", nome: "Cheddar", preco: 4.50, porcao: "100g" },
-      { id: "appresuntado", nome: "Appresuntado", preco: 3.80, porcao: "100g" },
+      { id: "apresuntado", nome: "Apresuntado", preco: 3.80, porcao: "Pc" },
+      { id: "mussarela", nome: "Mussarela", preco: 4.50, porcao: "100g" },
       { id: "salsicha", nome: "Salsicha", preco: 13.20, porcao: "1kg" },
     ]
   },
