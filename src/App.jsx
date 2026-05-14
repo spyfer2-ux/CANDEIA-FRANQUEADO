@@ -41,7 +41,7 @@ const CATEGORIAS = {
       { id: "cheddar", nome: "Cheddar", preco: 4.50, porcao: "100g" },
       { id: "apresuntado", nome: "Apresuntado", preco: 3.80, porcao: "Pc" },
       { id: "mussarela", nome: "Mussarela", preco: 4.50, porcao: "100g" },
-      { id: "salsicha", nome: "Salsicha", preco: 13.20, porcao: "1kg" },
+      { id: "salsicha", nome: "Salsicha", preco: 1.00, porcao: "Un" },
       { id: "bisnaga-catupiry", nome: "Bisnaga Catupiry", preco: 40.83, porcao: "1,5kg" },
       { id: "bisnaga-cheddar", nome: "Bisnaga Cheddar", preco: 13.50, porcao: "1,2kg" },
     ]
@@ -80,10 +80,10 @@ const CATEGORIAS = {
       { id: "cereja", nome: "Cereja", preco: 12.60, porcao: "100g" },
       { id: "ameixa", nome: "Ameixa", preco: 19.60, porcao: "400g" },
       { id: "goiabada", nome: "Goiabada", preco: 1.30, porcao: "100g" },
-      { id: "chocolate-cremoso", nome: "Chocolate Cremoso Gourmet", preco: 42.63, porcao: "1kg" },
-      { id: "chocolate-leite", nome: "Chocolate ao Leite", preco: 44.00, porcao: "860g" },
-      { id: "chocolate-branco", nome: "Chocolate Branco", preco: 40.00, porcao: "1kg" },
-      { id: "coco", nome: "Coco", preco: 43.00, porcao: "1kg" },
+      { id: "chocolate-cremoso", nome: "Chocolate Gourmet", preco: 42.63, porcao: "1kg", pesoCustom: true },
+      { id: "chocolate-leite", nome: "Chocolate ao Leite", preco: 4.40, porcao: "100g" },
+      { id: "chocolate-branco", nome: "Chocolate Branco", preco: 4.00, porcao: "100g" },
+      { id: "coco", nome: "Coco Ralado", preco: 49.00, porcao: "1kg", pesoCustom: true },
       { id: "canela", nome: "Canela", preco: 5.00, porcao: "100g" },
       { id: "suflair", nome: "Suflair", preco: 8.00, porcao: "pacote" },
       { id: "leite-condensado", nome: "Leite Condensado", preco: 8.50, porcao: "395g" },
@@ -210,16 +210,30 @@ export default function App() {
     : []
 
   const adicionarAoCarrinho = (item, catKey) => {
-    const qty = quantidades[item.id] || 1
-    if (qty <= 0) return
     const catInfo = CATEGORIAS[catKey]
-    const existente = carrinho.find(c => c.id === item.id + '-' + catKey)
-    if (existente) {
-      setCarrinho(carrinho.map(c => c.id === item.id + '-' + catKey ? { ...c, quantidade: c.quantidade + qty } : c))
+    if (item.pesoCustom) {
+      const gramas = quantidades[item.id] || 100
+      if (gramas <= 0) return
+      const precoUnitario = parseFloat((item.preco / 1000 * gramas).toFixed(2))
+      const porcaoLabel = gramas + 'g'
+      const existente = carrinho.find(c => c.id === item.id + '-' + catKey)
+      if (existente) {
+        setCarrinho(carrinho.map(c => c.id === item.id + '-' + catKey ? { ...c, quantidade: c.quantidade + 1, porcao: porcaoLabel, preco: precoUnitario } : c))
+      } else {
+        setCarrinho([...carrinho, { id: item.id + '-' + catKey, nome: item.nome, porcao: porcaoLabel, preco: precoUnitario, quantidade: 1, categoria: catInfo.nome }])
+      }
+      setQuantidades({ ...quantidades, [item.id]: 100 })
     } else {
-      setCarrinho([...carrinho, { id: item.id + '-' + catKey, nome: item.nome, porcao: item.porcao, preco: item.preco, quantidade: qty, categoria: catInfo.nome }])
+      const qty = quantidades[item.id] || 1
+      if (qty <= 0) return
+      const existente = carrinho.find(c => c.id === item.id + '-' + catKey)
+      if (existente) {
+        setCarrinho(carrinho.map(c => c.id === item.id + '-' + catKey ? { ...c, quantidade: c.quantidade + qty } : c))
+      } else {
+        setCarrinho([...carrinho, { id: item.id + '-' + catKey, nome: item.nome, porcao: item.porcao, preco: item.preco, quantidade: qty, categoria: catInfo.nome }])
+      }
+      setQuantidades({ ...quantidades, [item.id]: 1 })
     }
-    setQuantidades({ ...quantidades, [item.id]: 1 })
   }
 
   const removerDoCarrinho = (id) => setCarrinho(carrinho.filter(c => c.id !== id))
@@ -429,12 +443,16 @@ td{padding:8px;border-bottom:1px solid #ddd}
               return (
                 <div key={item.id} style={{ background: 'white', borderRadius: 10, padding: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderLeft: `4px solid ${cat.cor}` }}>
                   <div style={{ fontWeight: 'bold', marginBottom: 4, color: '#222' }}>{item.nome}</div>
-                  <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>Embalagem: {item.porcao}</div>
-                  <div style={{ fontSize: 18, fontWeight: 'bold', color: cat.cor, marginBottom: 10 }}>{formatPreco(item.preco)}</div>
+                  <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>{item.pesoCustom ? `Preço: ${formatPreco(item.preco)}/kg` : `Embalagem: ${item.porcao}`}</div>
+                  <div style={{ fontSize: 18, fontWeight: 'bold', color: cat.cor, marginBottom: 10 }}>{item.pesoCustom ? formatPreco(parseFloat((item.preco / 1000 * (quantidades[item.id] || 100)).toFixed(2))) : formatPreco(item.preco)}</div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <button onClick={() => setQuantidades({...quantidades, [item.id]: Math.max(1,(quantidades[item.id]||1)-1)})} style={{ width: 32, height: 32, border: `1px solid ${cat.cor}`, borderRadius: 4, background: 'white', color: cat.cor, fontWeight: 'bold', fontSize: 16, cursor: 'pointer' }}>-</button>
+                    {item.pesoCustom ? (
+                      <><input type="number" min="1" value={quantidades[item.id] || 100} onChange={e => setQuantidades({...quantidades, [item.id]: Math.max(1, parseInt(e.target.value)||1)})} style={{ width: 70, textAlign: 'center', padding: '4px', border: `1px solid ${cat.cor}`, borderRadius: 4 }}/><span style={{fontSize:12,color:'#888'}}>g</span></>
+                    ) : (
+                      <><button onClick={() => setQuantidades({...quantidades, [item.id]: Math.max(1,(quantidades[item.id]||1)-1)})} style={{ width: 32, height: 32, border: `1px solid ${cat.cor}`, borderRadius: 4, background: 'white', color: cat.cor, fontWeight: 'bold', fontSize: 16, cursor: 'pointer' }}>-</button>
                     <input type="number" min="1" value={quantidades[item.id] || 1} onChange={e => setQuantidades({...quantidades, [item.id]: Math.max(1, parseInt(e.target.value)||1)})} style={{ width: 50, textAlign: 'center', padding: '4px', border: '1px solid #ddd', borderRadius: 4 }}/>
-                    <button onClick={() => setQuantidades({...quantidades, [item.id]: (quantidades[item.id]||1)+1})} style={{ width: 32, height: 32, border: `1px solid ${cat.cor}`, borderRadius: 4, background: 'white', color: cat.cor, fontWeight: 'bold', fontSize: 16, cursor: 'pointer' }}>+</button>
+                    <button onClick={() => setQuantidades({...quantidades, [item.id]: (quantidades[item.id]||1)+1})} style={{ width: 32, height: 32, border: `1px solid ${cat.cor}`, borderRadius: 4, background: 'white', color: cat.cor, fontWeight: 'bold', fontSize: 16, cursor: 'pointer' }}>+</button></>
+                    )}
                     <button onClick={() => adicionarAoCarrinho(item, categoriaAtiva)} style={{ flex: 1, padding: '8px', background: cat.cor, color: 'white', border: 'none', borderRadius: 6, fontWeight: 'bold', fontSize: 13, cursor: 'pointer' }}>Adicionar</button>
                   </div>
                 </div>
