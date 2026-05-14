@@ -230,7 +230,7 @@ export default function App() {
       if (existente) {
         setCarrinho(carrinho.map(c => c.id === item.id + '-' + catKey ? { ...c, quantidade: c.quantidade + qty } : c))
       } else {
-        setCarrinho([...carrinho, { id: item.id + '-' + catKey, nome: item.nome, porcao: item.porcao, preco: item.preco, quantidade: qty, categoria: catInfo.nome }])
+        setCarrinho([...carrinho, { id: item.id + '-' + catKey, nome: item.nome, porcao: item.porcao === 'g' ? qty + 'g' : item.porcao, preco: item.porcao === 'g' ? item.preco * qty : item.preco, quantidade: item.porcao === 'g' ? 1 : qty, categoria: catInfo.nome }])
       }
       setQuantidades({ ...quantidades, [item.id]: 1 })
     }
