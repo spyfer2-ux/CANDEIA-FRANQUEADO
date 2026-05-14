@@ -399,19 +399,21 @@ td{padding:8px;border-bottom:1px solid #ddd}
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', minHeight: '100vh' }}>
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', padding: '16px 20px', textAlign: 'center' }}>
-        <img src="/CANDEIA-FRANQUEADO/logo.png" alt="Candeia Jr" style={{ height: 110, objectFit: 'contain', display: 'block', margin: '0 auto' }} />
-        {usuario ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 8 }}>
-            <img src={usuario.photoURL} alt="" style={{ width: 30, height: 30, borderRadius: '50%', border: '2px solid white' }} />
-            <span style={{ fontSize: 13 }}>{usuario.displayName}</span>
-            <button onClick={logout} style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid white', color: 'white', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontSize: 12 }}>Sair</button>
-          </div>
-        ) : (
-          <button onClick={loginGoogle} style={{ marginTop: 10, background: 'white', color: '#c0392b', border: 'none', borderRadius: 8, padding: '8px 18px', cursor: 'pointer', fontWeight: 'bold', fontSize: 14, display: 'flex', alignItems: 'center', gap: 8, margin: '10px auto 0' }}>
-            <span>G</span> Entrar com Google
-          </button>
-        )}
+      <div style={{ position: 'relative', width: '100%' }}>
+        <img src="/CANDEIA-FRANQUEADO/banner.png" alt="Pastelaria Candeias Jr" style={{ width: '100%', display: 'block', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', bottom: 12, right: 12 }}>
+          {usuario ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(0,0,0,0.55)', borderRadius: 20, padding: '5px 12px' }}>
+              <img src={usuario.photoURL} alt="" style={{ width: 26, height: 26, borderRadius: '50%', border: '2px solid white' }} />
+              <span style={{ fontSize: 12, color: 'white', fontWeight: 'bold' }}>{usuario.displayName}</span>
+              <button onClick={logout} style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid white', color: 'white', borderRadius: 10, padding: '3px 10px', cursor: 'pointer', fontSize: 11 }}>Sair</button>
+            </div>
+          ) : (
+            <button onClick={loginGoogle} style={{ background: 'white', color: '#c0392b', border: 'none', borderRadius: 20, padding: '8px 18px', cursor: 'pointer', fontWeight: 'bold', fontSize: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+              <span style={{ fontWeight: 'bold' }}>G</span> Entrar com Google
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Tabs */}
