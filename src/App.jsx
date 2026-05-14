@@ -165,6 +165,29 @@ const CATEGORIAS = {
     ]
   }
 }
+
+// Todos os itens em lista plana para busca
+const TODOS_ITENS = Object.entries(CATEGORIAS).flatMap(([catKey, cat]) =>
+  cat.itens.map(item => ({ ...item, catKey, catNome: cat.nome, catCor: cat.cor }))
+)
+
+// Gera próximo número de pedido sequencial a partir de 10002
+function proximoNumeroPedido() {
+  try {
+    const ultimo = parseInt(localStorage.getItem('ultimo_pedido') || '10001')
+    const proximo = ultimo + 1
+    localStorage.setItem('ultimo_pedido', String(proximo))
+    return proximo
+  } catch {
+    return 10002
+  }
+}
+
+const UNIDADES = [
+  "Jd Vila Formosa",
+  "Itaquera",
+]
+
 export default function App() {
   const [usuario, setUsuario] = useState(null)
   const [loadingAuth, setLoadingAuth] = useState(true)
