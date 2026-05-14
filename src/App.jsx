@@ -400,7 +400,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
     <div style={{ maxWidth: 900, margin: '0 auto', minHeight: '100vh' }}>
       {/* Header */}
       <div style={{ position: 'relative', width: '100%' }}>
-        <img src="/CANDEIA-FRANQUEADO/banner.png" alt="Pastelaria Candeias Jr" style={{ width: '100%', display: 'block', objectFit: 'cover' }} />
+        <img src="/CANDEIA-FRANQUEADO/banner.jpg" alt="Pastelaria Candeias Jr" style={{ width: '100%', display: 'block', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', bottom: 12, right: 12 }}>
           {usuario ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(0,0,0,0.55)', borderRadius: 20, padding: '5px 12px' }}>
