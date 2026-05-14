@@ -27,6 +27,14 @@ const CATEGORIAS = {
       { id: "salame", nome: "Salame", preco: 3.50, porcao: "50g" },
       { id: "calabresa", nome: "Calabresa", preco: 3.20, porcao: "50g" },
       { id: "atum", nome: "Atum", preco: 3.00, porcao: "50g" },
+      { id: "merluza", nome: "Merluza", preco: 0, porcao: "50g" },
+      { id: "portuguesa", nome: "Portuguesa", preco: 0, porcao: "50g" },
+      { id: "misturinha", nome: "Misturinha", preco: 0, porcao: "50g" },
+      { id: "escarola", nome: "Escarola", preco: 0, porcao: "50g" },
+      { id: "berinjela", nome: "Berinjela", preco: 0, porcao: "50g" },
+      { id: "goiabada-recheio", nome: "Goiabada (recheio)", preco: 0, porcao: "50g" },
+      { id: "top-cheddar", nome: "Top Cheddar", preco: 29.69, porcao: "un" },
+      { id: "requeijao-3-marias", nome: "Requeijão 3 Marias", preco: 204.16, porcao: "5un" },
     ]
   },
   frios: {
@@ -41,9 +49,10 @@ const CATEGORIAS = {
       { id: "cheddar", nome: "Cheddar", preco: 4.50, porcao: "100g" },
       { id: "apresuntado", nome: "Apresuntado", preco: 3.80, porcao: "Pc" },
       { id: "mussarela", nome: "Mussarela", preco: 4.50, porcao: "100g" },
-      { id: "salsicha", nome: "Salsicha", preco: 1.00, porcao: "Un" },
+      { id: "salsicha", nome: "Salsicha", preco: 0.65, porcao: "Un" },
       { id: "bisnaga-catupiry", nome: "Bisnaga Catupiry", preco: 40.83, porcao: "1,5kg" },
       { id: "bisnaga-cheddar", nome: "Bisnaga Cheddar", preco: 13.50, porcao: "1,2kg" },
+      { id: "salome", nome: "Salomé", preco: 0, porcao: "70kg" },
     ]
   },
   vegetais: {
@@ -56,6 +65,13 @@ const CATEGORIAS = {
       { id: "tomate-seco", nome: "Tomate Seco", preco: 4.78, porcao: "100g" },
       { id: "milho", nome: "Milho", preco: 1.50, porcao: "100g" },
       { id: "brocolis", nome: "Brócolis", preco: 4.79, porcao: "Pct 70g" },
+      { id: "morango", nome: "Morango", preco: 0, porcao: "100g" },
+      { id: "oregano", nome: "Orégano", preco: 0, porcao: "500g" },
+      { id: "maionese", nome: "Maionese", preco: 0, porcao: "1kg" },
+      { id: "acucar", nome: "Açúcar", preco: 0, porcao: "kg" },
+      { id: "pimenta", nome: "Pimenta", preco: 0, porcao: "un" },
+      { id: "molho-alho", nome: "Molho Alho", preco: 0, porcao: "un" },
+      { id: "batata-palha", nome: "Batata Palha", preco: 28.05, porcao: "860g" },
     ]
   },
   massas: {
@@ -65,9 +81,10 @@ const CATEGORIAS = {
     unidade: "pacote",
     itens: [
       { id: "massa-pastel", nome: "Massa de Pastel", preco: 9.40, porcao: "1kg" },
-      { id: "batata-congelada-350", nome: "Batata Congelada", preco: 4.62, porcao: "350g" },
-      { id: "batata-congelada-625", nome: "Batata Congelada", preco: 8.25, porcao: "625g" },
+      { id: "batata-congelada-350", nome: "Batata Congelada P", preco: 4.62, porcao: "350g" },
+      { id: "batata-congelada-625", nome: "Batata Congelada G", preco: 8.25, porcao: "625g" },
       { id: "pure", nome: "Purê", preco: 8.45, porcao: "500g" },
+      { id: "saco-pao-hot-dog", nome: "Saco de Pães Hot Dog", preco: 24.50, porcao: "2un" },
     ]
   },
   doces: {
@@ -77,16 +94,10 @@ const CATEGORIAS = {
     unidade: "unidade",
     itens: [
       { id: "doce-leite", nome: "Doce de Leite", preco: 135.00, porcao: "balde 4,8kg" },
-      { id: "cereja", nome: "Cereja", preco: 12.60, porcao: "100g" },
-      { id: "ameixa", nome: "Ameixa", preco: 19.60, porcao: "400g" },
       { id: "goiabada", nome: "Goiabada", preco: 1.30, porcao: "100g" },
       { id: "chocolate-cremoso", nome: "Chocolate Gourmet", preco: 42.63, porcao: "1kg", pesoCustom: true },
       { id: "chocolate-leite", nome: "Chocolate ao Leite", preco: 4.40, porcao: "100g" },
       { id: "chocolate-branco", nome: "Chocolate Branco", preco: 4.00, porcao: "100g" },
-      { id: "coco", nome: "Coco Ralado", preco: 49.00, porcao: "1kg", pesoCustom: true },
-      { id: "canela", nome: "Canela", preco: 5.00, porcao: "100g" },
-      { id: "suflair", nome: "Suflair", preco: 8.00, porcao: "pacote" },
-      { id: "leite-condensado", nome: "Leite Condensado", preco: 8.50, porcao: "395g" },
     ]
   },
   salgados: {
@@ -113,6 +124,10 @@ const CATEGORIAS = {
     corBg: "#f0f7ff",
     unidade: "unidade",
     itens: [
+      { id: "bandeja-batata-g", nome: "Bandeja Batata G", preco: 0, porcao: "cx c/100" },
+      { id: "bandeja-batata-p", nome: "Bandeja Batata P", preco: 0, porcao: "cx c/16" },
+      { id: "embalagem-empada-g", nome: "Embalagem Empada G", preco: 0, porcao: "cx c/10" },
+      { id: "embalagem-empada-p", nome: "Embalagem Empada P", preco: 0, porcao: "cx c/20" },
       { id: "bandeja-bh-102", nome: "Bandeja BH 102", preco: 124.30, porcao: "cx c/100" },
       { id: "bandeja-bh-101", nome: "Bandeja BH 101", preco: 52.41, porcao: "cx c/100" },
       { id: "papel-tv", nome: "Papel TV", preco: 10.23, porcao: "un" },
@@ -124,32 +139,25 @@ const CATEGORIAS = {
       { id: "copo-180", nome: "Copo 180ml", preco: 4.18, porcao: "pct" },
       { id: "caixa-media", nome: "Caixa Média", preco: 2.09, porcao: "un" },
       { id: "caixa-grande", nome: "Caixa Grande", preco: 2.46, porcao: "un" },
+      { id: "embalagem-lanche", nome: "Embalagem de Lanche", preco: 0, porcao: "un" },
+      { id: "viagem", nome: "Viagem", preco: 0, porcao: "un" },
+      { id: "saco-hot-dog", nome: "Saco Hot Dog", preco: 0, porcao: "un" },
+      { id: "saco-lixo-60l", nome: "Saco de Lixo 60L", preco: 0, porcao: "un" },
+      { id: "luva-descartavel", nome: "Luva Descartável", preco: 0, porcao: "cx" },
+      { id: "luva-borracha", nome: "Luva Borracha", preco: 0, porcao: "par" },
+      { id: "bombril", nome: "Bombril", preco: 0, porcao: "un" },
+      { id: "papel-toalha", nome: "Papel Toalha", preco: 0, porcao: "rolo" },
+      { id: "detergente", nome: "Detergente", preco: 0, porcao: "un" },
+      { id: "saco-lixo", nome: "Saco de Lixo", preco: 0, porcao: "un" },
+      { id: "sacola-25x35", nome: "Sacola 25x35", preco: 4.18, porcao: "c/100" },
+      { id: "sacola-35x45", nome: "Sacola 35x45", preco: 8.25, porcao: "c/100" },
+      { id: "touca-descartavel", nome: "Pacote Touca Descartável", preco: 16.50, porcao: "pct" },
+      { id: "bobinas-impressora", nome: "Bobinas Impressora", preco: 15.84, porcao: "3un" },
+      { id: "durex", nome: "Durex", preco: 20.90, porcao: "5un" },
+      { id: "saco-canudo", nome: "Saco de Canudo", preco: 12.10, porcao: "un" },
     ]
   }
 }
-
-// Todos os itens em lista plana para busca
-const TODOS_ITENS = Object.entries(CATEGORIAS).flatMap(([catKey, cat]) =>
-  cat.itens.map(item => ({ ...item, catKey, catNome: cat.nome, catCor: cat.cor }))
-)
-
-// Gera próximo número de pedido sequencial a partir de 10002
-function proximoNumeroPedido() {
-  try {
-    const ultimo = parseInt(localStorage.getItem('ultimo_pedido') || '10001')
-    const proximo = ultimo + 1
-    localStorage.setItem('ultimo_pedido', String(proximo))
-    return proximo
-  } catch {
-    return 10002
-  }
-}
-
-const UNIDADES = [
-  "Jd Vila Formosa",
-  "Itaquera",
-]
-
 export default function App() {
   const [usuario, setUsuario] = useState(null)
   const [loadingAuth, setLoadingAuth] = useState(true)
