@@ -147,14 +147,19 @@ function proximoNumeroPedido() {
 
 const UNIDADES = [
   "Jd Vila Formosa",
+  "Itaquera",
 ]
 
 export default function App() {
   const [usuario, setUsuario] = useState(null)
   const [loadingAuth, setLoadingAuth] = useState(true)
   const [aba, setAba] = useState('pedido')
-  const [franqueado, setFranqueado] = useState({ nome: '', unidade: 'Jd Vila Formosa' })
-  const [carrinho, setCarrinho] = useState([])
+  const [franqueado, setFranqueado] = useState(() => {
+    try { const r = JSON.parse(localStorage.getItem('rascunho_pedido') || 'null'); return r?.franqueado || { nome: '', unidade: 'Jd Vila Formosa' } } catch { return { nome: '', unidade: 'Jd Vila Formosa' } }
+  })
+  const [carrinho, setCarrinho] = useState(() => {
+    try { const r = JSON.parse(localStorage.getItem('rascunho_pedido') || 'null'); return r?.carrinho || [] } catch { return [] }
+  })
   const [categoriaAtiva, setCategoriaAtiva] = useState('carnes')
   const [quantidades, setQuantidades] = useState({})
   const [busca, setBusca] = useState('')
@@ -197,6 +202,14 @@ export default function App() {
     })
     return () => unsub()
   }, [])
+
+  // Auto-salva rascunho no localStorage sempre que carrinho ou franqueado mudar
+  useEffect(() => {
+    if (carrinho.length > 0 || franqueado.nome) {
+      localStorage.setItem('rascunho_pedido', JSON.stringify({ carrinho, franqueado }))
+    }
+  }, [carrinho, franqueado])
+
   const [pedidoGerado, setPedidoGerado] = useState(false)
   const [ultimoPedidoNum, setUltimoPedidoNum] = useState(null)
 
@@ -270,6 +283,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
 <button onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#c0392b;color:white;border:none;border-radius:5px;font-size:16px">🖨️ Imprimir / Salvar PDF</button>
 </body></html>`)
     win.document.close()
+    localStorage.removeItem('rascunho_pedido')
     setUltimoPedidoNum(numPedido)
     setPedidoGerado(true)
   }
