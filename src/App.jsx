@@ -27,8 +27,6 @@ const CATEGORIAS = {
       { id: "salame", nome: "Salame", preco: 3.50, porcao: "50g" },
       { id: "calabresa", nome: "Calabresa", preco: 3.20, porcao: "50g" },
       { id: "atum", nome: "Atum", preco: 3.00, porcao: "50g" },
-      { id: "tomate-seco", nome: "Tomate Seco", preco: 4.78, porcao: "100g" },
-      { id: "milho", nome: "Milho", preco: 1.50, porcao: "100g" },
     ]
   },
   frios: {
@@ -53,6 +51,8 @@ const CATEGORIAS = {
     unidade: "gramas",
     itens: [
       { id: "azeitona", nome: "Azeitona", preco: 2.50, porcao: "100g" },
+      { id: "tomate-seco", nome: "Tomate Seco", preco: 4.78, porcao: "100g" },
+      { id: "milho", nome: "Milho", preco: 1.50, porcao: "100g" },
     ]
   },
   massas: {
