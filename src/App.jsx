@@ -42,6 +42,8 @@ const CATEGORIAS = {
       { id: "apresuntado", nome: "Apresuntado", preco: 3.80, porcao: "Pc" },
       { id: "mussarela", nome: "Mussarela", preco: 4.50, porcao: "100g" },
       { id: "salsicha", nome: "Salsicha", preco: 13.20, porcao: "1kg" },
+      { id: "bisnaga-catupiry", nome: "Bisnaga Catupiry", preco: 40.83, porcao: "1,5kg" },
+      { id: "bisnaga-cheddar", nome: "Bisnaga Cheddar", preco: 13.50, porcao: "1,2kg" },
     ]
   },
   vegetais: {
@@ -50,9 +52,10 @@ const CATEGORIAS = {
     corBg: "#f2fdf5",
     unidade: "gramas",
     itens: [
-      { id: "azeitona", nome: "Azeitona", preco: 2.50, porcao: "100g" },
+      { id: "azeitona", nome: "Balde de Azeitona", preco: 27.50, porcao: "1kg" },
       { id: "tomate-seco", nome: "Tomate Seco", preco: 4.78, porcao: "100g" },
       { id: "milho", nome: "Milho", preco: 1.50, porcao: "100g" },
+      { id: "brocolis", nome: "Brócolis", preco: 4.79, porcao: "Pct 70g" },
     ]
   },
   massas: {
