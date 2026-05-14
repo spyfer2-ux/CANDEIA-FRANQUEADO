@@ -102,7 +102,7 @@ const CATEGORIAS = {
       { id: "chocolate-leite", nome: "Chocolate ao Leite", preco: 4.40, porcao: "100g" },
       { id: "chocolate-branco", nome: "Chocolate Branco", preco: 4.00, porcao: "100g" },
       { id: "coco", nome: "Coco Ralado", preco: 49.00, porcao: "1kg", pesoCustom: true },
-      { id: "canela", nome: "Canela", preco: 11.99, porcao: "100g" },
+      { id: "canela", nome: "Canela", preco: 13.50, porcao: "100g" },
       { id: "suflair", nome: "Suflair", preco: 8.00, porcao: "pacote" },
       { id: "leite-condensado", nome: "Leite Condensado", preco: 8.50, porcao: "395g" },
       { id: "ameixa", nome: "Ameixa", preco: 19.60, porcao: "400g" },
