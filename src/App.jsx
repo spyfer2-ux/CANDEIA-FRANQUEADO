@@ -107,7 +107,7 @@ const CATEGORIAS = {
       { id: "leite-condensado", nome: "Leite Condensado", preco: 8.50, porcao: "395g" },
       { id: "ameixa", nome: "Ameixa", preco: 19.60, porcao: "400g" },
       { id: "cereja", nome: "Cereja", preco: 12.60, porcao: "100g" },
-      { id: "granulado", nome: "Granulado", preco: 0, porcao: "100g" },
+      { id: "granulado", nome: "Granulado", preco: 31.70, porcao: "100g" },
     ]
   },
   salgados: {
