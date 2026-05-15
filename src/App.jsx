@@ -72,8 +72,6 @@ const CATEGORIAS = {
       { id: "maionese", nome: "Maionese", preco: 13.50, porcao: "1kg" },
       { id: "pimenta", nome: "Pimenta", preco: 13.49, porcao: "un" },
       { id: "molho-alho", nome: "Molho Alho", preco: 13.20, porcao: "un" },
-      { id: "batata-palha", nome: "Batata Palha", preco: 29.90, porcao: "860g" },
-      { id: "oleo", nome: "Óleo", preco: 7.57, porcao: "un" },
     ]
   },
   massas: {
@@ -82,6 +80,8 @@ const CATEGORIAS = {
     corBg: "#faf2fe",
     unidade: "pacote",
     itens: [
+      { id: "batata-palha", nome: "Batata Palha", preco: 29.90, porcao: "860g" },
+      { id: "oleo", nome: "Óleo", preco: 7.57, porcao: "un" },
       { id: "massa-pastel", nome: "Massa de Pastel", preco: 9.40, porcao: "1kg" },
       { id: "batata-congelada-350", nome: "Batata Congelada P", preco: 4.62, porcao: "350g" },
       { id: "batata-congelada-625", nome: "Batata Congelada G", preco: 8.25, porcao: "625g" },
