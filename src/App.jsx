@@ -26,7 +26,7 @@ const CATEGORIAS = {
       { id: "palmito-puro", nome: "Palmito Puro", preco: 5.15, porcao: "150g" },
       { id: "salame", nome: "Salame", preco: 3.50, porcao: "50g" },
       { id: "calabresa", nome: "Calabresa", preco: 3.20, porcao: "50g" },
-      { id: "atum", nome: "Atum", preco: 3.00, porcao: "50g" },
+      { id: "atum", nome: "Atum", preco: 3.00, porcao: "70g" },
       { id: "portuguesa", nome: "Portuguesa", preco: 3.05, porcao: "50g" },
       { id: "misturinha", nome: "Misturinha", preco: 0.80, porcao: "40g" },
       { id: "berinjela", nome: "Berinjela", preco: 3.56, porcao: "80g" },
