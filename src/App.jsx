@@ -70,7 +70,6 @@ const CATEGORIAS = {
       { id: "morango", nome: "Morango", preco: 11.00, porcao: "100g" },
       { id: "oregano", nome: "Orégano", preco: 0, porcao: "500g" },
       { id: "maionese", nome: "Maionese", preco: 13.50, porcao: "1kg" },
-      { id: "acucar", nome: "Açúcar", preco: 5.20, porcao: "kg" },
       { id: "pimenta", nome: "Pimenta", preco: 13.49, porcao: "un" },
       { id: "molho-alho", nome: "Molho Alho", preco: 13.20, porcao: "un" },
       { id: "batata-palha", nome: "Batata Palha", preco: 29.90, porcao: "860g" },
@@ -96,6 +95,7 @@ const CATEGORIAS = {
     corBg: "#fef5ec",
     unidade: "unidade",
     itens: [
+      { id: "acucar", nome: "Açúcar", preco: 5.20, porcao: "kg" },
       { id: "doce-leite", nome: "Doce de Leite", preco: 135.00, porcao: "balde 4,8kg" },
       { id: "chocolate-cremoso", nome: "Chocolate Gourmet", preco: 42.63, porcao: "1kg", pesoCustom: true },
       { id: "chocolate-leite", nome: "Chocolate ao Leite", preco: 4.40, porcao: "100g" },
