@@ -45,7 +45,7 @@ const CATEGORIAS = {
       { id: "provolone", nome: "Provolone", preco: 1.11, porcao: "20g" },
       { id: "queijo-prato", nome: "Queijo Prato", preco: 4.20, porcao: "100g" },
       { id: "cheddar", nome: "Cheddar", preco: 4.50, porcao: "100g" },
-      { id: "apresuntado", nome: "Apresuntado", preco: 3.80, porcao: "Pc" },
+      { id: "apresuntado", nome: "Apresuntado", preco: 22.00, porcao: "1kg" },
       { id: "mussarela", nome: "Mussarela", preco: 4.50, porcao: "100g" },
       { id: "salsicha", nome: "Salsicha", preco: 0.65, porcao: "Un" },
       { id: "bisnaga-catupiry", nome: "Bisnaga Catupiry", preco: 40.83, porcao: "1,5kg" },
