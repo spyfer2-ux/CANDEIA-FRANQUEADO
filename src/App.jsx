@@ -18,7 +18,7 @@ const CATEGORIAS = {
       { id: "carne-louca-mistura", nome: "Carne Louca Mistura", preco: 3.00, porcao: "50g" },
       { id: "carne-louca-pura", nome: "Carne Louca Pura", preco: 4.50, porcao: "50g" },
       { id: "carne-mistura", nome: "Carne Mistura", preco: 3.20, porcao: "50g" },
-      { id: "carne-pura", nome: "Carne Pura", preco: 4.80, porcao: "50g" },
+      { id: "carne-pura", nome: "Carne Pura", preco: 5.16, porcao: "70g" },
       { id: "carne-seca-mistura", nome: "Carne Seca Mistura", preco: 4.00, porcao: "50g" },
       { id: "frango-mistura", nome: "Frango Mistura", preco: 2.80, porcao: "50g" },
       { id: "frango-puro", nome: "Frango Puro", preco: 3.50, porcao: "50g" },
