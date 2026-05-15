@@ -29,7 +29,6 @@ const CATEGORIAS = {
       { id: "atum", nome: "Atum", preco: 3.00, porcao: "50g" },
       { id: "portuguesa", nome: "Portuguesa", preco: 3.05, porcao: "50g" },
       { id: "misturinha", nome: "Misturinha", preco: 0.80, porcao: "40g" },
-      { id: "escarola", nome: "Escarola", preco: 0, porcao: "50g" },
       { id: "berinjela", nome: "Berinjela", preco: 3.56, porcao: "80g" },
       { id: "goiabada-recheio", nome: "Goiabada (recheio)", preco: 0, porcao: "50g" },
       { id: "top-cheddar", nome: "Top Cheddar", preco: 29.69, porcao: "un" },
@@ -60,6 +59,7 @@ const CATEGORIAS = {
     corBg: "#f2fdf5",
     unidade: "gramas",
     itens: [
+      { id: "escarola", nome: "Escarola", preco: 0, porcao: "50g" },
       { id: "goiabada", nome: "Goiabada", preco: 1.30, porcao: "100g" },
       { id: "azeitona", nome: "Balde de Azeitona", preco: 27.50, porcao: "1kg" },
       { id: "tomate-seco", nome: "Tomate Seco", preco: 4.78, porcao: "100g" },
