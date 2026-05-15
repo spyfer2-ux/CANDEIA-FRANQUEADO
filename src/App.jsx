@@ -67,7 +67,7 @@ const CATEGORIAS = {
       { id: "ervilha", nome: "Ervilha", preco: 0.75, porcao: "un" },
       { id: "brocolis", nome: "Brócolis", preco: 4.79, porcao: "Pct 70g" },
       { id: "morango", nome: "Morango", preco: 11.00, porcao: "100g" },
-      { id: "oregano", nome: "Orégano", preco: 0, porcao: "500g" },
+      { id: "oregano", nome: "Orégano", preco: 14.60, porcao: "500g" },
       { id: "maionese", nome: "Maionese", preco: 13.50, porcao: "1kg" },
       { id: "pimenta", nome: "Pimenta", preco: 13.49, porcao: "un" },
       { id: "molho-alho", nome: "Molho Alho", preco: 13.20, porcao: "un" },
@@ -85,7 +85,7 @@ const CATEGORIAS = {
       { id: "batata-congelada-350", nome: "Batata Congelada P", preco: 4.62, porcao: "350g" },
       { id: "batata-congelada-625", nome: "Batata Congelada G", preco: 8.25, porcao: "625g" },
       { id: "pure", nome: "Purê", preco: 8.45, porcao: "500g" },
-      { id: "saco-pao-hot-dog", nome: "Saco de Pães Hot Dog", preco: 24.50, porcao: "2un" },
+      { id: "saco-pao-hot-dog", nome: "Pão Hot Dog", preco: 13.75, porcao: "10 pães" },
     ]
   },
   doces: {
