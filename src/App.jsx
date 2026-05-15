@@ -48,7 +48,7 @@ const CATEGORIAS = {
       { id: "mussarela", nome: "Mussarela", preco: 4.50, porcao: "100g" },
       { id: "salsicha", nome: "Salsicha", preco: 0.65, porcao: "Un" },
       { id: "bisnaga-catupiry", nome: "Bisnaga Catupiry", preco: 40.83, porcao: "1,5kg" },
-      { id: "bisnaga-cheddar", nome: "Bisnaga Cheddar", preco: 13.50, porcao: "1,2kg" },
+      { id: "bisnaga-cheddar", nome: "Cheddar", preco: 14.85, porcao: "1,2kg" },
     ]
   },
   vegetais: {
