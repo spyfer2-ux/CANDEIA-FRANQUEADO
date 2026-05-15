@@ -50,7 +50,6 @@ const CATEGORIAS = {
       { id: "salsicha", nome: "Salsicha", preco: 0.65, porcao: "Un" },
       { id: "bisnaga-catupiry", nome: "Bisnaga Catupiry", preco: 40.83, porcao: "1,5kg" },
       { id: "bisnaga-cheddar", nome: "Bisnaga Cheddar", preco: 13.50, porcao: "1,2kg" },
-      { id: "salome", nome: "Salomé", preco: 0, porcao: "70kg" },
     ]
   },
   vegetais: {
