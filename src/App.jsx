@@ -60,6 +60,7 @@ const CATEGORIAS = {
     corBg: "#f2fdf5",
     unidade: "gramas",
     itens: [
+      { id: "goiabada", nome: "Goiabada", preco: 1.30, porcao: "100g" },
       { id: "azeitona", nome: "Balde de Azeitona", preco: 27.50, porcao: "1kg" },
       { id: "tomate-seco", nome: "Tomate Seco", preco: 4.78, porcao: "100g" },
       { id: "milho-mistura", nome: "Milho Mistura", preco: 0.85, porcao: "40g" },
@@ -96,7 +97,6 @@ const CATEGORIAS = {
     unidade: "unidade",
     itens: [
       { id: "doce-leite", nome: "Doce de Leite", preco: 135.00, porcao: "balde 4,8kg" },
-      { id: "goiabada", nome: "Goiabada", preco: 1.30, porcao: "100g" },
       { id: "chocolate-cremoso", nome: "Chocolate Gourmet", preco: 42.63, porcao: "1kg", pesoCustom: true },
       { id: "chocolate-leite", nome: "Chocolate ao Leite", preco: 4.40, porcao: "100g" },
       { id: "chocolate-branco", nome: "Chocolate Branco", preco: 4.00, porcao: "100g" },
