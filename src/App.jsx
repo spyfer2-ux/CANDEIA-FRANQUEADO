@@ -47,7 +47,7 @@ const CATEGORIAS = {
       { { id: "apresuntado", nome: "Apresuntado", preco: 1.52, porcao: "60g" } },
       { { id: "mussarela", nome: "Mussarela", preco: 2.87, porcao: "60g" } },
       { { id: "salsicha", nome: "Salsicha", preco: 1.0, porcao: "unidade" } },
-      { id: "bisnaga-catupiry", nome: "Catupiry", preco: 40.83, porcao: "1,5kg" },
+      { id: "bisnaga-catupiry", nome: "Catupiry", preco: 40.83, porcao: "1,5kg" , vendaPorKg: true, kgBase: 1.5 },
       { { id: "bisnaga-cheddar", nome: "Cheddar", preco: 13.5, porcao: "1,2kg" } },
     ]
   },
@@ -60,7 +60,7 @@ const CATEGORIAS = {
       { { id: "escarola", nome: "Escarola", preco: 3.42, porcao: "70g" } },
       { { id: "laka", nome: "Laka", preco: 6.06, porcao: "100g" },
       { id: "goiabada", nome: "Goiabada", preco: 1.3, porcao: "100g" } },
-      { { id: "azeitona", nome: "Balde de Azeitona", preco: 27.5, porcao: "1kg" } },
+      { { id: "azeitona", nome: "Balde de Azeitona", preco: 27.5, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 } },
       { { id: "tomate-seco", nome: "Tomate Seco", preco: 4.78, porcao: "100g" } },
       { { id: "milho-mistura", nome: "Milho Mistura", preco: 0.71, porcao: "40g" } },
       { id: "milho-puro", nome: "Milho Puro", preco: 1.65, porcao: "80g" },
@@ -79,9 +79,9 @@ const CATEGORIAS = {
     corBg: "#faf2fe",
     unidade: "pacote",
     itens: [
-      { { id: "batata-palha", nome: "Batata Palha", preco: 28.05, porcao: "800g" } },
+      { { id: "batata-palha", nome: "Batata Palha", preco: 28.05, porcao: "800g" , vendaPorKg: true, kgBase: 0.8 } },
       { id: "oleo", nome: "Óleo", preco: 7.57, porcao: "un" },
-      { { id: "massa-pastel", nome: "Massa de Pastel", preco: 9.24, porcao: "1kg" } },
+      { { id: "massa-pastel", nome: "Massa de Pastel", preco: 9.24, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 } },
       { id: "batata-congelada-350", nome: "Batata Frita P", preco: 4.62, porcao: "325g" },
       { id: "batata-congelada-625", nome: "Batata Frita G", preco: 8.25, porcao: "650g" },
       { { id: "pure", nome: "Purê", preco: 8.45, porcao: "500g" } },
@@ -95,12 +95,12 @@ const CATEGORIAS = {
     unidade: "unidade",
     itens: [
       { id: "acucar", nome: "Açúcar", preco: 5.20, porcao: "kg" },
-      { { id: "doce-leite", nome: "Doce de Leite", preco: 135.0, porcao: "balde 4,8kg" } },
+      { { id: "doce-leite", nome: "Doce de Leite", preco: 135.0, porcao: "balde 4,8kg" , vendaPorKg: true, kgBase: 4.8 } },
       { id: "beijinho", nome: "Beijinho", preco: 39.06, porcao: "1kg" },
-      { { id: "chocolate-cremoso", nome: "Chocolate Cremoso Gourmet", preco: 42.63, porcao: "1kg", pesoCustom: true } },
-      { { id: "chocolate-leite", nome: "Chocolate ao Leite", preco: 44.0, porcao: "1kg" } },
-      { { id: "chocolate-branco", nome: "Chocolate Branco", preco: 39.0, porcao: "1kg" } },
-      { { id: "coco", nome: "Coco Ralado", preco: 49.0, porcao: "1kg", pesoCustom: true } },
+      { { id: "chocolate-cremoso", nome: "Chocolate Cremoso Gourmet", preco: 42.63, porcao: "1kg", pesoCustom: true , vendaPorKg: true, kgBase: 1.0 } },
+      { { id: "chocolate-leite", nome: "Chocolate ao Leite", preco: 44.0, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 } },
+      { { id: "chocolate-branco", nome: "Chocolate Branco", preco: 39.0, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 } },
+      { { id: "coco", nome: "Coco Ralado", preco: 49.0, porcao: "1kg", pesoCustom: true , vendaPorKg: true, kgBase: 1.0 } },
       { { id: "canela", nome: "Canela", preco: 22.0, porcao: "500g" } },
       { { id: "suflair", nome: "Suflair", preco: 9.1, porcao: "50g" } },
       { id: "leite-condensado", nome: "Leite Condensado", preco: 8.50, porcao: "395g" },
@@ -268,6 +268,21 @@ export default function App() {
 
   const adicionarAoCarrinho = (item, catKey) => {
     const catInfo = CATEGORIAS[catKey]
+    if (item.vendaPorKg) {
+      const kgDigitado = parseFloat(String(quantidades[item.id] || '').replace(',', '.') || 0)
+      if (kgDigitado <= 0) return
+      const precoKg = item.preco / (item.kgBase || 1)
+      const precoFinal = parseFloat((precoKg * kgDigitado).toFixed(2))
+      const porcaoLabel = kgDigitado.toFixed(3).replace('.', ',') + ' kg'
+      const existente = carrinho.find(c => c.id === item.id + '-' + catKey)
+      if (existente) {
+        setCarrinho(carrinho.map(c => c.id === item.id + '-' + catKey ? { ...c, quantidade: c.quantidade + 1, porcao: porcaoLabel, preco: precoFinal } : c))
+      } else {
+        setCarrinho([...carrinho, { id: item.id + '-' + catKey, nome: item.nome, porcao: porcaoLabel, preco: precoFinal, quantidade: 1, categoria: catInfo.nome }])
+      }
+      setQuantidades({ ...quantidades, [item.id]: '' })
+      return
+    }
     if (item.pesoCustom) {
       const gramas = quantidades[item.id] || 100
       if (gramas <= 0) return
@@ -503,10 +518,20 @@ td{padding:8px;border-bottom:1px solid #ddd}
               return (
                 <div key={item.id} style={{ background: 'white', borderRadius: 10, padding: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderLeft: `4px solid ${cat.cor}` }}>
                   <div style={{ fontWeight: 'bold', marginBottom: 4, color: '#222' }}>{item.nome}</div>
-                  <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>{item.pesoCustom ? `Preço: ${formatPreco(item.preco)}/kg` : `Embalagem: ${item.porcao}`}</div>
-                  <div style={{ fontSize: 18, fontWeight: 'bold', color: cat.cor, marginBottom: 10 }}>{item.pesoCustom ? formatPreco(parseFloat((item.preco / 1000 * (quantidades[item.id] || 100)).toFixed(2))) : formatPreco(item.preco)}</div>
+                  <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>
+                    {item.vendaPorKg ? `R$ ${(item.preco / (item.kgBase||1)).toFixed(2).replace('.',',')} / kg` : item.pesoCustom ? `Preço: ${formatPreco(item.preco)}/kg` : `Embalagem: ${item.porcao}`}
+                  </div>
+                  <div style={{ fontSize: 18, fontWeight: 'bold', color: cat.cor, marginBottom: 10 }}>
+                    {item.vendaPorKg
+                      ? formatPreco(parseFloat(((item.preco / (item.kgBase||1)) * (parseFloat(String(quantidades[item.id]||'0').replace(',','.')) || 0)).toFixed(2)))
+                      : item.pesoCustom
+                        ? formatPreco(parseFloat((item.preco / 1000 * (quantidades[item.id] || 100)).toFixed(2)))
+                        : formatPreco(item.preco)}
+                  </div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    {item.pesoCustom ? (
+                    {item.vendaPorKg ? (
+                      <><input type="number" step="0.001" min="0.001" value={quantidades[item.id] ?? ''} onChange={e => setQuantidades({...quantidades, [item.id]: e.target.value})} placeholder="ex: 3.658" style={{ width: 90, textAlign: 'center', padding: '4px', border: `1.5px solid ${cat.cor}`, borderRadius: 4, fontSize: 14 }}/><span style={{fontSize:12,color:'#888'}}>kg</span></>
+                    ) : item.pesoCustom ? (
                       <><input type="text" inputMode="numeric" pattern="[0-9]*" value={quantidades[item.id] === '' ? '' : (quantidades[item.id] ?? 100)} onChange={e => { const v = e.target.value; setQuantidades({...quantidades, [item.id]: v === '' ? '' : Math.max(1, parseInt(v)||1)}) }} style={{ width: 70, textAlign: 'center', padding: '4px', border: `1px solid ${cat.cor}`, borderRadius: 4 }}/><span style={{fontSize:12,color:'#888'}}>g</span></>
                     ) : (
                       <><button onClick={() => setQuantidades({...quantidades, [item.id]: Math.max(1,(quantidades[item.id]||1)-1)})} style={{ width: 32, height: 32, border: `1px solid ${cat.cor}`, borderRadius: 4, background: 'white', color: cat.cor, fontWeight: 'bold', fontSize: 16, cursor: 'pointer' }}>-</button>
