@@ -59,7 +59,7 @@ const CATEGORIAS = {
     itens: [
       { id: "escarola", nome: "Escarola", preco: 3.42, porcao: "70g" },
       { id: "laka", nome: "Laka", preco: 6.06, porcao: "100g" },
-      { id: "goiabada", nome: "Goiabada", preco: 1.3, porcao: "100g" } },
+      { id: "goiabada", nome: "Goiabada", preco: 1.30, porcao: "100g" },
       { id: "azeitona", nome: "Balde de Azeitona", preco: 27.5, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 },
       { id: "tomate-seco", nome: "Tomate Seco", preco: 4.78, porcao: "100g" },
       { id: "milho-mistura", nome: "Milho Mistura", preco: 0.71, porcao: "40g" },
@@ -85,7 +85,7 @@ const CATEGORIAS = {
       { id: "batata-congelada-350", nome: "Batata Frita P", preco: 4.62, porcao: "325g" },
       { id: "batata-congelada-625", nome: "Batata Frita G", preco: 8.25, porcao: "650g" },
       { id: "pure", nome: "Purê", preco: 8.45, porcao: "500g" },
-      { id: "saco-pao-hot-dog", nome: "Pão Hot Dog", preco: 27.50, porcao: "20 unid." }},
+      { id: "saco-pao-hot-dog", nome: "Pão Hot Dog", preco: 27.50, porcao: "20 unid." },
     ]
   },
   doces: {
