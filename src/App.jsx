@@ -97,7 +97,7 @@ const CATEGORIAS = {
       { id: "acucar", nome: "Açúcar", preco: 5.20, porcao: "kg" },
       { id: "doce-leite", nome: "Doce de Leite", preco: 135.0, porcao: "balde 4,8kg" , vendaPorKg: true, kgBase: 4.8 },
       { id: "beijinho", nome: "Beijinho", preco: 39.06, porcao: "1kg" },
-      { id: "chocolate-cremoso", nome: "Chocolate Cremoso Gourmet", preco: 42.63, porcao: "1kg", pesoCustom: true , vendaPorKg: true, kgBase: 1.0 },
+      { id: "chocolate-cremoso", nome: "Chocolate Cremoso Gourmet", preco: 45.00, porcao: "kg", vendaPorKg: true, kgBase: 1.0 },
       { id: "chocolate-leite", nome: "Chocolate ao Leite", preco: 44.0, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 },
       { id: "chocolate-branco", nome: "Chocolate Branco", preco: 39.0, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 },
       { id: "coco", nome: "Coco Ralado", preco: 49.0, porcao: "1kg", pesoCustom: true , vendaPorKg: true, kgBase: 1.0 },
