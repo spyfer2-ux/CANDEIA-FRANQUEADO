@@ -134,7 +134,7 @@ const CATEGORIAS = {
     unidade: "unidade",
     itens: [
       { id: "bandeja-batata-g", nome: "Bandeja Batata G", preco: 49.90, porcao: "c/100 unid." },
-      { id: "bandeja-batata-p", nome: "Bandeja Batata P", preco: 0, porcao: "cx c/16" },
+      { id: "bandeja-batata-p", nome: "Bandeja Batata P", preco: 0.25, porcao: "unidade" },
       { id: "embalagem-empada-g", nome: "Embalagem Empada G", preco: 0, porcao: "cx c/10" },
       { id: "embalagem-empada-p", nome: "Embalagem Empada P", preco: 0, porcao: "cx c/20" },
       { id: "bandeja-bh-102", nome: "Estojo 102", preco: 124.30, porcao: "cx c/100" },
