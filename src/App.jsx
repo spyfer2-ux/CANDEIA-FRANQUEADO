@@ -30,7 +30,6 @@ const CATEGORIAS = {
       { id: "portuguesa", nome: "Portuguesa", preco: 3.05, porcao: "50g" },
       { id: "misturinha", nome: "Misturinha", preco: 0.80, porcao: "40g" },
       { id: "berinjela", nome: "Berinjela", preco: 3.56, porcao: "90g" },
-      { id: "goiabada-recheio", nome: "Goiabada (recheio)", preco: 0, porcao: "50g" },
       { id: "top-cheddar", nome: "Top Cheddar", preco: 29.69, porcao: "un" },
       { id: "requeijao-3-marias", nome: "Requeijão 3 Marias", preco: 204.16, porcao: "5un" },
     ]
