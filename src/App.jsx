@@ -61,7 +61,7 @@ const CATEGORIAS = {
       { id: "laka", nome: "Laka", preco: 6.06, porcao: "100g" },
       { id: "goiabada", nome: "Goiabada", preco: 1.30, porcao: "100g" },
       { id: "azeitona", nome: "Balde de Azeitona", preco: 27.5, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 },
-      { id: "tomate-seco", nome: "Tomate Seco", preco: 4.78, porcao: "100g" },
+      { id: "tomate-seco", nome: "Tomate Seco", preco: 4.78, porcao: "unidade" },
       { id: "milho-mistura", nome: "Milho Mistura", preco: 0.71, porcao: "40g" },
       { id: "milho-puro", nome: "Milho Puro", preco: 1.65, porcao: "80g" },
       { id: "ervilha", nome: "Ervilha", preco: 0.75, porcao: "un" },
