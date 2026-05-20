@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { auth, db, loginGoogle, logout } from './firebase'
+import QRCode from 'react-qr-code'
 import { onAuthStateChanged } from 'firebase/auth'
 import { collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore'
 
@@ -194,6 +195,39 @@ const UNIDADES = [
   "Itaquera",
 ]
 
+
+// ── PIX ──────────────────────────────────────────────────────────────────────
+const PIX_KEY = 'f24b7d0b-79be-4404-b53d-cbb153c38f31'
+const PIX_NAME = 'CANDEIAS JR'
+const PIX_CITY = 'SAO PAULO'
+
+function crc16(str) {
+  let crc = 0xFFFF
+  for (let i = 0; i < str.length; i++) {
+    crc ^= str.charCodeAt(i) << 8
+    for (let j = 0; j < 8; j++) {
+      crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1
+      crc &= 0xFFFF
+    }
+  }
+  return crc
+}
+
+function buildPixPayload(amount) {
+  const f = (id, val) => `${id}${String(val.length).padStart(2,'0')}${val}`
+  const gui = f('00','BR.GOV.BCB.PIX') + f('01', PIX_KEY)
+  const merchantAccount = f('26', gui)
+  const name = PIX_NAME.substring(0,25)
+  const city = PIX_CITY.substring(0,15)
+  const amtStr = amount.toFixed(2)
+  const txId = f('05','***')
+  let payload = f('00','01') + f('01','12') + merchantAccount +
+    f('52','0000') + f('53','986') + f('54', amtStr) +
+    f('58','BR') + f('59', name) + f('60', city) + f('62', txId) + '6304'
+  const crc = crc16(payload).toString(16).toUpperCase().padStart(4,'0')
+  return payload + crc
+}
+
 export default function App() {
   const [usuario, setUsuario] = useState(null)
   const [loadingAuth, setLoadingAuth] = useState(true)
@@ -220,6 +254,7 @@ export default function App() {
     catch { return [] }
   })
   const [orcamentoSalvoMsg, setOrcamentoSalvoMsg] = useState(false)
+  const [pixModal, setPixModal] = useState(false)
 
   // Firebase Auth listener
   useEffect(() => {
@@ -582,6 +617,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   <span style={{ color: '#c0392b' }}>{formatPreco(total)}</span>
                 </div>
                 <button onClick={gerarPDF} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>📄 Gerar PDF do Pedido</button>
+                <button onClick={() => setPixModal(true)} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #00875a, #00a86b)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>💠 Gerar Cobrança PIX</button>
                 <button onClick={salvarOrcamento} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #2c3e50, #3d5166)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>💾 Salvar Orçamento</button>
                 {orcamentoSalvoMsg && (
                   <div style={{ background: '#eafaf1', border: '1px solid #27ae60', borderRadius: 8, padding: '10px 14px', color: '#27ae60', fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>
