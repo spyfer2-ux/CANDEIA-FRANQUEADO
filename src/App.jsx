@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import html2canvas from 'html2canvas'
 import { auth, db, loginGoogle, logout } from './firebase'
 import QRCode from 'react-qr-code'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -255,6 +256,8 @@ export default function App() {
   })
   const [orcamentoSalvoMsg, setOrcamentoSalvoMsg] = useState(false)
   const [pixModal, setPixModal] = useState(false)
+  const pixCardRef = useRef(null)
+  const [compartilhando, setCompartilhando] = useState(false)
 
   // Firebase Auth listener
   useEffect(() => {
@@ -714,29 +717,58 @@ td{padding:8px;border-bottom:1px solid #ddd}
 
       {/* Modal PIX */}
       {pixModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: 'white', borderRadius: 16, padding: 28, maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
-            <div style={{ fontSize: 32, marginBottom: 4 }}>💠</div>
-            <h2 style={{ color: '#00875a', margin: '0 0 4px' }}>Cobrança PIX</h2>
-            <p style={{ color: '#777', fontSize: 13, margin: '0 0 16px' }}>Escaneie o QR Code com o app do banco</p>
-            <div style={{ background: '#f5f5f5', borderRadius: 12, padding: 16, marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
-              <QRCode value={buildPixPayload(total)} size={200} />
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, overflowY: 'auto' }}>
+          <div style={{ background: 'white', borderRadius: 16, maxWidth: 400, width: '100%', boxShadow: '0 8px 32px rgba(0,0,0,0.3)', overflow: 'hidden' }}>
+
+            {/* Card que será compartilhado */}
+            <div ref={pixCardRef} style={{ padding: 24, background: 'white' }}>
+              {/* Header */}
+              <div style={{ textAlign: 'center', borderBottom: '2px solid #00875a', paddingBottom: 12, marginBottom: 16 }}>
+                <div style={{ fontSize: 20, fontWeight: 'bold', color: '#00875a' }}>🫓 Candeias Jr — Cobrança PIX</div>
+                <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{new Date().toLocaleString('pt-BR')}</div>
+              </div>
+              {/* Franqueado */}
+              <div style={{ fontSize: 13, color: '#444', marginBottom: 12 }}>
+                <b>Franqueado:</b> {franqueado.nome || '—'} &nbsp;|&nbsp; <b>Unidade:</b> {franqueado.unidade || '—'}
+              </div>
+              {/* Itens */}
+              <div style={{ marginBottom: 12, maxHeight: 160, overflowY: 'auto' }}>
+                {carrinho.map((item, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, padding: '3px 0', borderBottom: '1px solid #f0f0f0' }}>
+                    <span>{item.nome} ({item.porcao}) × {item.quantidade}</span>
+                    <span style={{ fontWeight: 'bold' }}>{(item.preco * item.quantidade).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                  </div>
+                ))}
+              </div>
+              {/* Total */}
+              <div style={{ background: '#e8f8f2', borderRadius: 8, padding: '10px 14px', textAlign: 'center', marginBottom: 16 }}>
+                <div style={{ fontSize: 12, color: '#555' }}>TOTAL A PAGAR</div>
+                <div style={{ fontSize: 26, fontWeight: 'bold', color: '#00875a' }}>{total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+              </div>
+              {/* QR Code */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                <div style={{ background: '#f9f9f9', padding: 12, borderRadius: 10, border: '1px solid #eee' }}>
+                  <QRCode value={buildPixPayload(total)} size={180} />
+                </div>
+                <div style={{ fontSize: 11, color: '#888', textAlign: 'center' }}>
+                  <div>Beneficiário: <b>{PIX_NAME}</b></div>
+                  <div style={{ wordBreak: 'break-all', fontSize: 10, marginTop: 2 }}>Chave: {PIX_KEY}</div>
+                </div>
+              </div>
             </div>
-            <div style={{ background: '#e8f8f2', borderRadius: 10, padding: '12px 16px', marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: '#555', marginBottom: 2 }}>Valor a pagar</div>
-              <div style={{ fontSize: 28, fontWeight: 'bold', color: '#00875a' }}>{total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-              <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>Beneficiário: {PIX_NAME}</div>
-            </div>
-            <div style={{ background: '#f5f5f5', borderRadius: 8, padding: '8px 12px', marginBottom: 16, fontSize: 11, color: '#888', wordBreak: 'break-all' }}>
-              Chave PIX: {PIX_KEY}
-            </div>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => { navigator.clipboard?.writeText(buildPixPayload(total)); alert('Código PIX Copia e Cola copiado!') }}
-                style={{ flex: 1, padding: 12, background: '#00875a', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', fontSize: 13 }}>
-                📋 Copiar Código
+
+            {/* Botões fora do card */}
+            <div style={{ padding: '12px 24px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <button onClick={compartilharPedido} disabled={compartilhando}
+                style={{ width: '100%', padding: 13, background: 'linear-gradient(135deg,#00875a,#00a86b)', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', fontSize: 15 }}>
+                {compartilhando ? '⏳ Gerando...' : '📤 Compartilhar Pedido com QR Code'}
+              </button>
+              <button onClick={() => { navigator.clipboard?.writeText(buildPixPayload(total)); alert('Código copiado!') }}
+                style={{ width: '100%', padding: 11, background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', fontSize: 13 }}>
+                📋 Copiar Código PIX Copia e Cola
               </button>
               <button onClick={() => setPixModal(false)}
-                style={{ flex: 1, padding: 12, background: '#eee', color: '#333', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', fontSize: 13 }}>
+                style={{ width: '100%', padding: 11, background: 'white', color: '#999', border: '1px solid #ddd', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}>
                 ✕ Fechar
               </button>
             </div>
