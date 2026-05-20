@@ -85,7 +85,7 @@ const CATEGORIAS = {
       { id: "batata-congelada-350", nome: "Batata Frita P", preco: 4.62, porcao: "325g" },
       { id: "batata-congelada-625", nome: "Batata Frita G", preco: 8.25, porcao: "650g" },
       { id: "pure", nome: "Purê", preco: 8.45, porcao: "500g" },
-      { id: "saco-pao-hot-dog", nome: "Pão Hot Dog", preco: 27.50, porcao: "20 unid." },
+      { id: "saco-pao-hot-dog", nome: "Pão Hot Dog", preco: 13.50, porcao: "10 unid." },
     ]
   },
   doces: {
