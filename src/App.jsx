@@ -142,7 +142,7 @@ const CATEGORIAS = {
       { id: "bandeja-bh-101", nome: "Estojo 101", preco: 52.41, porcao: "cx c/100" },
       { id: "papel-tv", nome: "Papel TV", preco: 10.23, porcao: "un" },
       { id: "interfolha", nome: "Interfolha", preco: 12.76, porcao: "1 pct" },
-      { id: "saco-grecepell-1kg", nome: "Saco Grecepell 1kg", preco: 106.70, porcao: "500 unidades" },
+      { id: "saco-grecepell-1kg", nome: "Saco Grecepell 1kg", preco: 55.00, porcao: "500 unidades" },
       { id: "saco-grecepell-2kg", nome: "Saco Grecepell 2kg", preco: 74.25, porcao: "500 unidades" },
       { id: "toalha-americana", nome: "Toalha Americana", preco: 26.18, porcao: "1 pacote" },
       { id: "copo-300", nome: "Copo 300ml", preco: 7.81, porcao: "pct" },
