@@ -42,7 +42,7 @@ const CATEGORIAS = {
     unidade: "gramas",
     itens: [
       { id: "queijo-fresco", nome: "Queijo Fresco", preco: 4.3, porcao: "100g" },
-      { id: "provolone", nome: "Provolone", preco: 1.11, porcao: "20g" },
+      { id: "provolone", nome: "Provolone", preco: 1.11, porcao: "30g" },
       { id: "queijo-prato", nome: "Queijo Prato", preco: 1.26, porcao: "30g" },
       { id: "apresuntado", nome: "Apresuntado", preco: 1.52, porcao: "60g" , vendaPorKg: true, kgBase: 0.06 },
       { id: "mussarela", nome: "Mussarela", preco: 2.87, porcao: "60g" , vendaPorKg: true, kgBase: 0.06 },
