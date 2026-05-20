@@ -711,6 +711,38 @@ td{padding:8px;border-bottom:1px solid #ddd}
           )}
         </div>
       )}
+
+      {/* Modal PIX */}
+      {pixModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div style={{ background: 'white', borderRadius: 16, padding: 28, maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
+            <div style={{ fontSize: 32, marginBottom: 4 }}>💠</div>
+            <h2 style={{ color: '#00875a', margin: '0 0 4px' }}>Cobrança PIX</h2>
+            <p style={{ color: '#777', fontSize: 13, margin: '0 0 16px' }}>Escaneie o QR Code com o app do banco</p>
+            <div style={{ background: '#f5f5f5', borderRadius: 12, padding: 16, marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+              <QRCode value={buildPixPayload(total)} size={200} />
+            </div>
+            <div style={{ background: '#e8f8f2', borderRadius: 10, padding: '12px 16px', marginBottom: 12 }}>
+              <div style={{ fontSize: 12, color: '#555', marginBottom: 2 }}>Valor a pagar</div>
+              <div style={{ fontSize: 28, fontWeight: 'bold', color: '#00875a' }}>{total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+              <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>Beneficiário: {PIX_NAME}</div>
+            </div>
+            <div style={{ background: '#f5f5f5', borderRadius: 8, padding: '8px 12px', marginBottom: 16, fontSize: 11, color: '#888', wordBreak: 'break-all' }}>
+              Chave PIX: {PIX_KEY}
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => { navigator.clipboard?.writeText(buildPixPayload(total)); alert('Código PIX Copia e Cola copiado!') }}
+                style={{ flex: 1, padding: 12, background: '#00875a', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', fontSize: 13 }}>
+                📋 Copiar Código
+              </button>
+              <button onClick={() => setPixModal(false)}
+                style={{ flex: 1, padding: 12, background: '#eee', color: '#333', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', fontSize: 13 }}>
+                ✕ Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
-       }
+}
