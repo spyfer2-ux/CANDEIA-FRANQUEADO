@@ -58,7 +58,6 @@ const CATEGORIAS = {
     itens: [
       { id: "escarola", nome: "Escarola", preco: 3.42, porcao: "70g" },
       { id: "laka", nome: "Laka", preco: 6.06, porcao: "100g" },
-      { id: "goiabada", nome: "Goiabada", preco: 1.30, porcao: "100g" },
       { id: "azeitona", nome: "Balde de Azeitona", preco: 27.5, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 },
       { id: "tomate-seco", nome: "Tomate Seco", preco: 53.66, porcao: "4kg" },
       { id: "milho-mistura", nome: "Milho Mistura", preco: 0.71, porcao: "40g" },
@@ -94,6 +93,7 @@ const CATEGORIAS = {
     unidade: "unidade",
     itens: [
       { id: "acucar", nome: "Açúcar", preco: 5.20, porcao: "kg" },
+      { id: "goiabada", nome: "Goiabada", preco: 1.30, porcao: "100g" },
       { id: "doce-leite", nome: "Doce de Leite", preco: 135.0, porcao: "balde 4,8kg" , vendaPorKg: true, kgBase: 4.8 },
       { id: "beijinho", nome: "Beijinho", preco: 39.06, porcao: "1kg" },
       { id: "chocolate-cremoso", nome: "Chocolate Cremoso Gourmet", preco: 45.00, porcao: "kg", vendaPorKg: true, kgBase: 1.0 },
