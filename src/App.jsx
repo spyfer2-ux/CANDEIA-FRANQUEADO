@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { auth, db, loginGoogle, logout } from './firebase'
 import { onAuthStateChanged } from 'firebase/auth'
-import { collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, updateDoc } from 'firebase/firestore'
+import { collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, updateDoc, onSnapshot } from 'firebase/firestore'
 
 const ADMIN_PIN = "1234"
 
@@ -227,28 +227,30 @@ export default function App() {
 
   // Firebase Auth listener
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
+    let unsubSnap = null
+    const unsub = onAuthStateChanged(auth, (user) => {
       setUsuario(user)
       setLoadingAuth(false)
+      if (unsubSnap) { unsubSnap(); unsubSnap = null }
       if (user) {
-        // Carrega or�amentos do Firestore
-        try {
-          const q = query(collection(db, 'orcamentos'), where('uid', '==', user.uid))
-          const snap = await getDocs(q)
-          const lista = snap.docs.map(d => ({ docId: d.id, ...d.data() }))
-          // Ordenar por id (timestamp) decrescente no cliente
-          lista.sort((a, b) => b.id - a.id)
-          setOrcamentosSalvos(lista)
-        } catch(e) { console.error('Firestore error:', e) }
+        // Listener em tempo real dos pedidos do Firestore
+        const q = query(collection(db, 'orcamentos'), where('uid', '==', user.uid))
+        unsubSnap = onSnapshot(q,
+          (snap) => {
+            const lista = snap.docs.map(d => ({ docId: d.id, ...d.data() }))
+            lista.sort((a, b) => b.id - a.id)
+            setOrcamentosSalvos(lista)
+          },
+          (e) => { console.error('Firestore listener error:', e); alert('Erro ao carregar pedidos: ' + e.message) }
+        )
       } else {
-        // Sem login: carregar do localStorage
         try {
           const local = JSON.parse(localStorage.getItem('orcamentos_salvos') || '[]')
           setOrcamentosSalvos(local)
         } catch(e) { setOrcamentosSalvos([]) }
       }
     })
-    return () => unsub()
+    return () => { unsub(); if (unsubSnap) unsubSnap() }
   }, [])
 
   // Auto-salva rascunho no localStorage sempre que carrinho ou franqueado mudar
@@ -395,9 +397,13 @@ td{padding:8px;border-bottom:1px solid #ddd}
     }
     if (usuario) {
       try {
-        const docRef = await addDoc(collection(db, 'orcamentos'), orcamento)
-        setOrcamentosSalvos([{ docId: docRef.id, ...orcamento }, ...orcamentosSalvos])
-      } catch(e) { console.error(e) }
+        await addDoc(collection(db, 'orcamentos'), orcamento)
+        // onSnapshot atualiza a lista automaticamente
+      } catch(e) {
+        console.error('Erro ao salvar:', e)
+        alert('Erro ao salvar pedido: ' + e.message + '\nVerifique sua conexão e tente novamente.')
+        return
+      }
     } else {
       const novos = [orcamento, ...orcamentosSalvos]
       setOrcamentosSalvos(novos)
