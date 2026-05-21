@@ -1,9 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
-import html2canvas from 'html2canvas'
+import { useState, useEffect } from 'react'
 import { auth, db, loginGoogle, logout } from './firebase'
-import QRCode from 'react-qr-code'
 import { onAuthStateChanged } from 'firebase/auth'
-import { collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore'
+import { collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, updateDoc } from 'firebase/firestore'
 
 const ADMIN_PIN = "1234"
 
@@ -197,37 +195,6 @@ const UNIDADES = [
 ]
 
 
-// ── PIX ──────────────────────────────────────────────────────────────────────
-const PIX_KEY = 'f24b7d0b-79be-4404-b53d-cbb153c38f31'
-const PIX_NAME = 'CANDEIAS JR'
-const PIX_CITY = 'SAO PAULO'
-
-function crc16(str) {
-  let crc = 0xFFFF
-  for (let i = 0; i < str.length; i++) {
-    crc ^= str.charCodeAt(i) << 8
-    for (let j = 0; j < 8; j++) {
-      crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1
-      crc &= 0xFFFF
-    }
-  }
-  return crc
-}
-
-function buildPixPayload(amount) {
-  const f = (id, val) => `${id}${String(val.length).padStart(2,'0')}${val}`
-  const gui = f('00','BR.GOV.BCB.PIX') + f('01', PIX_KEY)
-  const merchantAccount = f('26', gui)
-  const name = PIX_NAME.substring(0,25)
-  const city = PIX_CITY.substring(0,15)
-  const amtStr = amount.toFixed(2)
-  const txId = f('05','***')
-  let payload = f('00','01') + f('01','12') + merchantAccount +
-    f('52','0000') + f('53','986') + f('54', amtStr) +
-    f('58','BR') + f('59', name) + f('60', city) + f('62', txId) + '6304'
-  const crc = crc16(payload).toString(16).toUpperCase().padStart(4,'0')
-  return payload + crc
-}
 
 export default function App() {
   const [usuario, setUsuario] = useState(null)
@@ -255,9 +222,6 @@ export default function App() {
     catch { return [] }
   })
   const [orcamentoSalvoMsg, setOrcamentoSalvoMsg] = useState(false)
-  const [pixModal, setPixModal] = useState(false)
-  const pixCardRef = useRef(null)
-  const [compartilhando, setCompartilhando] = useState(false)
 
   // Firebase Auth listener
   useEffect(() => {
@@ -417,6 +381,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
   const salvarOrcamento = async () => {
     if (carrinho.length === 0) return
     const orcamento = {
+      status: 'pendente',
       id: Date.now(),
       data: new Date().toLocaleString('pt-BR'),
       franqueado: franqueado.nome || 'Sem nome',
@@ -438,6 +403,17 @@ td{padding:8px;border-bottom:1px solid #ddd}
     }
     setOrcamentoSalvoMsg(true)
     setTimeout(() => setOrcamentoSalvoMsg(false), 3000)
+  }
+
+
+  const darBaixa = async (o) => {
+    const novoStatus = 'concluido'
+    if (o.docId) {
+      try {
+        await updateDoc(doc(db, 'orcamentos', o.docId), { status: novoStatus })
+      } catch (e) { console.error(e) }
+    }
+    setOrcamentosSalvos(prev => prev.map(x => x.id === o.id ? { ...x, status: novoStatus } : x))
   }
 
   const excluirOrcamento = async (id, docId) => {
@@ -474,7 +450,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
 
       {/* Tabs */}
       <div style={{ display: 'flex', borderBottom: '2px solid #e74c3c', background: 'white' }}>
-        {[['pedido','📋 Pedido'],['carrinho',`🛒 Carrinho (${carrinho.length})`],['admin','⚙️ Admin']].map(([key,label]) => (
+        {[['pedido','📋 Pedido'],['carrinho',`🛒 Carrinho (${carrinho.length})`],['meus-pedidos','📦 Meus Pedidos'],['admin','⚙️ Admin']].map(([key,label]) => (
           <button key={key} onClick={() => setAba(key)} style={{ flex: 1, padding: '12px', border: 'none', background: aba === key ? '#e74c3c' : 'white', color: aba === key ? 'white' : '#333', fontWeight: 'bold', fontSize: 14, transition: 'all 0.2s' }}>{label}</button>
         ))}
       </div>
@@ -620,8 +596,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   <span style={{ color: '#c0392b' }}>{formatPreco(total)}</span>
                 </div>
                 <button onClick={gerarPDF} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>📄 Gerar PDF do Pedido</button>
-                <button onClick={() => setPixModal(true)} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #00875a, #00a86b)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>💠 Gerar Cobrança PIX</button>
-                <button onClick={salvarOrcamento} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #2c3e50, #3d5166)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>💾 Salvar Orçamento</button>
+                                <button onClick={salvarOrcamento} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #2c3e50, #3d5166)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>💾 Salvar Orçamento</button>
                 {orcamentoSalvoMsg && (
                   <div style={{ background: '#eafaf1', border: '1px solid #27ae60', borderRadius: 8, padding: '10px 14px', color: '#27ae60', fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>
                     ✅ Orçamento salvo com sucesso!
@@ -634,6 +609,52 @@ td{padding:8px;border-bottom:1px solid #ddd}
                 )}
               </div>
             </>
+          )}
+        </div>
+      )}
+
+
+      {/* ABA MEUS PEDIDOS */}
+      {aba === 'meus-pedidos' && (
+        <div style={{ padding: 16 }}>
+          <h2 style={{ color: '#c0392b', margin: '0 0 16px' }}>📦 Meus Pedidos Realizados</h2>
+          {!usuario ? (
+            <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>
+              <p style={{ fontSize: 16 }}>Faça login para ver seus pedidos.</p>
+              <button onClick={loginGoogle} style={{ marginTop: 12, background: '#c0392b', color: 'white', border: 'none', borderRadius: 8, padding: '10px 24px', cursor: 'pointer', fontWeight: 'bold', fontSize: 15 }}>Entrar com Google</button>
+            </div>
+          ) : orcamentosSalvos.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 40, color: '#aaa' }}>
+              <div style={{ fontSize: 48 }}>📦</div>
+              <p>Nenhum pedido realizado ainda.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {orcamentosSalvos.map(o => (
+                <div key={o.id} style={{ background: 'white', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: `2px solid ${o.status === 'concluido' ? '#27ae60' : '#e74c3c'}` }}>
+                  <div style={{ padding: '12px 16px', background: o.status === 'concluido' ? '#eafaf1' : '#fff5f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontWeight: 'bold', color: '#333', fontSize: 14 }}>📅 {o.data}</div>
+                      <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>Unidade: {o.unidade || '—'}</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontWeight: 'bold', color: '#c0392b', fontSize: 16 }}>{o.total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                      <div style={{ marginTop: 4, padding: '2px 10px', borderRadius: 12, fontSize: 11, fontWeight: 'bold', background: o.status === 'concluido' ? '#27ae60' : '#e74c3c', color: 'white', display: 'inline-block' }}>
+                        {o.status === 'concluido' ? '✅ Concluído' : '⏳ Pendente'}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ padding: '10px 16px' }}>
+                    {(o.itens || []).map((item, i) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '2px 0', color: '#555' }}>
+                        <span>{item.nome} ({item.porcao}) × {item.quantidade}</span>
+                        <span>{(item.preco * item.quantidade).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}
@@ -715,66 +736,6 @@ td{padding:8px;border-bottom:1px solid #ddd}
         </div>
       )}
 
-      {/* Modal PIX */}
-      {pixModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, overflowY: 'auto' }}>
-          <div style={{ background: 'white', borderRadius: 16, maxWidth: 400, width: '100%', boxShadow: '0 8px 32px rgba(0,0,0,0.3)', overflow: 'hidden' }}>
-
-            {/* Card que será compartilhado */}
-            <div ref={pixCardRef} style={{ padding: 24, background: 'white' }}>
-              {/* Header */}
-              <div style={{ textAlign: 'center', borderBottom: '2px solid #00875a', paddingBottom: 12, marginBottom: 16 }}>
-                <div style={{ fontSize: 20, fontWeight: 'bold', color: '#00875a' }}>🫓 Candeias Jr — Cobrança PIX</div>
-                <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{new Date().toLocaleString('pt-BR')}</div>
-              </div>
-              {/* Franqueado */}
-              <div style={{ fontSize: 13, color: '#444', marginBottom: 12 }}>
-                <b>Franqueado:</b> {franqueado.nome || '—'} &nbsp;|&nbsp; <b>Unidade:</b> {franqueado.unidade || '—'}
-              </div>
-              {/* Itens */}
-              <div style={{ marginBottom: 12, maxHeight: 160, overflowY: 'auto' }}>
-                {carrinho.map((item, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, padding: '3px 0', borderBottom: '1px solid #f0f0f0' }}>
-                    <span>{item.nome} ({item.porcao}) × {item.quantidade}</span>
-                    <span style={{ fontWeight: 'bold' }}>{(item.preco * item.quantidade).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                  </div>
-                ))}
-              </div>
-              {/* Total */}
-              <div style={{ background: '#e8f8f2', borderRadius: 8, padding: '10px 14px', textAlign: 'center', marginBottom: 16 }}>
-                <div style={{ fontSize: 12, color: '#555' }}>TOTAL A PAGAR</div>
-                <div style={{ fontSize: 26, fontWeight: 'bold', color: '#00875a' }}>{total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-              </div>
-              {/* QR Code */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                <div style={{ background: '#f9f9f9', padding: 12, borderRadius: 10, border: '1px solid #eee' }}>
-                  <QRCode value={buildPixPayload(total)} size={180} />
-                </div>
-                <div style={{ fontSize: 11, color: '#888', textAlign: 'center' }}>
-                  <div>Beneficiário: <b>{PIX_NAME}</b></div>
-                  <div style={{ wordBreak: 'break-all', fontSize: 10, marginTop: 2 }}>Chave: {PIX_KEY}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Botões fora do card */}
-            <div style={{ padding: '12px 24px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <button onClick={compartilharPedido} disabled={compartilhando}
-                style={{ width: '100%', padding: 13, background: 'linear-gradient(135deg,#00875a,#00a86b)', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', fontSize: 15 }}>
-                {compartilhando ? '⏳ Gerando...' : '📤 Compartilhar Pedido com QR Code'}
-              </button>
-              <button onClick={() => { navigator.clipboard?.writeText(buildPixPayload(total)); alert('Código copiado!') }}
-                style={{ width: '100%', padding: 11, background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', fontSize: 13 }}>
-                📋 Copiar Código PIX Copia e Cola
-              </button>
-              <button onClick={() => setPixModal(false)}
-                style={{ width: '100%', padding: 11, background: 'white', color: '#999', border: '1px solid #ddd', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}>
-                ✕ Fechar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
