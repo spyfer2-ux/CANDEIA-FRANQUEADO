@@ -196,6 +196,8 @@ const UNIDADES = [
 
 
 
+const ADMIN_EMAIL = 'jrmauro380@gmail.com'
+
 export default function App() {
   const [usuario, setUsuario] = useState(null)
   const [loadingAuth, setLoadingAuth] = useState(true)
@@ -407,6 +409,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
 
 
   const darBaixa = async (o) => {
+    if (usuario?.email?.toLowerCase() !== ADMIN_EMAIL) return
     const novoStatus = 'concluido'
     if (o.docId) {
       try {
@@ -450,7 +453,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
 
       {/* Tabs */}
       <div style={{ display: 'flex', borderBottom: '2px solid #e74c3c', background: 'white' }}>
-        {[['pedido','📋 Pedido'],['carrinho',`🛒 Carrinho (${carrinho.length})`],['meus-pedidos','📦 Meus Pedidos'],['admin','⚙️ Admin']].map(([key,label]) => (
+        {[['pedido','📋 Pedido'],['carrinho',`🛒 Carrinho (${carrinho.length})`],['meus-pedidos','📦 Meus Pedidos'],...(usuario?.email?.toLowerCase() === ADMIN_EMAIL ? [['admin','⚙️ Admin']] : [])].map(([key,label]) => (
           <button key={key} onClick={() => setAba(key)} style={{ flex: 1, padding: '12px', border: 'none', background: aba === key ? '#e74c3c' : 'white', color: aba === key ? 'white' : '#333', fontWeight: 'bold', fontSize: 14, transition: 'all 0.2s' }}>{label}</button>
         ))}
       </div>
@@ -660,7 +663,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
       )}
 
       {/* ABA ADMIN */}
-      {aba === 'admin' && (
+      {aba === 'admin' && usuario?.email?.toLowerCase() === ADMIN_EMAIL && (
         <div style={{ padding: 16 }}>
           {!adminLogado ? (
             <div style={{ maxWidth: 360, margin: '40px auto', background: 'white', padding: 24, borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }}>
