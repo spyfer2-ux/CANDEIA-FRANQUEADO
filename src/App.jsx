@@ -227,11 +227,19 @@ export default function App() {
 
   // Firebase Auth listener
   useEffect(() => {
-    // Processar resultado do redirect de login
-    getRedirectResult(auth).catch(e => console.error('Redirect error:', e))
-
     let unsubSnap = null
-    const unsub = onAuthStateChanged(auth, (user) => {
+
+    const init = async () => {
+      // Primeiro processar resultado do redirect
+      try {
+        const result = await getRedirectResult(auth)
+        if (result?.user) console.log('Login por redirect OK:', result.user.email)
+      } catch (e) {
+        console.error('Redirect error:', e)
+      }
+
+      // Depois configurar listener de auth
+      const unsub = onAuthStateChanged(auth, (user) => {
       setUsuario(user)
       setLoadingAuth(false)
       if (unsubSnap) { unsubSnap(); unsubSnap = null }
@@ -252,8 +260,13 @@ export default function App() {
           setOrcamentosSalvos(local)
         } catch(e) { setOrcamentosSalvos([]) }
       }
-    })
-    return () => { unsub(); if (unsubSnap) unsubSnap() }
+      })
+      return unsub
+    }
+
+    let cleanup = null
+    init().then(unsub => { cleanup = unsub })
+    return () => { if (cleanup) cleanup(); if (unsubSnap) unsubSnap() }
   }, [])
 
   // Auto-salva rascunho no localStorage sempre que carrinho ou franqueado mudar
