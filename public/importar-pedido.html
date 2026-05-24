@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Importar Pedido #10002 — Candeias Jr</title>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: 60px auto; padding: 20px; text-align: center; background: #fdf6ec; }
+    h2 { color: #c0392b; }
+    button { padding: 16px 32px; background: #c0392b; color: white; border: none; border-radius: 10px; font-size: 18px; cursor: pointer; margin: 10px; }
+    button:disabled { background: #ccc; cursor: default; }
+    #status { margin-top: 20px; padding: 16px; border-radius: 8px; font-size: 15px; }
+    .ok { background: #eafaf1; color: #27ae60; }
+    .err { background: #fdecea; color: #c0392b; }
+    .info { background: #eaf3fb; color: #1a6a9b; }
+  </style>
+</head>
+<body>
+  <h2>🫓 Importar Pedido #10002</h2>
+  <p>Pedido de <b>Jd Vila Formosa</b> — 19/05/2026</p>
+  <p>Total: <b>R$ 6.329,15</b> — 88 itens</p>
+
+  <button onclick="importar()" id="btn">📥 Importar Pedido</button>
+
+  <div id="status" class="info">Clique para importar o pedido histórico para o Firestore.</div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js'
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js'
+    import { getFirestore, collection, addDoc, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js'
+
+    const app = initializeApp({
+      apiKey: "AIzaSyBHk_pJO_-xvIZ3gsiSNNaq7NfHsW-VPZI",
+      authDomain: "candeia-jr.firebaseapp.com",
+      projectId: "candeia-jr",
+      storageBucket: "candeia-jr.firebasestorage.app",
+      messagingSenderId: "825450097768",
+      appId: "1:825450097768:web:da2bc771011825b68c1fdd"
+    })
+
+    const auth = getAuth(app)
+    const db = getFirestore(app)
+
+    const itens = [
+      { nome: 'Queijo Fresco', porcao: '100g', quantidade: 10, preco: 4.50 },
+      { nome: 'Bacon Mistura', porcao: '20g', quantidade: 90, preco: 2.68 },
+      { nome: 'Bacon Puro', porcao: '30g', quantidade: 20, preco: 4.47 },
+      { nome: 'Ervilha', porcao: 'un', quantidade: 20, preco: 0.75 },
+      { nome: 'Milho Puro', porcao: '80g', quantidade: 10, preco: 1.65 },
+      { nome: 'Milho Mistura', porcao: '40g', quantidade: 50, preco: 0.85 },
+      { nome: 'Carne Louca Mistura', porcao: '60g', quantidade: 20, preco: 4.13 },
+      { nome: 'Carne Mistura', porcao: '50g', quantidade: 100, preco: 3.60 },
+      { nome: 'Frango Puro', porcao: '70g', quantidade: 20, preco: 3.19 },
+      { nome: 'Frango Mistura', porcao: '50g', quantidade: 90, preco: 2.48 },
+      { nome: 'Portuguesa', porcao: '50g', quantidade: 20, preco: 3.05 },
+      { nome: 'Misturinha', porcao: '40g', quantidade: 20, preco: 0.80 },
+      { nome: 'Berinjela', porcao: '80g', quantidade: 10, preco: 3.56 },
+      { nome: 'Carne Pura', porcao: '70g', quantidade: 60, preco: 5.16 },
+      { nome: 'Palmito Mistura', porcao: '70g', quantidade: 30, preco: 2.34 },
+      { nome: 'Palmito Puro', porcao: '150g', quantidade: 20, preco: 5.15 },
+      { nome: 'Maionese', porcao: '1kg', quantidade: 1, preco: 13.50 },
+      { nome: 'Batata Congelada P', porcao: '350g', quantidade: 6, preco: 4.62 },
+      { nome: 'Batata Congelada G', porcao: '625g', quantidade: 6, preco: 8.25 },
+      { nome: 'Massa de Pastel', porcao: '1kg', quantidade: 60, preco: 9.40 },
+      { nome: 'Óleo', porcao: 'un', quantidade: 28, preco: 7.57 },
+      { nome: 'Açúcar', porcao: 'kg', quantidade: 1, preco: 5.20 },
+      { nome: 'Chocolate ao Leite', porcao: '100g', quantidade: 5, preco: 4.40 },
+      { nome: 'Chocolate Branco', porcao: '100g', quantidade: 8, preco: 4.00 },
+      { nome: 'Chocolate Gourmet', porcao: '2,730 kg', quantidade: 1, preco: 122.85 },
+      { nome: 'Doce de Leite', porcao: 'balde 4,8kg', quantidade: 1, preco: 135.00 },
+      { nome: 'Bisnaga Cheddar', porcao: '1,2kg', quantidade: 2, preco: 13.50 },
+      { nome: 'Salsicha', porcao: 'Un', quantidade: 60, preco: 0.65 },
+      { nome: 'Goiabada', porcao: '100g', quantidade: 10, preco: 1.30 },
+      { nome: 'Balde de Azeitona', porcao: '1kg', quantidade: 2, preco: 27.50 },
+      { nome: 'Brócolis', porcao: 'Pct 70g', quantidade: 30, preco: 4.79 },
+      { nome: 'Morango', porcao: '100g', quantidade: 1, preco: 11.00 },
+      { nome: 'Molho Alho', porcao: 'un', quantidade: 1, preco: 13.20 },
+      { nome: 'Pimenta', porcao: 'un', quantidade: 1, preco: 13.49 },
+      { nome: 'Batata Palha', porcao: '860g', quantidade: 1, preco: 29.90 },
+      { nome: 'Purê', porcao: '500g', quantidade: 4, preco: 8.45 },
+      { nome: 'Carne Louca Lanche', porcao: '160g', quantidade: 10, preco: 10.96 },
+      { nome: 'Carne Louca Pura', porcao: '100g', quantidade: 10, preco: 7.24 },
+      { nome: 'Empada Frango c/ Catupiry', porcao: 'un', quantidade: 5, preco: 7.50 },
+      { nome: 'Empada de Palmito', porcao: 'un', quantidade: 5, preco: 7.50 },
+      { nome: 'Esfiha Frango Catupiry', porcao: 'un', quantidade: 2, preco: 7.50 },
+      { nome: 'Esfiha Calabresa Catupiry', porcao: 'un', quantidade: 5, preco: 7.50 },
+      { nome: 'Esfiha de Carne', porcao: 'un', quantidade: 3, preco: 7.50 },
+      { nome: 'Bandeja BH 102', porcao: 'cx c/100', quantidade: 1, preco: 124.30 },
+      { nome: 'Bandeja BH 101', porcao: 'cx c/100', quantidade: 1, preco: 52.41 },
+      { nome: 'Papel TV', porcao: 'un', quantidade: 2, preco: 10.23 },
+      { nome: 'Interfolha', porcao: '1 pct', quantidade: 2, preco: 12.76 },
+      { nome: 'Toalha Americana', porcao: 'pct', quantidade: 1, preco: 26.18 },
+      { nome: 'Luva Descartável', porcao: 'cx', quantidade: 1, preco: 2.20 },
+      { nome: 'Luva Borracha', porcao: 'par', quantidade: 1, preco: 5.60 },
+      { nome: 'Bombril', porcao: 'un', quantidade: 1, preco: 2.80 },
+      { nome: 'Papel Toalha', porcao: 'rolo', quantidade: 1, preco: 6.20 },
+      { nome: 'Detergente', porcao: 'un', quantidade: 1, preco: 2.90 },
+      { nome: 'Saco de Lixo', porcao: 'un', quantidade: 1, preco: 13.46 },
+      { nome: 'Sacola 25x35', porcao: 'c/100', quantidade: 1, preco: 4.18 },
+      { nome: 'Sacola 35x45', porcao: 'c/100', quantidade: 1, preco: 8.25 },
+      { nome: 'Bobinas Impressora', porcao: '3un', quantidade: 1, preco: 15.84 },
+      { nome: 'Durex', porcao: '5un', quantidade: 1, preco: 20.90 },
+      { nome: 'Embalagem de Lanche', porcao: 'un', quantidade: 1, preco: 30.25 },
+      { nome: 'Viagem', porcao: 'un', quantidade: 1, preco: 6.60 },
+      { nome: 'Saco Hot Dog', porcao: 'un', quantidade: 1, preco: 11.00 },
+      { nome: 'Coco Ralado', porcao: '400g', quantidade: 1, preco: 19.60 },
+      { nome: 'Canela', porcao: '100g', quantidade: 1, preco: 13.50 },
+      { nome: 'Suflair', porcao: 'pacote', quantidade: 2, preco: 8.00 },
+      { nome: 'Ameixa', porcao: '400g', quantidade: 1, preco: 19.60 },
+      { nome: 'Cereja', porcao: '100g', quantidade: 2, preco: 12.60 },
+      { nome: 'Granulado', porcao: '100g', quantidade: 1, preco: 31.70 },
+      { nome: 'Copo 300ml', porcao: 'pct', quantidade: 2, preco: 7.81 },
+      { nome: 'Copo 180ml', porcao: 'pct', quantidade: 2, preco: 4.18 },
+      { nome: 'Saco de Canudo', porcao: 'un', quantidade: 1, preco: 12.10 },
+      { nome: 'Touca Descartável', porcao: 'pct', quantidade: 1, preco: 16.50 },
+      { nome: 'Carne Seca Mistura', porcao: '40g', quantidade: 40, preco: 7.78 },
+      { nome: 'Salame', porcao: '50g', quantidade: 30, preco: 3.50 },
+      { nome: 'Requeijão 3 Marias', porcao: '5un', quantidade: 1, preco: 204.16 },
+      { nome: 'Apresuntado', porcao: '3,560 kg', quantidade: 1, preco: 90.19 },
+      { nome: 'Escarola', porcao: '70g', quantidade: 20, preco: 3.42 },
+      { nome: 'Atum', porcao: '70g', quantidade: 30, preco: 5.00 },
+      { nome: 'Tomate Seco', porcao: '4kg', quantidade: 1, preco: 53.66 },
+      { nome: 'Queijo Prato', porcao: '20g', quantidade: 20, preco: 1.26 },
+      { nome: 'Provolone', porcao: '30g', quantidade: 20, preco: 1.60 },
+      { nome: 'Bandeja Batata G', porcao: 'c/100 unid.', quantidade: 1, preco: 49.90 },
+      { nome: 'Caixa Grande', porcao: 'un', quantidade: 26, preco: 2.46 },
+      { nome: 'Caixa Média', porcao: 'un', quantidade: 24, preco: 2.09 },
+      { nome: 'Bandeja Batata P', porcao: 'unidade', quantidade: 16, preco: 0.25 },
+      { nome: 'Embalagem Empada P', porcao: 'cx c/20', quantidade: 20, preco: 0.00 },
+      { nome: 'Mussarela', porcao: '18,359 kg', quantidade: 1, preco: 878.17 },
+      { nome: 'Embalagem Empada G', porcao: 'unidade', quantidade: 10, preco: 0.19 },
+      { nome: 'Orégano', porcao: '500g', quantidade: 1, preco: 14.60 },
+    ]
+
+    window.importar = async () => {
+      const st = document.getElementById('status')
+      const btn = document.getElementById('btn')
+      btn.disabled = true
+
+      // Login se necessário
+      if (!auth.currentUser) {
+        st.className = 'info'
+        st.textContent = '🔐 Fazendo login...'
+        try {
+          await signInWithPopup(auth, new GoogleAuthProvider())
+        } catch(e) {
+          st.className = 'err'
+          st.textContent = 'Erro no login: ' + e.message
+          btn.disabled = false
+          return
+        }
+      }
+
+      st.className = 'info'
+      st.textContent = '⏳ Importando pedido...'
+
+      try {
+        // Atualizar contador para 10002
+        const counterRef = doc(db, 'config', 'contador')
+        const counterSnap = await getDoc(counterRef)
+        const atualContador = counterSnap.exists() ? counterSnap.data().pedidos : 0
+        if (atualContador < 10002) {
+          await setDoc(counterRef, { pedidos: 10002 })
+        }
+
+        const pedido = {
+          numeroPedido: 10002,
+          id: 1747699510000,
+          data: '19/05/2026 23:05:10',
+          franqueado: 'Franqueado',
+          unidade: 'Jd Vila Formosa',
+          itens,
+          total: 6329.15,
+          status: 'pendente',
+          observacao: '',
+          uid: auth.currentUser.uid,
+          email: auth.currentUser.email
+        }
+
+        await addDoc(collection(db, 'orcamentos'), pedido)
+        st.className = 'ok'
+        st.textContent = '✅ Pedido #10002 importado com sucesso! Pode fechar esta página.'
+      } catch(e) {
+        st.className = 'err'
+        st.textContent = 'Erro: ' + e.message
+        btn.disabled = false
+      }
+    }
+  </script>
+</body>
+</html>
