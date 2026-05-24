@@ -248,7 +248,10 @@ export default function App() {
       if (unsubSnap) { unsubSnap(); unsubSnap = null }
       if (user) {
         // Listener em tempo real dos pedidos do Firestore
-        const q = query(collection(db, 'orcamentos'), where('uid', '==', user.uid))
+        // Admin vê todos os pedidos, franqueado vê só os seus
+        const q = isAdmin(user.email)
+          ? query(collection(db, 'orcamentos'))
+          : query(collection(db, 'orcamentos'), where('uid', '==', user.uid))
         unsubSnap = onSnapshot(q,
           (snap) => {
             const lista = snap.docs.map(d => ({ docId: d.id, ...d.data() }))
