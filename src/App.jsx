@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { auth, db, loginGoogle, logout, getRedirectResult } from './firebase'
 import { onAuthStateChanged } from 'firebase/auth'
-import { collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, updateDoc, onSnapshot } from 'firebase/firestore'
+import { collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, updateDoc, onSnapshot, getDoc, setDoc } from 'firebase/firestore'
 
 const ADMIN_PIN = "1234"
 
@@ -417,6 +417,16 @@ td{padding:8px;border-bottom:1px solid #ddd}
     }
     if (usuario) {
       try {
+        // Gerar número sequencial do pedido
+        const counterRef = doc(db, 'config', 'contador')
+        let numeroPedido = 1
+        try {
+          const counterSnap = await getDoc(counterRef)
+          if (counterSnap.exists()) numeroPedido = counterSnap.data().pedidos + 1
+          await setDoc(counterRef, { pedidos: numeroPedido })
+        } catch(e) { numeroPedido = Date.now() }
+        orcamento.numeroPedido = numeroPedido
+
         await addDoc(collection(db, 'orcamentos'), orcamento)
         // onSnapshot atualiza a lista automaticamente
       } catch(e) {
@@ -439,7 +449,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
     const linhas = (o.itens || []).map(item =>
       `• ${item.nome} (${item.porcao}) × ${item.quantidade} = ${(item.preco * item.quantidade).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`
     ).join('\n')
-    const texto = `🫓 *Pedido Candeias Jr*\n` +
+    const texto = `🫓 *Pedido Candeias Jr — #${o.numeroPedido || '—'}*\n` +
       `📅 ${o.data}\n` +
       `👤 ${o.franqueado || '—'} | ${o.unidade || '—'}\n\n` +
       `${linhas}\n\n` +
@@ -713,7 +723,8 @@ td{padding:8px;border-bottom:1px solid #ddd}
                 <div key={o.id} style={{ background: 'white', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: `2px solid ${o.status === 'concluido' ? '#27ae60' : '#e74c3c'}` }}>
                   <div style={{ padding: '12px 16px', background: o.status === 'concluido' ? '#eafaf1' : '#fff5f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontWeight: 'bold', color: '#333', fontSize: 14 }}>📅 {o.data}</div>
+                      <div style={{ fontWeight: 'bold', color: '#c0392b', fontSize: 15 }}>Pedido #{o.numeroPedido || '—'}</div>
+                      <div style={{ fontWeight: 'bold', color: '#333', fontSize: 13 }}>📅 {o.data}</div>
                       <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>Unidade: {o.unidade || '—'}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
