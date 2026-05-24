@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { auth, db, loginGoogle, logout } from './firebase'
+import { auth, db, loginGoogle, logout, getRedirectResult } from './firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import { collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, updateDoc, onSnapshot } from 'firebase/firestore'
 
@@ -227,6 +227,9 @@ export default function App() {
 
   // Firebase Auth listener
   useEffect(() => {
+    // Processar resultado do redirect de login
+    getRedirectResult(auth).catch(e => console.error('Redirect error:', e))
+
     let unsubSnap = null
     const unsub = onAuthStateChanged(auth, (user) => {
       setUsuario(user)
