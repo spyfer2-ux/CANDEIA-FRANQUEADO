@@ -423,6 +423,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
         try {
           const counterSnap = await getDoc(counterRef)
           if (counterSnap.exists()) numeroPedido = counterSnap.data().pedidos + 1
+          else numeroPedido = 1076
           await setDoc(counterRef, { pedidos: numeroPedido })
         } catch(e) { numeroPedido = Date.now() }
         orcamento.numeroPedido = numeroPedido
