@@ -441,6 +441,32 @@ td{padding:8px;border-bottom:1px solid #ddd}
 
   const catKeys = Object.keys(CATEGORIAS)
 
+  // Tela de loading
+  if (loadingAuth) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fdf6ec' }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 48 }}>🫓</div>
+        <p style={{ color: '#c0392b', fontWeight: 'bold', fontSize: 16 }}>Carregando...</p>
+      </div>
+    </div>
+  )
+
+  // Tela de login obrigatório
+  if (!usuario) return (
+    <div style={{ minHeight: '100vh', background: '#fdf6ec', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <img src="/CANDEIA-FRANQUEADO/banner.jpg" alt="Candeias Jr" style={{ width: '100%', maxWidth: 500, borderRadius: 16, marginBottom: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }} />
+      <div style={{ background: 'white', borderRadius: 16, padding: 32, maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+        <h2 style={{ color: '#c0392b', margin: '0 0 8px' }}>Portal do Franqueado</h2>
+        <p style={{ color: '#888', fontSize: 14, margin: '0 0 24px' }}>Faça login com sua conta Google para acessar o sistema de pedidos</p>
+        <button onClick={loginGoogle} style={{ width: '100%', padding: '14px', background: 'white', color: '#444', border: '1.5px solid #ddd', borderRadius: 10, cursor: 'pointer', fontWeight: 'bold', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.7 29.3 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6-6C34.5 5.1 29.5 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21c10.6 0 20-7.7 20-21 0-1.3-.2-2.7-.4-4z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.5 15.1 18.9 12 24 12c3.1 0 5.9 1.1 8.1 2.9l6-6C34.5 5.1 29.5 3 24 3 16.3 3 9.7 7.9 6.3 14.7z"/><path fill="#4CAF50" d="M24 45c5.2 0 10-1.9 13.7-5L31 33.9C29.1 35.2 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8L6 32.9C9.3 39.9 16.2 45 24 45z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.9 2.6-2.6 4.8-4.8 6.3l6.7 5.1C41 35.6 44 30.3 44 24c0-1.3-.2-2.7-.4-4z"/></svg>
+          Entrar com Google
+        </button>
+        <p style={{ color: '#bbb', fontSize: 12, marginTop: 16 }}>Apenas franqueados autorizados</p>
+      </div>
+    </div>
+  )
+
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', minHeight: '100vh' }}>
       {/* Header */}
