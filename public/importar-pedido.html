@@ -15,13 +15,21 @@
   </style>
 </head>
 <body>
-  <h2>🫓 Importar Pedido #10002</h2>
-  <p>Pedido de <b>Jd Vila Formosa</b> — 19/05/2026</p>
-  <p>Total: <b>R$ 6.329,15</b> — 88 itens</p>
+  <h2>🫓 Importar Pedidos Históricos</h2>
+  
+  <div style="border:1px solid #ddd;border-radius:10px;padding:16px;margin:12px 0;background:white;">
+    <b>Pedido #10002</b> — Jd Vila Formosa — 19/05/2026<br>
+    <small>88 itens — Total: R$ 6.329,15</small><br>
+    <button onclick="importar10002()" id="btn10002" style="margin-top:8px;padding:10px 20px;font-size:15px;">📥 Importar #10002</button>
+  </div>
 
-  <button onclick="importar()" id="btn">📥 Importar Pedido</button>
+  <div style="border:1px solid #ddd;border-radius:10px;padding:16px;margin:12px 0;background:white;">
+    <b>Pedido #10005</b> — Jd Vila Formosa — 22/05/2026<br>
+    <small>4 itens — Total: R$ 263,30</small><br>
+    <button onclick="importar10005()" id="btn10005" style="margin-top:8px;padding:10px 20px;font-size:15px;">📥 Importar #10005</button>
+  </div>
 
-  <div id="status" class="info">Clique para importar o pedido histórico para o Firestore.</div>
+  <div id="status" class="info">Escolha um pedido para importar.</div>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js'
@@ -131,10 +139,11 @@
       { nome: 'Orégano', porcao: '500g', quantidade: 1, preco: 14.60 },
     ]
 
-    window.importar = async () => {
+    window.importar10002 = async () => {
       const st = document.getElementById('status')
       const btn = document.getElementById('btn')
-      btn.disabled = true
+      document.getElementById('btn10002').disabled = true
+      document.getElementById('btn10005').disabled = true
 
       // Login se necessário
       if (!auth.currentUser) {
@@ -145,7 +154,8 @@
         } catch(e) {
           st.className = 'err'
           st.textContent = 'Erro no login: ' + e.message
-          btn.disabled = false
+          document.getElementById('btn10002').disabled = false
+        document.getElementById('btn10005').disabled = false
           return
         }
       }
@@ -182,7 +192,61 @@
       } catch(e) {
         st.className = 'err'
         st.textContent = 'Erro: ' + e.message
-        btn.disabled = false
+        document.getElementById('btn10002').disabled = false
+        document.getElementById('btn10005').disabled = false
+      }
+    }
+
+    window.importar10005 = async () => {
+      const st = document.getElementById('status')
+      document.getElementById('btn10002').disabled = true
+      document.getElementById('btn10005').disabled = true
+
+      if (!auth.currentUser) {
+        st.className = 'info'
+        st.textContent = '🔐 Fazendo login...'
+        try {
+          await signInWithPopup(auth, new GoogleAuthProvider())
+        } catch(e) {
+          st.className = 'err'
+          st.textContent = 'Erro no login: ' + e.message
+          document.getElementById('btn10002').disabled = false
+          document.getElementById('btn10005').disabled = false
+          return
+        }
+      }
+
+      st.className = 'info'
+      st.textContent = '⏳ Importando pedido #10005...'
+
+      try {
+        const pedido = {
+          numeroPedido: 10005,
+          id: 1748044800000,
+          data: '22/05/2026 00:00:00',
+          franqueado: 'Franquia O Pastel Gigante',
+          unidade: 'Irati, 26 — Jd. Vila Formosa',
+          itens: [
+            { nome: 'Esfiha de Carne', porcao: 'un', quantidade: 3, preco: 7.50 },
+            { nome: 'Coxinha Frango', porcao: 'un', quantidade: 3, preco: 7.50 },
+            { nome: 'Massa de Pastel', porcao: '5,000 kg', quantidade: 1, preco: 46.20 },
+            { nome: 'Mussarela', porcao: '3,598 kg', quantidade: 1, preco: 172.10 },
+          ],
+          total: 263.30,
+          status: 'pendente',
+          observacao: '',
+          uid: auth.currentUser.uid,
+          email: auth.currentUser.email
+        }
+
+        await addDoc(collection(db, 'orcamentos'), pedido)
+        st.className = 'ok'
+        st.textContent = '✅ Pedido #10005 importado! Pode fechar esta página.'
+      } catch(e) {
+        st.className = 'err'
+        st.textContent = 'Erro: ' + e.message
+        document.getElementById('btn10002').disabled = false
+        document.getElementById('btn10005').disabled = false
       }
     }
   </script>
