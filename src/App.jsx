@@ -214,8 +214,14 @@ export default function App() {
   const [busca, setBusca] = useState('')
   const [adminPin, setAdminPin] = useState('')
   const [adminLogado, setAdminLogado] = useState(false)
-  const [baixaAtiva, setBaixaAtiva] = useState(null) // id do pedido com baixa aberta
+  const [baixaAtiva, setBaixaAtiva] = useState(null)
   const [obsAtual, setObsAtual] = useState('')
+  const [abaAdmin, setAbaAdmin] = useState('pedidos') // 'pedidos' | 'alugueis' | 'precos'
+  const [alugueis, setAlugueis] = useState([])
+  const [novoAluguel, setNovoAluguel] = useState({ franqueado: '', unidade: '', valor: '', mes: new Date().toLocaleString('pt-BR',{month:'long'}), ano: new Date().getFullYear(), vencimento: '' })
+  const [baixaAluguelId, setBaixaAluguelId] = useState(null)
+  const [obsAluguel, setObsAluguel] = useState('')
+  const [showFormAluguel, setShowFormAluguel] = useState(false)
   const [pinErro, setPinErro] = useState(false)
   const [historico, setHistorico] = useState(() => {
     try { return JSON.parse(localStorage.getItem('historico_precos') || '[]') }
@@ -471,6 +477,76 @@ td{padding:8px;border-bottom:1px solid #ddd}
       }
     } catch (e) { console.error(e) }
   }
+
+  const salvarAluguel = async () => {
+    if (!novoAluguel.franqueado || !novoAluguel.valor) return
+    try {
+      const rec = {
+        ...novoAluguel,
+        id: Date.now(),
+        valor: parseFloat(novoAluguel.valor),
+        dataEmissao: new Date().toLocaleDateString('pt-BR'),
+        status: 'pendente',
+        observacao: '',
+        uid: usuario.uid
+      }
+      await addDoc(collection(db, 'alugueis'), rec)
+      setNovoAluguel({ franqueado: '', unidade: '', valor: '', mes: new Date().toLocaleString('pt-BR',{month:'long'}), ano: new Date().getFullYear(), vencimento: '' })
+      setShowFormAluguel(false)
+    } catch(e) { console.error(e) }
+  }
+
+  const darBaixaAluguel = async (a, obs) => {
+    if (!isAdmin(usuario?.email)) return
+    try {
+      await updateDoc(doc(db, 'alugueis', a.docId), {
+        status: 'pago',
+        dataPagamento: new Date().toLocaleDateString('pt-BR'),
+        observacao: obs || ''
+      })
+    } catch(e) { console.error(e) }
+    setBaixaAluguelId(null)
+    setObsAluguel('')
+  }
+
+  const excluirAluguel = async (a) => {
+    if (!window.confirm('Excluir este recibo?')) return
+    try { await deleteDoc(doc(db, 'alugueis', a.docId)) } catch(e) { console.error(e) }
+  }
+
+  const imprimirRecibo = (a) => {
+    const w = window.open('', '_blank')
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Recibo #${a.id}</title>
+    <style>
+      body{font-family:Georgia,serif;max-width:600px;margin:40px auto;padding:20px;color:#222}
+      h1{text-align:center;color:#c0392b;font-size:22px;margin-bottom:4px}
+      .sub{text-align:center;color:#888;font-size:13px;margin-bottom:24px}
+      .box{border:2px solid #c0392b;border-radius:8px;padding:20px;margin-bottom:20px}
+      .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:14px}
+      .total{font-size:22px;font-weight:bold;color:#c0392b;text-align:center;padding:16px;background:#fdf0ef;border-radius:8px;margin:16px 0}
+      .assinatura{margin-top:40px;border-top:1px solid #ccc;padding-top:10px;text-align:center;font-size:12px;color:#888}
+    </style></head><body>
+    <h1>🫓 Pastelaria Candeias Jr</h1>
+    <div class="sub">RECIBO DE ALUGUEL</div>
+    <div class="box">
+      <div class="row"><span><b>Franqueado</b></span><span>${a.franqueado}</span></div>
+      <div class="row"><span><b>Unidade</b></span><span>${a.unidade || '—'}</span></div>
+      <div class="row"><span><b>Referência</b></span><span>${a.mes} / ${a.ano}</span></div>
+      <div class="row"><span><b>Emissão</b></span><span>${a.dataEmissao}</span></div>
+      <div class="row"><span><b>Vencimento</b></span><span>${a.vencimento || '—'}</span></div>
+      <div class="row"><span><b>Status</b></span><span>${a.status === 'pago' ? '✅ PAGO em ' + (a.dataPagamento||'') : '⏳ PENDENTE'}</span></div>
+      ${a.observacao ? '<div class="row"><span><b>Obs</b></span><span>'+a.observacao+'</span></div>' : ''}
+    </div>
+    <div class="total">R$ ${a.valor.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+    <div class="assinatura">
+      Candeias Jr — Recibo gerado em ${new Date().toLocaleDateString('pt-BR')}<br><br>
+      _________________________________<br>Assinatura do Locador
+    </div>
+    <script>window.print();window.onafterprint=()=>window.close()<\/script>
+    </body></html>`)
+    w.document.close()
+  }
+
 
   const darBaixa = async (o, novoStatus, obs) => {
     if (!isAdmin(usuario?.email)) return
@@ -796,8 +872,10 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   ))
                 )}
               </div>
+              )}
 
               {/* ORÇAMENTOS SALVOS */}
+              {abaAdmin === 'pedidos' && (
               <div style={{ background: 'white', padding: 16, borderRadius: 10, marginTop: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <h3 style={{ color: '#c0392b', margin: 0 }}>💾 Orçamentos Salvos ({orcamentosSalvos.length})</h3>
@@ -883,6 +961,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   ))
                 )}
               </div>
+              )}
             </div>
           )}
         </div>
