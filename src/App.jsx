@@ -434,6 +434,27 @@ td{padding:8px;border-bottom:1px solid #ddd}
   }
 
 
+
+  const compartilharPedido = async (o) => {
+    const linhas = (o.itens || []).map(item =>
+      `• ${item.nome} (${item.porcao}) × ${item.quantidade} = ${(item.preco * item.quantidade).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`
+    ).join('\n')
+    const texto = `🫓 *Pedido Candeias Jr*\n` +
+      `📅 ${o.data}\n` +
+      `👤 ${o.franqueado || '—'} | ${o.unidade || '—'}\n\n` +
+      `${linhas}\n\n` +
+      `💰 *Total: ${o.total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}*\n` +
+      `Status: ${o.status === 'concluido' ? '✅ Concluído' : '⏳ Pendente'}`
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Pedido Candeias Jr', text: texto })
+      } else {
+        await navigator.clipboard.writeText(texto)
+        alert('Pedido copiado! Cole no WhatsApp.')
+      }
+    } catch (e) { console.error(e) }
+  }
+
   const darBaixa = async (o) => {
     if (usuario?.email?.toLowerCase() !== ADMIN_EMAIL) return
     const novoStatus = 'concluido'
@@ -709,6 +730,12 @@ td{padding:8px;border-bottom:1px solid #ddd}
                         <span>{(item.preco * item.quantidade).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                       </div>
                     ))}
+                  </div>
+                  <div style={{ padding: '10px 16px', borderTop: '1px solid #f5f5f5' }}>
+                    <button onClick={() => compartilharPedido(o)}
+                      style={{ width: '100%', padding: '10px', background: 'linear-gradient(135deg, #25d366, #128c7e)', color: 'white', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                      📤 Compartilhar Pedido
+                    </button>
                   </div>
                 </div>
               ))}
