@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import html2canvas from 'html2canvas'
+import { useState, useEffect, useRef } from 'react'
 import { auth, db, loginGoogle, logout, getRedirectResult } from './firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import { collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, updateDoc, onSnapshot, getDoc, setDoc } from 'firebase/firestore'
@@ -225,6 +226,8 @@ export default function App() {
   const [baixaAluguelId, setBaixaAluguelId] = useState(null)
   const [obsAluguel, setObsAluguel] = useState('')
   const [showFormAluguel, setShowFormAluguel] = useState(false)
+  const [faturaAtiva, setFaturaAtiva] = useState(null)
+  const faturaRef = useRef(null)
   const [pinErro, setPinErro] = useState(false)
   const [historico, setHistorico] = useState(() => {
     try { return JSON.parse(localStorage.getItem('historico_precos') || '[]') }
@@ -480,6 +483,30 @@ td{padding:8px;border-bottom:1px solid #ddd}
       }
     } catch (e) { console.error(e) }
   }
+
+  const gerarFaturaImagem = async (o) => {
+    setFaturaAtiva(o)
+    await new Promise(r => setTimeout(r, 300))
+    if (!faturaRef.current) return
+    try {
+      const canvas = await html2canvas(faturaRef.current, { scale: 2, backgroundColor: '#ffffff', useCORS: true })
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], `fatura-${o.numeroPedido || o.id}.png`, { type: 'image/png' })
+        if (navigator.share && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: `Fatura #${o.numeroPedido || o.id}`, text: `Fatura Candeias Jr — Total: ${o.total?.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}` })
+        } else {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `fatura-${o.numeroPedido || o.id}.png`
+          a.click()
+          URL.revokeObjectURL(url)
+        }
+        setFaturaAtiva(null)
+      }, 'image/png')
+    } catch(e) { console.error(e); setFaturaAtiva(null) }
+  }
+
 
   const gerarFatura = (o) => {
     const dataEmissao = new Date().toLocaleDateString('pt-BR')
@@ -1003,8 +1030,12 @@ td{padding:8px;border-bottom:1px solid #ddd}
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           <div style={{ fontWeight: 'bold', color: '#c0392b', fontSize: 16 }}>{o.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                             <button onClick={() => gerarFatura(o)}
-                            style={{ background:'#2c3e50', color:'white', border:'none', borderRadius:6, padding:'5px 12px', cursor:'pointer', fontSize:12, fontWeight:'bold' }}>
-                            🧾 Fatura
+                            style={{ background:'#2c3e50', color:'white', border:'none', borderRadius:6, padding:'5px 10px', cursor:'pointer', fontSize:12, fontWeight:'bold' }}>
+                            🖨️ PDF
+                          </button>
+                          <button onClick={() => gerarFaturaImagem(o)}
+                            style={{ background:'#25d366', color:'white', border:'none', borderRadius:6, padding:'5px 10px', cursor:'pointer', fontSize:12, fontWeight:'bold' }}>
+                            📲 WhatsApp
                           </button>
                           <button onClick={() => excluirOrcamento(o.id, o.docId)}
                             style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}>✕</button>
@@ -1066,6 +1097,71 @@ td{padding:8px;border-bottom:1px solid #ddd}
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Card invisível para geração de imagem da fatura */}
+      {faturaAtiva && (
+        <div style={{ position: 'fixed', left: -9999, top: 0, zIndex: -1 }}>
+          <div ref={faturaRef} style={{ width: 600, background: 'white', fontFamily: 'Arial, sans-serif', padding: 32, color: '#222' }}>
+            {/* Header */}
+            <div style={{ background: '#c0392b', color: 'white', padding: 24, borderRadius: '8px 8px 0 0', textAlign: 'center', marginBottom: 0 }}>
+              <div style={{ fontSize: 20, letterSpacing: 2, fontWeight: 'bold', marginBottom: 4 }}>FATURA DE COBRANÇA</div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>Pedido #{faturaAtiva.numeroPedido || faturaAtiva.id} — Candeias Jr</div>
+            </div>
+            {/* Info grid */}
+            <div style={{ border: '1px solid #ddd', borderTop: 'none', marginBottom: 16 }}>
+              <div style={{ padding: '12px 16px', borderBottom: '1px solid #ddd' }}>
+                <div style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', marginBottom: 4 }}>UNIDADE</div>
+                <div style={{ fontWeight: 'bold' }}>{faturaAtiva.franqueado} — {faturaAtiva.unidade}</div>
+              </div>
+              <div style={{ display: 'flex' }}>
+                <div style={{ flex: 1, padding: '12px 16px', borderRight: '1px solid #ddd' }}>
+                  <div style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', marginBottom: 4 }}>DATA DE EMISSÃO</div>
+                  <div style={{ fontWeight: 'bold' }}>{new Date().toLocaleDateString('pt-BR')}</div>
+                </div>
+                <div style={{ flex: 1, padding: '12px 16px' }}>
+                  <div style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', marginBottom: 4 }}>VENCIMENTO</div>
+                  <div style={{ fontWeight: 'bold' }}>{(() => { const d = new Date(); d.setDate(d.getDate()+7); return d.toLocaleDateString('pt-BR') })()}</div>
+                </div>
+              </div>
+            </div>
+            {/* Tabela de itens */}
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16, border: '1px solid #ddd' }}>
+              <thead>
+                <tr style={{ background: '#f5f5f5' }}>
+                  <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: 12, color: '#555' }}>DESCRIÇÃO</th>
+                  <th style={{ padding: '8px 12px', textAlign: 'center', fontSize: 12, color: '#555' }}>QTD</th>
+                  <th style={{ padding: '8px 12px', textAlign: 'right', fontSize: 12, color: '#555' }}>VALOR</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(faturaAtiva.itens || []).map((item, i) => (
+                  <tr key={i}>
+                    <td style={{ padding: '7px 12px', borderBottom: '1px solid #f0f0f0', fontSize: 13 }}>{item.nome} ({item.porcao})</td>
+                    <td style={{ padding: '7px 12px', borderBottom: '1px solid #f0f0f0', textAlign: 'center', fontSize: 13 }}>{item.quantidade}</td>
+                    <td style={{ padding: '7px 12px', borderBottom: '1px solid #f0f0f0', textAlign: 'right', fontSize: 13 }}>{(item.preco * item.quantidade).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr style={{ background: '#c0392b', color: 'white' }}>
+                  <td colSpan={2} style={{ padding: '12px', fontWeight: 'bold', fontSize: 15 }}>VALOR TOTAL</td>
+                  <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', fontSize: 15 }}>{faturaAtiva.total?.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</td>
+                </tr>
+              </tfoot>
+            </table>
+            {/* PIX */}
+            <div style={{ background: '#f9f9f9', border: '2px solid #e0e0e0', borderRadius: 8, padding: 20 }}>
+              <div style={{ color: '#c0392b', fontWeight: 'bold', fontSize: 15, marginBottom: 10 }}>💠 Instruções para Pagamento via PIX</div>
+              <div style={{ marginBottom: 8 }}>Favor utilizar a chave CPF abaixo para transferência:</div>
+              <div style={{ background: 'white', border: '1px solid #ddd', borderRadius: 6, padding: '12px 16px', fontFamily: 'monospace', fontSize: 18, fontWeight: 'bold', textAlign: 'center', letterSpacing: 2, marginBottom: 8 }}>{FATURA_PIX_KEY}</div>
+              <div><b>Favorecido:</b> {FATURA_FAVORECIDO}</div>
+            </div>
+            <div style={{ marginTop: 20, textAlign: 'center', fontSize: 12, color: '#aaa', borderTop: '1px solid #eee', paddingTop: 12 }}>
+              Documento gerado em {new Date().toLocaleDateString('pt-BR')}. Por favor, envie o comprovante após o pagamento.
+            </div>
+          </div>
         </div>
       )}
 
