@@ -384,6 +384,10 @@ td{padding:8px;border-bottom:1px solid #ddd}
 
   const salvarOrcamento = async () => {
     if (carrinho.length === 0) return
+    if (!usuario) {
+      alert('⚠️ Você precisa fazer login com o Google antes de salvar o pedido!')
+      return
+    }
     const orcamento = {
       status: 'pendente',
       id: Date.now(),
@@ -605,7 +609,10 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   <span style={{ color: '#c0392b' }}>{formatPreco(total)}</span>
                 </div>
                 <button onClick={gerarPDF} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>📄 Gerar PDF do Pedido</button>
-                                <button onClick={salvarOrcamento} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #2c3e50, #3d5166)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>💾 Salvar Orçamento</button>
+                                <div style={{ background: '#f0f7ff', border: '1px solid #bee3f8', borderRadius: 8, padding: '8px 12px', marginBottom: 8, fontSize: 13, color: '#2c5f8a', textAlign: 'center' }}>
+                  {usuario ? `✅ Logado como ${usuario.email}` : '⚠️ Faça login para salvar pedidos'}
+                </div>
+                <button onClick={salvarOrcamento} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #2c3e50, #3d5166)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>💾 Salvar Orçamento</button>
                 {orcamentoSalvoMsg && (
                   <div style={{ background: '#eafaf1', border: '1px solid #27ae60', borderRadius: 8, padding: '10px 14px', color: '#27ae60', fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>
                     ✅ Orçamento salvo com sucesso!
