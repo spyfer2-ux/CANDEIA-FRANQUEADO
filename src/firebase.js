@@ -1,5 +1,14 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth, GoogleAuthProvider, signInWithRedirect, signOut, getRedirectResult } from 'firebase/auth'
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithRedirect,
+  signInWithPopup,
+  signOut, 
+  getRedirectResult,
+  browserLocalPersistence,
+  setPersistence
+} from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
 const firebaseConfig = {
@@ -16,6 +25,19 @@ export const auth = getAuth(app)
 export const db = getFirestore(app)
 export const googleProvider = new GoogleAuthProvider()
 
-export const loginGoogle = () => signInWithRedirect(auth, googleProvider)
+export const loginGoogle = async () => {
+  await setPersistence(auth, browserLocalPersistence)
+  try {
+    // Tenta popup primeiro
+    return await signInWithPopup(auth, googleProvider)
+  } catch (e) {
+    // Se popup bloqueado, usa redirect
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user') {
+      return signInWithRedirect(auth, googleProvider)
+    }
+    throw e
+  }
+}
+
 export const logout = () => signOut(auth)
 export { getRedirectResult }
