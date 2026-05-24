@@ -29,6 +29,12 @@
     <button onclick="importar10005()" id="btn10005" style="margin-top:8px;padding:10px 20px;font-size:15px;">📥 Importar #10005</button>
   </div>
 
+  <div style="border:1px solid #ddd;border-radius:10px;padding:16px;margin:12px 0;background:white;">
+    <b>Pedido #10007</b> — Jd Vila Formosa — 22/05/2026<br>
+    <small>30 itens — Total: R$ 1.475,02</small><br>
+    <button onclick="importar10007()" id="btn10007" style="margin-top:8px;padding:10px 20px;font-size:15px;">📥 Importar #10007</button>
+  </div>
+
   <div id="status" class="info">Escolha um pedido para importar.</div>
 
   <script type="module">
@@ -247,6 +253,67 @@
         st.textContent = 'Erro: ' + e.message
         document.getElementById('btn10002').disabled = false
         document.getElementById('btn10005').disabled = false
+      }
+    }
+
+    window.importar10007 = async () => {
+      const st = document.getElementById('status')
+      ;['btn10002','btn10005','btn10007'].forEach(id => document.getElementById(id).disabled = true)
+      if (!auth.currentUser) {
+        st.className = 'info'; st.textContent = '🔐 Fazendo login...'
+        try { await signInWithPopup(auth, new GoogleAuthProvider()) }
+        catch(e) { st.className='err'; st.textContent='Erro: '+e.message; ['btn10002','btn10005','btn10007'].forEach(id=>document.getElementById(id).disabled=false); return }
+      }
+      st.className='info'; st.textContent='⏳ Importando pedido #10007...'
+      try {
+        await addDoc(collection(db,'orcamentos'), {
+          numeroPedido: 10007,
+          id: 1748044775000,
+          data: '22/05/2026 21:46:15',
+          franqueado: 'Franqueado',
+          unidade: 'Jd Vila Formosa',
+          total: 1475.02,
+          status: 'pendente',
+          observacao: '',
+          uid: auth.currentUser.uid,
+          email: auth.currentUser.email,
+          itens: [
+            { nome:'Bacon Mistura', porcao:'20g', quantidade:20, preco:2.68 },
+            { nome:'Bacon Puro', porcao:'30g', quantidade:10, preco:4.47 },
+            { nome:'Escarola', porcao:'70g', quantidade:10, preco:3.42 },
+            { nome:'Frango Mistura', porcao:'50g', quantidade:30, preco:2.48 },
+            { nome:'Carne Pura', porcao:'70g', quantidade:20, preco:5.16 },
+            { nome:'Carne Mistura', porcao:'50g', quantidade:30, preco:3.60 },
+            { nome:'Milho Mistura', porcao:'40g', quantidade:10, preco:0.71 },
+            { nome:'Calabresa', porcao:'50g', quantidade:20, preco:1.43 },
+            { nome:'Palmito Mistura', porcao:'70g', quantidade:10, preco:2.34 },
+            { nome:'Palmito Puro', porcao:'150g', quantidade:5, preco:5.15 },
+            { nome:'Salame', porcao:'50g', quantidade:10, preco:4.55 },
+            { nome:'Brócolis', porcao:'70g', quantidade:10, preco:4.79 },
+            { nome:'Massa de Pastel', porcao:'10,000 kg', quantidade:1, preco:92.40 },
+            { nome:'Mussarela', porcao:'3,000 kg', quantidade:2, preco:143.50 },
+            { nome:'Embalagem Empada G', porcao:'unidade', quantidade:20, preco:0.19 },
+            { nome:'Bandeja Batata P', porcao:'unidade', quantidade:20, preco:0.25 },
+            { nome:'Carne Louca Mistura', porcao:'60g', quantidade:10, preco:4.13 },
+            { nome:'Empada Frango c/ Catupiry', porcao:'un', quantidade:2, preco:7.50 },
+            { nome:'Empada de Palmito', porcao:'un', quantidade:2, preco:7.50 },
+            { nome:'Esfiha de Carne', porcao:'un', quantidade:2, preco:7.50 },
+            { nome:'Esfiha Calabresa Catupiry', porcao:'un', quantidade:2, preco:7.50 },
+            { nome:'Esfiha Frango Catupiry', porcao:'un', quantidade:2, preco:7.50 },
+            { nome:'Kibe c/ Catupiry', porcao:'un', quantidade:1, preco:7.50 },
+            { nome:'Chocolate ao Leite', porcao:'1,000 kg', quantidade:1, preco:44.00 },
+            { nome:'Apresuntado', porcao:'1,000 kg', quantidade:1, preco:25.33 },
+            { nome:'Catupiry', porcao:'4,500 kg', quantidade:1, preco:122.49 },
+            { nome:'Carne Seca Mistura', porcao:'40g', quantidade:10, preco:7.78 },
+            { nome:'Caixa Grande', porcao:'un', quantidade:20, preco:2.46 },
+            { nome:'Batata Frita P', porcao:'325g', quantidade:5, preco:4.62 },
+            { nome:'Batata Frita G', porcao:'650g', quantidade:3, preco:8.25 },
+          ]
+        })
+        st.className='ok'; st.textContent='✅ Pedido #10007 importado! Pode fechar esta página.'
+      } catch(e) {
+        st.className='err'; st.textContent='Erro: '+e.message
+        ;['btn10002','btn10005','btn10007'].forEach(id=>document.getElementById(id).disabled=false)
       }
     }
   </script>
