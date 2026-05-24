@@ -903,7 +903,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {orcamentosSalvos.map(o => (
-                <div key={o.id} style={{ background: 'white', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: `2px solid ${o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : '#e74c3c'}` }}>
+                <div key={o.docId || o.id} style={{ background: 'white', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: `2px solid ${o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : '#e74c3c'}` }}>
                   <div style={{ padding: '12px 16px', background: o.status === 'concluido' ? '#eafaf1' : o.status === 'parcial' ? '#fef9e7' : '#fff5f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontWeight: 'bold', color: '#c0392b', fontSize: 15 }}>Pedido #{o.numeroPedido || '—'}</div>
@@ -988,7 +988,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   <p style={{ color: '#888', textAlign: 'center', padding: 20 }}>Nenhum orçamento salvo ainda.</p>
                 ) : (
                   orcamentosSalvos.map(o => (
-                    <div key={o.id} style={{ border: `2px solid ${o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : '#e74c3c'}`, borderRadius: 8, marginBottom: 12, overflow: 'hidden' }}>
+                    <div key={o.docId || o.id} style={{ border: `2px solid ${o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : '#e74c3c'}`, borderRadius: 8, marginBottom: 12, overflow: 'hidden' }}>
                       <div style={{ background: o.status === 'concluido' ? '#eafaf1' : o.status === 'parcial' ? '#fef9e7' : '#fdf0ef', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
                           <div style={{ fontWeight: 'bold', color: '#c0392b' }}>👤 {o.franqueado} — {o.unidade}</div>

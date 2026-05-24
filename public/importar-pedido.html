@@ -145,6 +145,13 @@
       { nome: 'Orégano', porcao: '500g', quantidade: 1, preco: 14.60 },
     ]
 
+    // Verificar se pedido já existe
+    async function pedidoExiste(numero) {
+      const { getDocs: gd, query: q, collection: col, where: wh } = await import('https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js')
+      const snap = await gd(q(col(db, 'orcamentos'), wh('numeroPedido', '==', numero)))
+      return !snap.empty
+    }
+
     window.importar10002 = async () => {
       const st = document.getElementById('status')
       const btn = document.getElementById('btn')
@@ -226,6 +233,11 @@
       st.textContent = '⏳ Importando pedido #10005...'
 
       try {
+        if (await pedidoExiste(10005)) {
+          st.className='err'; st.textContent='⚠️ Pedido #10005 já existe no sistema!'
+          ;['btn10002','btn10005','btn10007'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false})
+          return
+        }
         const pedido = {
           numeroPedido: 10005,
           id: 1748044800000,
