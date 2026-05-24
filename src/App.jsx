@@ -197,6 +197,9 @@ const UNIDADES = [
 
 
 const ADMIN_EMAILS = ['jrmauro380@gmail.com', 'spyfer2@gmail.com']
+const FATURA_PIX_KEY = '306.987.778-83'
+const FATURA_FAVORECIDO = 'Cibelle Cristiane Reis'
+const FATURA_VENCIMENTO_DIAS = 7
 const isAdmin = (email) => ADMIN_EMAILS.includes(email?.toLowerCase())
 
 export default function App() {
@@ -477,6 +480,101 @@ td{padding:8px;border-bottom:1px solid #ddd}
       }
     } catch (e) { console.error(e) }
   }
+
+  const gerarFatura = (o) => {
+    const dataEmissao = new Date().toLocaleDateString('pt-BR')
+    const dataVenc = new Date()
+    dataVenc.setDate(dataVenc.getDate() + FATURA_VENCIMENTO_DIAS)
+    const dataVencimento = dataVenc.toLocaleDateString('pt-BR')
+
+    const linhasItens = (o.itens || []).map(item => `
+      <tr>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0">${item.nome} (${item.porcao})</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;text-align:center">${item.quantidade}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;text-align:right">${(item.preco * item.quantidade).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</td>
+      </tr>`).join('')
+
+    const w = window.open('', '_blank')
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Fatura #${o.numeroPedido || o.id}</title>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:Arial,sans-serif;max-width:680px;margin:0 auto;padding:32px;color:#222;font-size:14px}
+      .header{background:#c0392b;color:white;padding:24px;border-radius:8px 8px 0 0;text-align:center}
+      .header h1{font-size:20px;letter-spacing:2px;margin-bottom:4px}
+      .header h2{font-size:14px;opacity:0.9;font-weight:normal}
+      .info-grid{display:grid;grid-template-columns:1fr 1fr;border:1px solid #ddd;border-top:none}
+      .info-cell{padding:14px 16px;border-right:1px solid #ddd}
+      .info-cell:last-child{border-right:none}
+      .info-cell label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px}
+      .info-cell span{font-weight:bold;font-size:14px}
+      table{width:100%;border-collapse:collapse;margin:20px 0;border:1px solid #ddd;border-radius:6px;overflow:hidden}
+      thead{background:#f5f5f5}
+      thead th{padding:10px 12px;text-align:left;font-size:12px;text-transform:uppercase;color:#555;letter-spacing:.5px}
+      thead th:last-child{text-align:right}
+      thead th:nth-child(2){text-align:center}
+      .total-row{background:#c0392b;color:white}
+      .total-row td{padding:14px 12px;font-weight:bold;font-size:16px}
+      .pix-box{background:#f9f9f9;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin-top:16px}
+      .pix-box h3{color:#c0392b;margin-bottom:12px;font-size:15px}
+      .pix-key{background:white;border:1px solid #ddd;border-radius:6px;padding:12px 16px;font-family:monospace;font-size:16px;font-weight:bold;text-align:center;letter-spacing:2px;color:#333;margin:8px 0}
+      .footer{margin-top:24px;text-align:center;font-size:12px;color:#aaa;border-top:1px solid #eee;padding-top:16px}
+      @media print{body{padding:16px}}
+    </style></head><body>
+
+    <div class="header">
+      <h1>FATURA DE COBRANÇA</h1>
+      <h2>Pedido #${o.numeroPedido || o.id} — Candeias Jr</h2>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-cell" style="border-bottom:1px solid #ddd;grid-column:1/-1">
+        <label>Unidade</label>
+        <span>${o.franqueado || 'Franqueado'} — ${o.unidade || 'Jd. Vila Formosa'}</span>
+      </div>
+      <div class="info-cell">
+        <label>Data de Emissão</label>
+        <span>${dataEmissao}</span>
+      </div>
+      <div class="info-cell">
+        <label>Data de Vencimento</label>
+        <span>${dataVencimento}</span>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Descrição do Item</th>
+          <th style="text-align:center">Qtd / Peso</th>
+          <th style="text-align:right">Valor</th>
+        </tr>
+      </thead>
+      <tbody>${linhasItens}</tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="2">VALOR TOTAL</td>
+          <td style="text-align:right">${o.total?.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="pix-box">
+      <h3>💠 Instruções para Pagamento via PIX</h3>
+      <p>Favor utilizar a chave CPF abaixo para transferência:</p>
+      <div class="pix-key">${FATURA_PIX_KEY}</div>
+      <p><b>Favorecido:</b> ${FATURA_FAVORECIDO}</p>
+    </div>
+
+    <div class="footer">
+      Documento gerado em ${dataEmissao}. Por favor, envie o comprovante após o pagamento.
+    </div>
+
+    <script>window.print();window.onafterprint=()=>window.close()<\/script>
+    </body></html>`)
+    w.document.close()
+  }
+
 
   const salvarAluguel = async () => {
     if (!novoAluguel.franqueado || !novoAluguel.valor) return
@@ -904,6 +1002,10 @@ td{padding:8px;border-bottom:1px solid #ddd}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           <div style={{ fontWeight: 'bold', color: '#c0392b', fontSize: 16 }}>{o.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                            <button onClick={() => gerarFatura(o)}
+                            style={{ background:'#2c3e50', color:'white', border:'none', borderRadius:6, padding:'5px 12px', cursor:'pointer', fontSize:12, fontWeight:'bold' }}>
+                            🧾 Fatura
+                          </button>
                           <button onClick={() => excluirOrcamento(o.id, o.docId)}
                             style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}>✕</button>
                         </div>
