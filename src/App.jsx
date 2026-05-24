@@ -214,6 +214,8 @@ export default function App() {
   const [busca, setBusca] = useState('')
   const [adminPin, setAdminPin] = useState('')
   const [adminLogado, setAdminLogado] = useState(false)
+  const [baixaAtiva, setBaixaAtiva] = useState(null) // id do pedido com baixa aberta
+  const [obsAtual, setObsAtual] = useState('')
   const [pinErro, setPinErro] = useState(false)
   const [historico, setHistorico] = useState(() => {
     try { return JSON.parse(localStorage.getItem('historico_precos') || '[]') }
@@ -456,7 +458,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
       `👤 ${o.franqueado || '—'} | ${o.unidade || '—'}\n\n` +
       `${linhas}\n\n` +
       `💰 *Total: ${o.total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}*\n` +
-      `Status: ${o.status === 'concluido' ? '✅ Concluído' : '⏳ Pendente'}`
+      `Status: ${o.status === 'concluido' ? '✅ Concluído' : o.status === 'parcial' ? '🔶 Baixa Parcial' : '⏳ Pendente'}`
     try {
       if (navigator.share) {
         await navigator.share({ title: 'Pedido Candeias Jr', text: texto })
@@ -467,15 +469,17 @@ td{padding:8px;border-bottom:1px solid #ddd}
     } catch (e) { console.error(e) }
   }
 
-  const darBaixa = async (o) => {
+  const darBaixa = async (o, novoStatus, obs) => {
     if (!isAdmin(usuario?.email)) return
-    const novoStatus = 'concluido'
+    const update = { status: novoStatus, observacao: obs || '' }
     if (o.docId) {
       try {
-        await updateDoc(doc(db, 'orcamentos', o.docId), { status: novoStatus })
+        await updateDoc(doc(db, 'orcamentos', o.docId), update)
       } catch (e) { console.error(e) }
     }
-    setOrcamentosSalvos(prev => prev.map(x => x.id === o.id ? { ...x, status: novoStatus } : x))
+    setOrcamentosSalvos(prev => prev.map(x => x.id === o.id ? { ...x, ...update } : x))
+    setBaixaAtiva(null)
+    setObsAtual('')
   }
 
   const excluirOrcamento = async (id, docId) => {
@@ -722,8 +726,8 @@ td{padding:8px;border-bottom:1px solid #ddd}
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {orcamentosSalvos.map(o => (
-                <div key={o.id} style={{ background: 'white', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: `2px solid ${o.status === 'concluido' ? '#27ae60' : '#e74c3c'}` }}>
-                  <div style={{ padding: '12px 16px', background: o.status === 'concluido' ? '#eafaf1' : '#fff5f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div key={o.id} style={{ background: 'white', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: `2px solid ${o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : '#e74c3c'}` }}>
+                  <div style={{ padding: '12px 16px', background: o.status === 'concluido' ? '#eafaf1' : o.status === 'parcial' ? '#fef9e7' : '#fff5f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontWeight: 'bold', color: '#c0392b', fontSize: 15 }}>Pedido #{o.numeroPedido || '—'}</div>
                       <div style={{ fontWeight: 'bold', color: '#333', fontSize: 13 }}>📅 {o.data}</div>
@@ -731,8 +735,8 @@ td{padding:8px;border-bottom:1px solid #ddd}
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontWeight: 'bold', color: '#c0392b', fontSize: 16 }}>{o.total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                      <div style={{ marginTop: 4, padding: '2px 10px', borderRadius: 12, fontSize: 11, fontWeight: 'bold', background: o.status === 'concluido' ? '#27ae60' : '#e74c3c', color: 'white', display: 'inline-block' }}>
-                        {o.status === 'concluido' ? '✅ Concluído' : '⏳ Pendente'}
+                      <div style={{ marginTop: 4, padding: '2px 10px', borderRadius: 12, fontSize: 11, fontWeight: 'bold', background: o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : '#e74c3c', color: 'white', display: 'inline-block' }}>
+                        {o.status === 'concluido' ? '✅ Concluído' : o.status === 'parcial' ? '🔶 Baixa Parcial' : '⏳ Pendente'}
                       </div>
                     </div>
                   </div>
@@ -805,10 +809,16 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   <p style={{ color: '#888', textAlign: 'center', padding: 20 }}>Nenhum orçamento salvo ainda.</p>
                 ) : (
                   orcamentosSalvos.map(o => (
-                    <div key={o.id} style={{ border: '1px solid #f0f0f0', borderRadius: 8, marginBottom: 12, overflow: 'hidden' }}>
-                      <div style={{ background: '#fdf0ef', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div key={o.id} style={{ border: `2px solid ${o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : '#e74c3c'}`, borderRadius: 8, marginBottom: 12, overflow: 'hidden' }}>
+                      <div style={{ background: o.status === 'concluido' ? '#eafaf1' : o.status === 'parcial' ? '#fef9e7' : '#fdf0ef', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
                           <div style={{ fontWeight: 'bold', color: '#c0392b' }}>👤 {o.franqueado} — {o.unidade}</div>
+                          <div style={{ fontSize: 11, marginTop: 2 }}>
+                            <span style={{ padding: '2px 8px', borderRadius: 10, fontWeight: 'bold', background: o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : '#e74c3c', color: 'white' }}>
+                              {o.status === 'concluido' ? '✅ Concluído' : o.status === 'parcial' ? '🔶 Parcial' : '⏳ Pendente'}
+                            </span>
+                            {o.numeroPedido && <span style={{ marginLeft: 6, color: '#888' }}>#{o.numeroPedido}</span>}
+                          </div>
                           <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>🕐 {o.data}</div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -824,7 +834,48 @@ td{padding:8px;border-bottom:1px solid #ddd}
                             <span style={{ fontWeight: 'bold', color: '#555' }}>{(item.preco * item.quantidade).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                           </div>
                         ))}
+                        {o.observacao && (
+                          <div style={{ marginTop: 8, padding: '6px 10px', background: '#fffbe6', borderRadius: 6, fontSize: 12, color: '#666', borderLeft: '3px solid #f0ad00' }}>
+                            📝 {o.observacao}
+                          </div>
+                        )}
                       </div>
+
+                      {/* Botões de baixa */}
+                      {o.status !== 'concluido' && (
+                        <div style={{ padding: '10px 14px', borderTop: '1px solid #f5f5f5' }}>
+                          {baixaAtiva === o.id ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                              <input
+                                type="text"
+                                placeholder="Observação (opcional)..."
+                                value={obsAtual}
+                                onChange={e => setObsAtual(e.target.value)}
+                                style={{ width: '100%', padding: '8px 10px', border: '1px solid #ddd', borderRadius: 6, fontSize: 13, boxSizing: 'border-box' }}
+                              />
+                              <div style={{ display: 'flex', gap: 8 }}>
+                                <button onClick={() => darBaixa(o, 'parcial', obsAtual)}
+                                  style={{ flex: 1, padding: '9px', background: '#f39c12', color: 'white', border: 'none', borderRadius: 6, fontWeight: 'bold', fontSize: 13, cursor: 'pointer' }}>
+                                  🔶 Baixa Parcial
+                                </button>
+                                <button onClick={() => darBaixa(o, 'concluido', obsAtual)}
+                                  style={{ flex: 1, padding: '9px', background: '#27ae60', color: 'white', border: 'none', borderRadius: 6, fontWeight: 'bold', fontSize: 13, cursor: 'pointer' }}>
+                                  ✅ Concluído
+                                </button>
+                              </div>
+                              <button onClick={() => { setBaixaAtiva(null); setObsAtual('') }}
+                                style={{ width: '100%', padding: '7px', background: '#eee', color: '#666', border: 'none', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}>
+                                Cancelar
+                              </button>
+                            </div>
+                          ) : (
+                            <button onClick={() => { setBaixaAtiva(o.id); setObsAtual('') }}
+                              style={{ width: '100%', padding: '9px', background: o.status === 'parcial' ? '#f39c12' : '#c0392b', color: 'white', border: 'none', borderRadius: 6, fontWeight: 'bold', fontSize: 13, cursor: 'pointer' }}>
+                              {o.status === 'parcial' ? '🔶 Atualizar Baixa' : '📋 Dar Baixa'}
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))
                 )}
