@@ -80,7 +80,7 @@ const CATEGORIAS = {
     itens: [
       { id: "batata-palha", nome: "Batata Palha", preco: 28.05, porcao: "800g" , vendaPorKg: true, kgBase: 0.8 },
       { id: "oleo", nome: "Óleo", preco: 7.57, porcao: "un" },
-      { id: "massa-pastel", nome: "Massa de Pastel", preco: 9.24, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 },
+      { id: "massa-pastel", nome: "Massa de Pastel", preco: 9.40, porcao: "5kg", vendaPorKg: true, kgBase: 5.0 },
       { id: "batata-congelada-350", nome: "Batata Frita P", preco: 4.62, porcao: "325g" },
       { id: "batata-congelada-625", nome: "Batata Frita G", preco: 8.25, porcao: "650g" },
       { id: "pure", nome: "Purê", preco: 8.45, porcao: "500g" },
