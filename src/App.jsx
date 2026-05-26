@@ -912,12 +912,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
               <div style={{ background: 'white', padding: 16, borderRadius: 10, marginTop: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <h3 style={{ color: '#c0392b', margin: 0 }}>💾 Orçamentos Salvos ({orcamentosSalvos.length})</h3>
-                  {orcamentosSalvos.length > 0 && (
-                    <button onClick={() => { setOrcamentosSalvos([]); localStorage.removeItem('orcamentos_salvos') }}
-                      style={{ padding: '4px 12px', background: '#fee', color: '#c0392b', border: '1px solid #f5c6c6', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}>
-                      Limpar tudo
-                    </button>
-                  )}
+
                 </div>
                 {orcamentosSalvos.length === 0 ? (
                   <p style={{ color: '#888', textAlign: 'center', padding: 20 }}>Nenhum orçamento salvo ainda.</p>
