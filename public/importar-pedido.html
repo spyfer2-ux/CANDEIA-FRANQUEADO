@@ -35,6 +35,12 @@
     <button onclick="importar10007()" id="btn10007" style="margin-top:8px;padding:10px 20px;font-size:15px;">📥 Importar #10007</button>
   </div>
 
+  <div style="border:1px solid #ddd;border-radius:10px;padding:16px;margin:12px 0;background:white;">
+    <b>Pedido #10008</b> — Bruno | Jd Vila Formosa — 25/05/2026<br>
+    <small>7 itens — Total: R$ 493,48 (corrigido)</small><br>
+    <button onclick="importar10008()" id="btn10008" style="margin-top:8px;padding:10px 20px;font-size:15px;">📥 Importar #10008</button>
+  </div>
+
   <div id="status" class="info">Escolha um pedido para importar.</div>
 
   <script type="module">
@@ -326,6 +332,58 @@
       } catch(e) {
         st.className='err'; st.textContent='Erro: '+e.message
         ;['btn10002','btn10005','btn10007'].forEach(id=>document.getElementById(id).disabled=false)
+      }
+    }
+
+    window.importar10008 = async () => {
+      const st = document.getElementById('status')
+      const btns = ['btn10002','btn10005','btn10007','btn10008']
+      btns.forEach(id => { const b=document.getElementById(id); if(b) b.disabled=true })
+
+      if (!auth.currentUser) {
+        st.className='info'; st.textContent='🔐 Fazendo login...'
+        try { await signInWithPopup(auth, new GoogleAuthProvider()) }
+        catch(e) { st.className='err'; st.textContent='Erro: '+e.message; btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false}); return }
+      }
+
+      if (await pedidoExiste(10008)) {
+        st.className='err'; st.textContent='⚠️ Pedido #10008 já existe!'
+        btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false}); return
+      }
+
+      st.className='info'; st.textContent='⏳ Importando pedido #10008...'
+      try {
+        await addDoc(collection(db,'orcamentos'), {
+          numeroPedido: 10008,
+          id: 1748217600000,
+          data: '25/05/2026 00:00:00',
+          franqueado: 'Bruno',
+          unidade: 'Jd Vila Formosa',
+          total: 493.48,
+          status: 'pendente',
+          observacao: '',
+          uid: auth.currentUser.uid,
+          email: auth.currentUser.email,
+          itens: [
+            { nome:'Calabresa', porcao:'50g', quantidade:20, preco:1.43 },
+            { nome:'Carne Mistura', porcao:'50g', quantidade:30, preco:3.60 },
+            { nome:'Massa de Pastel', porcao:'pacote 5kg', quantidade:2, preco:47.00 },
+            { nome:'Cereja', porcao:'50g', quantidade:4, preco:7.80 },
+            { nome:'Mussarela', porcao:'3,970 kg', quantidade:1, preco:189.90 },
+            { nome:'Sachê Ketchup Heinz', porcao:'cx unidade', quantidade:1, preco:20.89 },
+            { nome:'Sachê Mostarda Heinz', porcao:'cx unidade', quantidade:1, preco:20.89 },
+          ]
+        })
+        // Atualizar contador para >= 10008
+        const counterRef = doc(db, 'config', 'contador')
+        const snap = await getDoc(counterRef)
+        if (!snap.exists() || snap.data().pedidos < 10008) {
+          await setDoc(counterRef, { pedidos: 10008 })
+        }
+        st.className='ok'; st.textContent='✅ Pedido #10008 (Bruno) importado com sucesso!'
+      } catch(e) {
+        st.className='err'; st.textContent='Erro: '+e.message
+        btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false})
       }
     }
   </script>
