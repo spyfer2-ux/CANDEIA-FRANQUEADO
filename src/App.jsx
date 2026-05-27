@@ -476,7 +476,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
       `👤 ${o.franqueado || '—'} | ${o.unidade || '—'}\n\n` +
       `${linhas}\n\n` +
       `💰 *Total: ${o.total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}*\n` +
-      `Status: ${o.status === 'concluido' ? '✅ Concluído' : o.status === 'parcial' ? '🔶 Baixa Parcial' : '⏳ Pendente'}`
+      `Status: ${o.status === 'concluido' ? '✅ Concluído' : o.status === 'parcial' ? '🔶 Parcial' : isVencido(o) ? '🔴 Vencido' : '📅 ' + (o.data?.split(' ')[0] || '')}`
     try {
       if (navigator.share) {
         await navigator.share({ title: 'Pedido Candeias Jr', text: texto })
@@ -486,6 +486,18 @@ td{padding:8px;border-bottom:1px solid #ddd}
       }
     } catch (e) { console.error(e) }
   }
+
+  const isVencido = (o) => {
+    if (o.status === 'concluido') return false
+    try {
+      const partes = o.data?.split(' ')[0]?.split('/')
+      if (!partes || partes.length < 3) return false
+      const dataPedido = new Date(partes[2], partes[1]-1, partes[0])
+      const diff = (new Date() - dataPedido) / (1000 * 60 * 60 * 24)
+      return diff > 7
+    } catch { return false }
+  }
+
 
   const gerarFaturaImagem = async (o) => {
     setFaturaAtiva(o)
@@ -851,7 +863,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontWeight: 'bold', color: '#c0392b', fontSize: 16 }}>{o.total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                       <div style={{ marginTop: 4, padding: '2px 10px', borderRadius: 12, fontSize: 11, fontWeight: 'bold', background: o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : '#e74c3c', color: 'white', display: 'inline-block' }}>
-                        {o.status === 'concluido' ? '✅ Concluído' : o.status === 'parcial' ? '🔶 Baixa Parcial' : '⏳ Pendente'}
+                        {o.status === 'concluido' ? '✅ Concluído' : o.status === 'parcial' ? '🔶 Parcial' : isVencido(o) ? '🔴 Vencido' : '📅 ' + (o.data?.split(' ')[0] || '')}
                       </div>
                     </div>
                   </div>
@@ -922,7 +934,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   </div>
                   {/* Filtros */}
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {[['todos','🗂️ Todos'], ['pendente','⏳ Pendentes'], ['parcial','🔶 Parciais'], ['concluido','✅ Concluídos']].map(([k,l]) => (
+                    {[['todos','🗂️ Todos'], ['pendente','Abertos'], ['parcial','🔶 Parciais'], ['vencido','🔴 Vencidos'], ['concluido','✅ Concluídos']].map(([k,l]) => (
                       <button key={k} onClick={() => setFiltroPedidos(k)} style={{
                         padding: '6px 12px', borderRadius: 16, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 'bold',
                         background: filtroPedidos === k ? '#c0392b' : '#f5f5f5',
@@ -931,19 +943,20 @@ td{padding:8px;border-bottom:1px solid #ddd}
                     ))}
                   </div>
                 </div>
-                {orcamentosSalvos.filter(o => filtroPedidos === 'todos' || o.status === filtroPedidos).length === 0 ? (
+                {orcamentosSalvos.filter(o => filtroPedidos === 'todos' || (filtroPedidos === 'vencido' ? isVencido(o) : o.status === filtroPedidos)).length === 0 ? (
                   <p style={{ color: '#888', textAlign: 'center', padding: 20 }}>Nenhum pedido neste filtro.</p>
                 ) : (
-                  orcamentosSalvos.filter(o => filtroPedidos === 'todos' || o.status === filtroPedidos).map(o => (
+                  orcamentosSalvos.filter(o => filtroPedidos === 'todos' || (filtroPedidos === 'vencido' ? isVencido(o) : o.status === filtroPedidos)).map(o => (
                     <div key={o.docId || o.id} style={{ border: `2px solid ${o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : '#e74c3c'}`, borderRadius: 8, marginBottom: 12, overflow: 'hidden' }}>
                       <div style={{ background: o.status === 'concluido' ? '#eafaf1' : o.status === 'parcial' ? '#fef9e7' : '#fdf0ef', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
                           <div style={{ fontWeight: 'bold', color: '#c0392b' }}>👤 {o.franqueado} — {o.unidade}</div>
-                          <div style={{ fontSize: 11, marginTop: 2 }}>
-                            <span style={{ padding: '2px 8px', borderRadius: 10, fontWeight: 'bold', background: o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : '#e74c3c', color: 'white' }}>
-                              {o.status === 'concluido' ? '✅ Concluído' : o.status === 'parcial' ? '🔶 Parcial' : '⏳ Pendente'}
+                          <div style={{ fontSize: 11, marginTop: 2, display:'flex', gap:4, flexWrap:'wrap', alignItems:'center' }}>
+                            <span style={{ padding: '2px 8px', borderRadius: 10, fontWeight: 'bold', background: o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : isVencido(o) ? '#8e44ad' : '#e0e0e0', color: o.status === 'concluido' || o.status === 'parcial' || isVencido(o) ? 'white' : '#888' }}>
+                              {o.status === 'concluido' ? '✅ Concluído' : o.status === 'parcial' ? '🔶 Parcial' : isVencido(o) ? '🔴 Vencido' : ''}
                             </span>
-                            {o.numeroPedido && <span style={{ marginLeft: 6, color: '#888' }}>#{o.numeroPedido}</span>}
+                            {o.data && <span style={{ color: '#888' }}>📅 {o.data.split(' ')[0]}</span>}
+                            {o.numeroPedido && <span style={{ color: '#aaa' }}>#{o.numeroPedido}</span>}
                           </div>
                           <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>🕐 {o.data}</div>
                         </div>
