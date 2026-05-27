@@ -500,7 +500,16 @@ td{padding:8px;border-bottom:1px solid #ddd}
 
 
   const gerarFaturaImagem = async (o) => {
-    setFaturaAtiva(o)
+    // Salvar dataVencimento no Firestore
+    const dataVenc = new Date()
+    dataVenc.setDate(dataVenc.getDate() + 7)
+    const dataVencStr = dataVenc.toLocaleDateString('pt-BR')
+    if (o.docId) {
+      try {
+        await updateDoc(doc(db, 'orcamentos', o.docId), { dataVencimento: dataVencStr })
+      } catch(e) { console.error(e) }
+    }
+    setFaturaAtiva({ ...o, dataVencimento: dataVencStr })
     await new Promise(r => setTimeout(r, 400))
     if (!faturaRef.current) return
     try {
@@ -955,7 +964,8 @@ td{padding:8px;border-bottom:1px solid #ddd}
                             <span style={{ padding: '2px 8px', borderRadius: 10, fontWeight: 'bold', background: o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : isVencido(o) ? '#8e44ad' : '#e0e0e0', color: o.status === 'concluido' || o.status === 'parcial' || isVencido(o) ? 'white' : '#888' }}>
                               {o.status === 'concluido' ? '✅ Concluído' : o.status === 'parcial' ? '🔶 Parcial' : isVencido(o) ? '🔴 Vencido' : ''}
                             </span>
-                            {o.data && <span style={{ color: '#888' }}>📅 {o.data.split(' ')[0]}</span>}
+                            {o.data && <span style={{ color: '#888' }}>📅 Pedido: {o.data.split(' ')[0]}</span>}
+                            {o.dataVencimento && <span style={{ color: o.status !== 'concluido' ? '#e74c3c' : '#888', fontWeight: 'bold' }}>⏰ Vence: {o.dataVencimento}</span>}
                             {o.numeroPedido && <span style={{ color: '#aaa' }}>#{o.numeroPedido}</span>}
                           </div>
                           <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>🕐 {o.data}</div>
@@ -1051,7 +1061,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                 </div>
                 <div style={{ flex: 1, padding: '12px 16px' }}>
                   <div style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', marginBottom: 4 }}>VENCIMENTO</div>
-                  <div style={{ fontWeight: 'bold' }}>{(() => { const d = new Date(); d.setDate(d.getDate()+7); return d.toLocaleDateString('pt-BR') })()}</div>
+                  <div style={{ fontWeight: 'bold', color: '#e74c3c' }}>{faturaAtiva.dataVencimento || (() => { const d = new Date(); d.setDate(d.getDate()+7); return d.toLocaleDateString('pt-BR') })()}</div>
                 </div>
               </div>
             </div>
