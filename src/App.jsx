@@ -226,6 +226,7 @@ export default function App() {
   const [baixaAluguelId, setBaixaAluguelId] = useState(null)
   const [obsAluguel, setObsAluguel] = useState('')
   const [showFormAluguel, setShowFormAluguel] = useState(false)
+  const [filtroPedidos, setFiltroPedidos] = useState('todos')
   const [faturaAtiva, setFaturaAtiva] = useState(null)
   const faturaRef = useRef(null)
   const [pinErro, setPinErro] = useState(false)
@@ -912,14 +913,28 @@ td{padding:8px;border-bottom:1px solid #ddd}
               {/* ORÇAMENTOS SALVOS */}
               {abaAdmin === 'pedidos' && (
               <div style={{ background: 'white', padding: 16, borderRadius: 10, marginTop: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                  <h3 style={{ color: '#c0392b', margin: 0 }}>💾 Orçamentos Salvos ({orcamentosSalvos.length})</h3>
-
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                    <h3 style={{ color: '#c0392b', margin: 0 }}>📦 Pedidos ({orcamentosSalvos.length})</h3>
+                    <span style={{ fontSize: 12, color: '#888' }}>
+                      {orcamentosSalvos.filter(o => o.status !== 'concluido').length} pendentes
+                    </span>
+                  </div>
+                  {/* Filtros */}
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {[['todos','🗂️ Todos'], ['pendente','⏳ Pendentes'], ['parcial','🔶 Parciais'], ['concluido','✅ Concluídos']].map(([k,l]) => (
+                      <button key={k} onClick={() => setFiltroPedidos(k)} style={{
+                        padding: '6px 12px', borderRadius: 16, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 'bold',
+                        background: filtroPedidos === k ? '#c0392b' : '#f5f5f5',
+                        color: filtroPedidos === k ? 'white' : '#555'
+                      }}>{l} ({k === 'todos' ? orcamentosSalvos.length : orcamentosSalvos.filter(o => o.status === k).length})</button>
+                    ))}
+                  </div>
                 </div>
-                {orcamentosSalvos.length === 0 ? (
-                  <p style={{ color: '#888', textAlign: 'center', padding: 20 }}>Nenhum orçamento salvo ainda.</p>
+                {orcamentosSalvos.filter(o => filtroPedidos === 'todos' || o.status === filtroPedidos).length === 0 ? (
+                  <p style={{ color: '#888', textAlign: 'center', padding: 20 }}>Nenhum pedido neste filtro.</p>
                 ) : (
-                  orcamentosSalvos.map(o => (
+                  orcamentosSalvos.filter(o => filtroPedidos === 'todos' || o.status === filtroPedidos).map(o => (
                     <div key={o.docId || o.id} style={{ border: `2px solid ${o.status === 'concluido' ? '#27ae60' : o.status === 'parcial' ? '#f39c12' : '#e74c3c'}`, borderRadius: 8, marginBottom: 12, overflow: 'hidden' }}>
                       <div style={{ background: o.status === 'concluido' ? '#eafaf1' : o.status === 'parcial' ? '#fef9e7' : '#fdf0ef', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
