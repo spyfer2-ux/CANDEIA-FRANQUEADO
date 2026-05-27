@@ -440,8 +440,10 @@ td{padding:8px;border-bottom:1px solid #ddd}
         let numeroPedido = 1
         try {
           const counterSnap = await getDoc(counterRef)
-          if (counterSnap.exists()) numeroPedido = counterSnap.data().pedidos + 1
-          else numeroPedido = 1076
+          if (counterSnap.exists()) {
+            const atual = counterSnap.data().pedidos
+            numeroPedido = Math.max(atual, 10008) + 1
+          } else numeroPedido = 10009
           await setDoc(counterRef, { pedidos: numeroPedido })
         } catch(e) { numeroPedido = Date.now() }
         orcamento.numeroPedido = numeroPedido
