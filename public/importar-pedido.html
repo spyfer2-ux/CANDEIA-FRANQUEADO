@@ -47,6 +47,12 @@
     <button onclick="importar10009()" id="btn10009" style="margin-top:8px;padding:10px 20px;font-size:15px;">📥 Importar #10009</button>
   </div>
 
+  <div style="border:1px solid #ddd;border-radius:10px;padding:16px;margin:12px 0;background:white;">
+    <b>Pedido #10004</b> — Jd Vila Formosa — 27/05/2026<br>
+    <small>2 itens — Total: R$ 113,75</small><br>
+    <button onclick="importar10004()" id="btn10004" style="margin-top:8px;padding:10px 20px;font-size:15px;">📥 Importar #10004</button>
+  </div>
+
   <div id="status" class="info">Escolha um pedido para importar.</div>
 
   <script type="module">
@@ -436,6 +442,44 @@
         })
         await setDoc(doc(db,'config','contador'), { pedidos: 10009 })
         st.className='ok'; st.textContent='✅ Pedido #10009 (Bruno) importado!'
+      } catch(e) {
+        st.className='err'; st.textContent='Erro: '+e.message
+        btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false})
+      }
+    }
+
+    window.importar10004 = async () => {
+      const st = document.getElementById('status')
+      const btns = ['btn10002','btn10004','btn10005','btn10007','btn10008','btn10009']
+      btns.forEach(id => { const b=document.getElementById(id); if(b) b.disabled=true })
+      if (!auth.currentUser) {
+        st.className='info'; st.textContent='🔐 Fazendo login...'
+        try { await signInWithPopup(auth, new GoogleAuthProvider()) }
+        catch(e) { st.className='err'; st.textContent='Erro: '+e.message; btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false}); return }
+      }
+      if (await pedidoExiste(10004)) {
+        st.className='err'; st.textContent='⚠️ Pedido #10004 já existe!'
+        btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false}); return
+      }
+      st.className='info'; st.textContent='⏳ Importando pedido #10004...'
+      try {
+        await addDoc(collection(db,'orcamentos'), {
+          numeroPedido: 10004,
+          id: 1748354566000,
+          data: '27/05/2026 14:02:46',
+          franqueado: 'Franqueado',
+          unidade: 'Jd Vila Formosa',
+          total: 113.75,
+          status: 'pendente',
+          observacao: '',
+          uid: auth.currentUser.uid,
+          email: auth.currentUser.email,
+          itens: [
+            { nome:'Caixa Média', porcao:'un', quantidade:25, preco:2.09 },
+            { nome:'Caixa Grande', porcao:'un', quantidade:25, preco:2.46 },
+          ]
+        })
+        st.className='ok'; st.textContent='✅ Pedido #10004 importado!'
       } catch(e) {
         st.className='err'; st.textContent='Erro: '+e.message
         btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false})
