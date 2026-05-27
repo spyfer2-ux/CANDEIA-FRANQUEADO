@@ -41,6 +41,12 @@
     <button onclick="importar10008()" id="btn10008" style="margin-top:8px;padding:10px 20px;font-size:15px;">📥 Importar #10008</button>
   </div>
 
+  <div style="border:1px solid #ddd;border-radius:10px;padding:16px;margin:12px 0;background:white;">
+    <b>Pedido #10009</b> — Bruno | Jd Vila Formosa — 27/05/2026<br>
+    <small>12 itens — Total: R$ 678,08</small><br>
+    <button onclick="importar10009()" id="btn10009" style="margin-top:8px;padding:10px 20px;font-size:15px;">📥 Importar #10009</button>
+  </div>
+
   <div id="status" class="info">Escolha um pedido para importar.</div>
 
   <script type="module">
@@ -381,6 +387,55 @@
           await setDoc(counterRef, { pedidos: 10008 })
         }
         st.className='ok'; st.textContent='✅ Pedido #10008 (Bruno) importado com sucesso!'
+      } catch(e) {
+        st.className='err'; st.textContent='Erro: '+e.message
+        btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false})
+      }
+    }
+
+    window.importar10009 = async () => {
+      const st = document.getElementById('status')
+      const btns = ['btn10002','btn10005','btn10007','btn10008','btn10009']
+      btns.forEach(id => { const b=document.getElementById(id); if(b) b.disabled=true })
+      if (!auth.currentUser) {
+        st.className='info'; st.textContent='🔐 Fazendo login...'
+        try { await signInWithPopup(auth, new GoogleAuthProvider()) }
+        catch(e) { st.className='err'; st.textContent='Erro: '+e.message; btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false}); return }
+      }
+      if (await pedidoExiste(10009)) {
+        st.className='err'; st.textContent='⚠️ Pedido #10009 já existe!'
+        btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false}); return
+      }
+      st.className='info'; st.textContent='⏳ Importando pedido #10009...'
+      try {
+        await addDoc(collection(db,'orcamentos'), {
+          numeroPedido: 10009,
+          id: 1748390400000,
+          data: '27/05/2026 00:00:00',
+          franqueado: 'Bruno',
+          unidade: 'Jd Vila Formosa',
+          total: 678.08,
+          status: 'pendente',
+          observacao: '',
+          uid: auth.currentUser.uid,
+          email: auth.currentUser.email,
+          itens: [
+            { nome:'Sacola 35x45', porcao:'100 unid.', quantidade:2, preco:8.25 },
+            { nome:'Bacon Mistura', porcao:'20g', quantidade:30, preco:2.68 },
+            { nome:'Bacon Puro', porcao:'30g', quantidade:10, preco:4.47 },
+            { nome:'Massa de Pastel', porcao:'20,000 kg', quantidade:1, preco:188.00 },
+            { nome:'Frango Puro', porcao:'70g', quantidade:20, preco:3.19 },
+            { nome:'Batata Frita P', porcao:'325g', quantidade:3, preco:4.62 },
+            { nome:'Batata Frita G', porcao:'650g', quantidade:3, preco:8.25 },
+            { nome:'Purê', porcao:'500g', quantidade:2, preco:8.45 },
+            { nome:'Carne Pura', porcao:'70g', quantidade:10, preco:5.16 },
+            { nome:'Chocolate Branco', porcao:'1,000 kg', quantidade:1, preco:39.00 },
+            { nome:'Mussarela', porcao:'2,000 kg', quantidade:1, preco:95.67 },
+            { nome:'Calabresa', porcao:'50g', quantidade:30, preco:1.43 },
+          ]
+        })
+        await setDoc(doc(db,'config','contador'), { pedidos: 10009 })
+        st.className='ok'; st.textContent='✅ Pedido #10009 (Bruno) importado!'
       } catch(e) {
         st.className='err'; st.textContent='Erro: '+e.message
         btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false})
