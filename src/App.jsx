@@ -1047,31 +1047,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                             style={{ background:'#2c3e50', color:'white', border:'none', borderRadius:6, padding:'5px 10px', cursor:'pointer', fontSize:12, fontWeight:'bold' }}>
                             🧾 Fatura
                           </button>
-                          {(() => {
-                            const key = o.franqueado + '_' + o.unidade
-                            const num = whatsappNums[key]
-                            return editandoWpp === o.docId ? (
-                              <div style={{ display:'flex', gap:4, alignItems:'center' }}>
-                                <input type="tel" placeholder="DDD + número" defaultValue={num || ''}
-                                  id={`wpp_${o.docId}`}
-                                  style={{ width:120, padding:'4px 8px', border:'1px solid #ddd', borderRadius:6, fontSize:12 }} />
-                                <button onClick={() => salvarWhatsapp(key, document.getElementById('wpp_'+o.docId).value)}
-                                  style={{ background:'#25d366', color:'white', border:'none', borderRadius:6, padding:'5px 8px', cursor:'pointer', fontSize:11, fontWeight:'bold' }}>✓</button>
-                                <button onClick={() => setEditandoWpp(null)}
-                                  style={{ background:'#eee', color:'#555', border:'none', borderRadius:6, padding:'5px 8px', cursor:'pointer', fontSize:11 }}>✕</button>
-                              </div>
-                            ) : num ? (
-                              <button onClick={() => enviarFaturaWhatsapp(o, num)}
-                                style={{ background:'#25d366', color:'white', border:'none', borderRadius:6, padding:'5px 10px', cursor:'pointer', fontSize:12, fontWeight:'bold' }}>
-                                📲 WhatsApp
-                              </button>
-                            ) : (
-                              <button onClick={() => setEditandoWpp(o.docId)}
-                                style={{ background:'#f0f0f0', color:'#555', border:'1px dashed #ccc', borderRadius:6, padding:'5px 10px', cursor:'pointer', fontSize:11 }}>
-                                + Nº WhatsApp
-                              </button>
-                            )
-                          })()}
+
                           <button onClick={() => { if (window.confirm("⚠️ Tem certeza que deseja EXCLUIR este pedido?\n\nEsta ação não pode ser desfeita!")) excluirOrcamento(o.id, o.docId) }}
                             style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}>✕</button>
                         </div>
