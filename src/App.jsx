@@ -543,7 +543,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
     const dataVencStr = dataVenc.toLocaleDateString('pt-BR')
     if (o.docId) {
       try {
-        await updateDoc(doc(db, 'orcamentos', o.docId), { dataVencimento: dataVencStr })
+        await updateDoc(doc(db, 'orcamentos', o.docId), { dataVencimento: dataVencStr, faturaGerada: true })
       } catch(e) { console.error(e) }
     }
     setFaturaAtiva({ ...o, dataVencimento: dataVencStr })
@@ -1020,10 +1020,12 @@ td{padding:8px;border-bottom:1px solid #ddd}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           <div style={{ fontWeight: 'bold', color: '#c0392b', fontSize: 16 }}>{o.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                            {!o.faturaGerada && (
                             <button onClick={() => gerarFaturaImagem(o)}
-                            style={{ background:'#2c3e50', color:'white', border:'none', borderRadius:6, padding:'5px 10px', cursor:'pointer', fontSize:12, fontWeight:'bold' }}>
-                            🧾 Fatura
-                          </button>
+                              style={{ background:'#2c3e50', color:'white', border:'none', borderRadius:6, padding:'5px 10px', cursor:'pointer', fontSize:12, fontWeight:'bold' }}>
+                              🧾 Fatura
+                            </button>
+                          )}
 
                           <button onClick={() => { if (window.confirm("⚠️ Tem certeza que deseja EXCLUIR este pedido?\n\nEsta ação não pode ser desfeita!")) excluirOrcamento(o.id, o.docId) }}
                             style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}>✕</button>
