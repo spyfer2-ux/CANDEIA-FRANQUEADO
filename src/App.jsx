@@ -955,14 +955,10 @@ td{padding:8px;border-bottom:1px solid #ddd}
                       </div>
                     ))}
                   </div>
-                  <div style={{ padding: '10px 16px', borderTop: '1px solid #f5f5f5', display: 'flex', gap: 8 }}>
+                  <div style={{ padding: '10px 16px', borderTop: '1px solid #f5f5f5' }}>
                     <button onClick={() => gerarImagemPedido(o)}
-                      style={{ flex: 1, padding: '10px', background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 'bold', cursor: 'pointer' }}>
-                      📸 Gerar Pedido
-                    </button>
-                    <button onClick={() => compartilharPedido(o)}
-                      style={{ flex: 1, padding: '10px', background: 'linear-gradient(135deg, #25d366, #128c7e)', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 'bold', cursor: 'pointer' }}>
-                      📤 Compartilhar
+                      style={{ width: '100%', padding: '11px', background: 'linear-gradient(135deg, #25d366, #128c7e)', color: 'white', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                      📲 Compartilhar Pedido
                     </button>
                   </div>
                 </div>
