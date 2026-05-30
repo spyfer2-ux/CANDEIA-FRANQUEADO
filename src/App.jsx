@@ -919,7 +919,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   <div style={{ padding: '10px 16px', borderTop: '1px solid #f5f5f5', display: 'flex', gap: 8 }}>
                     <button onClick={() => gerarImagemPedido(o)}
                       style={{ flex: 1, padding: '10px', background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 'bold', cursor: 'pointer' }}>
-                      📸 Gerar Imagem
+                      📸 Gerar Pedido
                     </button>
                     <button onClick={() => compartilharPedido(o)}
                       style={{ flex: 1, padding: '10px', background: 'linear-gradient(135deg, #25d366, #128c7e)', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 'bold', cursor: 'pointer' }}>
