@@ -461,8 +461,12 @@ td{padding:8px;border-bottom:1px solid #ddd}
       setOrcamentosSalvos(novos)
       localStorage.setItem('orcamentos_salvos', JSON.stringify(novos))
     }
+    // Limpar carrinho e ir para Meus Pedidos
+    setCarrinho([])
+    localStorage.removeItem('rascunho_pedido')
+    setAba('meus-pedidos')
     setOrcamentoSalvoMsg(true)
-    setTimeout(() => setOrcamentoSalvoMsg(false), 3000)
+    setTimeout(() => setOrcamentoSalvoMsg(false), 4000)
   }
 
 
