@@ -582,8 +582,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
     const dataVenc = o.dataVencimento || (() => {
       const d = new Date(); d.setDate(d.getDate()+7); return d.toLocaleDateString('pt-BR')
     })()
-    const linhas = (o.itens||[]).map(i => `  • ${i.nome} (${i.porcao}) ×${i.quantidade} = ${(i.preco*i.quantidade).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}`).join('
-')
+    const linhas = (o.itens||[]).map(i => '  • ' + i.nome + ' (' + i.porcao + ') x' + i.quantidade + ' = ' + (i.preco*i.quantidade).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})).join('\n')
     const nl = '\n'
     const msg = [
       '🧾 *FATURA #' + o.numeroPedido + ' — Candeias Jr*',
