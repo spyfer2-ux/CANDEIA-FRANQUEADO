@@ -1072,7 +1072,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                               </button>
                             )
                           })()}
-                          <button onClick={() => excluirOrcamento(o.id, o.docId)}
+                          <button onClick={() => { if (window.confirm("⚠️ Tem certeza que deseja EXCLUIR este pedido?\n\nEsta ação não pode ser desfeita!")) excluirOrcamento(o.id, o.docId) }}
                             style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}>✕</button>
                         </div>
                       </div>
