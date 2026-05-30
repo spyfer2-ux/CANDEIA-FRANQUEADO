@@ -229,6 +229,8 @@ export default function App() {
   const [filtroPedidos, setFiltroPedidos] = useState('todos')
   const [faturaAtiva, setFaturaAtiva] = useState(null)
   const faturaRef = useRef(null)
+  const [pedidoImagemAtivo, setPedidoImagemAtivo] = useState(null)
+  const pedidoImagemRef = useRef(null)
   const [pinErro, setPinErro] = useState(false)
   const [historico, setHistorico] = useState(() => {
     try { return JSON.parse(localStorage.getItem('historico_precos') || '[]') }
@@ -469,6 +471,32 @@ td{padding:8px;border-bottom:1px solid #ddd}
     setTimeout(() => setOrcamentoSalvoMsg(false), 4000)
   }
 
+
+
+  const gerarImagemPedido = async (o) => {
+    setPedidoImagemAtivo(o)
+    await new Promise(r => setTimeout(r, 400))
+    if (!pedidoImagemRef.current) return
+    try {
+      const canvas = await html2canvas(pedidoImagemRef.current, { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false })
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], `pedido-${o.numeroPedido || o.id}.png`, { type: 'image/png' })
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: `Pedido #${o.numeroPedido} — Candeias Jr`, text: `Pedido de ${o.franqueado} — Total: ${o.total?.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}` })
+        } else {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `pedido-${o.numeroPedido || o.id}.png`
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+        }
+        setPedidoImagemAtivo(null)
+      }, 'image/png')
+    } catch(e) { console.error(e); setPedidoImagemAtivo(null) }
+  }
 
 
   const compartilharPedido = async (o) => {
@@ -888,10 +916,14 @@ td{padding:8px;border-bottom:1px solid #ddd}
                       </div>
                     ))}
                   </div>
-                  <div style={{ padding: '10px 16px', borderTop: '1px solid #f5f5f5' }}>
+                  <div style={{ padding: '10px 16px', borderTop: '1px solid #f5f5f5', display: 'flex', gap: 8 }}>
+                    <button onClick={() => gerarImagemPedido(o)}
+                      style={{ flex: 1, padding: '10px', background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 'bold', cursor: 'pointer' }}>
+                      📸 Gerar Imagem
+                    </button>
                     <button onClick={() => compartilharPedido(o)}
-                      style={{ width: '100%', padding: '10px', background: 'linear-gradient(135deg, #25d366, #128c7e)', color: 'white', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                      📤 Compartilhar Pedido
+                      style={{ flex: 1, padding: '10px', background: 'linear-gradient(135deg, #25d366, #128c7e)', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 'bold', cursor: 'pointer' }}>
+                      📤 Compartilhar
                     </button>
                   </div>
                 </div>
@@ -1040,6 +1072,42 @@ td{padding:8px;border-bottom:1px solid #ddd}
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Card invisível para imagem do pedido */}
+      {pedidoImagemAtivo && (
+        <div style={{ position: 'fixed', left: -9999, top: 0, zIndex: -1 }}>
+          <div ref={pedidoImagemRef} style={{ width: 580, background: 'white', fontFamily: 'Arial, sans-serif', padding: 0, color: '#222', borderRadius: 12, overflow: 'hidden' }}>
+            {/* Header */}
+            <div style={{ background: 'linear-gradient(135deg, #7c2f00, #c44010)', color: 'white', padding: '20px 24px' }}>
+              <div style={{ fontSize: 11, opacity: 0.8, letterSpacing: 2, marginBottom: 4 }}>CANDEIAS JR — PEDIDO CONFIRMADO</div>
+              <div style={{ fontSize: 22, fontWeight: 'bold' }}>Pedido #{pedidoImagemAtivo.numeroPedido || '—'}</div>
+              <div style={{ fontSize: 13, opacity: 0.9, marginTop: 4 }}>📅 {pedidoImagemAtivo.data} &nbsp;|&nbsp; 👤 {pedidoImagemAtivo.franqueado} &nbsp;|&nbsp; 🏪 {pedidoImagemAtivo.unidade}</div>
+            </div>
+            {/* Itens */}
+            <div style={{ padding: '16px 24px' }}>
+              <div style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10, fontWeight: 'bold' }}>Itens do Pedido</div>
+              {(pedidoImagemAtivo.itens || []).map((item, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: '1px solid #f5f5f5', fontSize: 13 }}>
+                  <span style={{ color: '#333' }}>{item.nome} <span style={{ color: '#aaa', fontSize: 12 }}>({item.porcao})</span></span>
+                  <span style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                    <span style={{ color: '#888', fontSize: 12 }}>×{item.quantidade}</span>
+                    <span style={{ fontWeight: 'bold', color: '#333', minWidth: 80, textAlign: 'right' }}>{(item.preco * item.quantidade).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+            {/* Total */}
+            <div style={{ background: '#fdf0ef', padding: '14px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '2px solid #c0392b' }}>
+              <span style={{ fontWeight: 'bold', fontSize: 15, color: '#7c2f00' }}>TOTAL DO PEDIDO</span>
+              <span style={{ fontWeight: 'bold', fontSize: 22, color: '#c0392b' }}>{pedidoImagemAtivo.total?.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span>
+            </div>
+            {/* Footer */}
+            <div style={{ background: '#1a1a1a', color: '#aaa', padding: '10px 24px', fontSize: 11, textAlign: 'center' }}>
+              🫓 Pastelaria Candeias Jr &nbsp;•&nbsp; Pedido gerado em {new Date().toLocaleString('pt-BR')}
+            </div>
+          </div>
         </div>
       )}
 
