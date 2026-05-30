@@ -227,6 +227,8 @@ export default function App() {
   const [obsAluguel, setObsAluguel] = useState('')
   const [showFormAluguel, setShowFormAluguel] = useState(false)
   const [filtroPedidos, setFiltroPedidos] = useState('todos')
+  const [whatsappNums, setWhatsappNums] = useState({})
+  const [editandoWpp, setEditandoWpp] = useState(null)
   const [faturaAtiva, setFaturaAtiva] = useState(null)
   const faturaRef = useRef(null)
   const [pedidoImagemAtivo, setPedidoImagemAtivo] = useState(null)
@@ -565,6 +567,44 @@ td{padding:8px;border-bottom:1px solid #ddd}
     } catch(e) { console.error(e); setFaturaAtiva(null) }
   }
 
+
+
+  const salvarWhatsapp = async (franqueadoKey, numero) => {
+    const novos = { ...whatsappNums, [franqueadoKey]: numero }
+    setWhatsappNums(novos)
+    try {
+      await setDoc(doc(db, 'config', 'whatsapp_nums'), novos)
+    } catch(e) { console.error(e) }
+    setEditandoWpp(null)
+  }
+
+  const enviarFaturaWhatsapp = (o, numero) => {
+    const dataVenc = o.dataVencimento || (() => {
+      const d = new Date(); d.setDate(d.getDate()+7); return d.toLocaleDateString('pt-BR')
+    })()
+    const linhas = (o.itens||[]).map(i => `  • ${i.nome} (${i.porcao}) ×${i.quantidade} = ${(i.preco*i.quantidade).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}`).join('
+')
+    const nl = '\n'
+    const msg = [
+      '🧾 *FATURA #' + o.numeroPedido + ' — Candeias Jr*',
+      '',
+      '👤 *' + o.franqueado + '* | 🏪 ' + o.unidade,
+      '📅 Emissão: ' + new Date().toLocaleDateString('pt-BR'),
+      '⏰ *Vencimento: ' + dataVenc + '*',
+      '',
+      '📋 *Itens:*',
+      linhas,
+      '',
+      '💰 *TOTAL: ' + o.total?.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) + '*',
+      '',
+      '💠 *PIX:* ' + FATURA_PIX_KEY,
+      '👤 Favorecido: ' + FATURA_FAVORECIDO,
+      '',
+      'Por favor envie o comprovante após o pagamento. ✅'
+    ].join(nl)
+    const num = numero.replace(/\D/g,'')
+    window.open(`https://wa.me/55${num}?text=${encodeURIComponent(msg)}`, '_blank')
+  }
 
 
   const salvarAluguel = async () => {
@@ -1009,9 +1049,34 @@ td{padding:8px;border-bottom:1px solid #ddd}
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           <div style={{ fontWeight: 'bold', color: '#c0392b', fontSize: 16 }}>{o.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                             <button onClick={() => gerarFaturaImagem(o)}
-                            style={{ background:'#25d366', color:'white', border:'none', borderRadius:6, padding:'5px 12px', cursor:'pointer', fontSize:12, fontWeight:'bold' }}>
-                            🧾 Gerar Fatura
+                            style={{ background:'#2c3e50', color:'white', border:'none', borderRadius:6, padding:'5px 10px', cursor:'pointer', fontSize:12, fontWeight:'bold' }}>
+                            🧾 Fatura
                           </button>
+                          {(() => {
+                            const key = o.franqueado + '_' + o.unidade
+                            const num = whatsappNums[key]
+                            return editandoWpp === o.docId ? (
+                              <div style={{ display:'flex', gap:4, alignItems:'center' }}>
+                                <input type="tel" placeholder="DDD + número" defaultValue={num || ''}
+                                  id={`wpp_${o.docId}`}
+                                  style={{ width:120, padding:'4px 8px', border:'1px solid #ddd', borderRadius:6, fontSize:12 }} />
+                                <button onClick={() => salvarWhatsapp(key, document.getElementById('wpp_'+o.docId).value)}
+                                  style={{ background:'#25d366', color:'white', border:'none', borderRadius:6, padding:'5px 8px', cursor:'pointer', fontSize:11, fontWeight:'bold' }}>✓</button>
+                                <button onClick={() => setEditandoWpp(null)}
+                                  style={{ background:'#eee', color:'#555', border:'none', borderRadius:6, padding:'5px 8px', cursor:'pointer', fontSize:11 }}>✕</button>
+                              </div>
+                            ) : num ? (
+                              <button onClick={() => enviarFaturaWhatsapp(o, num)}
+                                style={{ background:'#25d366', color:'white', border:'none', borderRadius:6, padding:'5px 10px', cursor:'pointer', fontSize:12, fontWeight:'bold' }}>
+                                📲 WhatsApp
+                              </button>
+                            ) : (
+                              <button onClick={() => setEditandoWpp(o.docId)}
+                                style={{ background:'#f0f0f0', color:'#555', border:'1px dashed #ccc', borderRadius:6, padding:'5px 10px', cursor:'pointer', fontSize:11 }}>
+                                + Nº WhatsApp
+                              </button>
+                            )
+                          })()}
                           <button onClick={() => excluirOrcamento(o.id, o.docId)}
                             style={{ background: 'none', border: 'none', color: '#e74c3c', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}>✕</button>
                         </div>
