@@ -63,6 +63,11 @@
     <small>1 item — Total: R$ 188,00</small><br>
     <button onclick="importar10011()" id="btn10011" style="margin-top:8px;padding:10px 20px;font-size:15px;">📥 Importar #10011</button>
   </div>
+  <div style="border:1px solid #e0a800;border-radius:10px;padding:16px;margin:12px 0;background:#fffbe6;">
+    <b>⚙️ Ajustar Contador</b><br>
+    <small>Define o número do próximo pedido</small><br>
+    <button onclick="ajustarContador(10014)" id="btnContador" style="margin-top:8px;padding:10px 20px;font-size:15px;background:#f0ad00;color:white;border:none;border-radius:8px;cursor:pointer;">🔢 Próximo pedido = #10015</button>
+  </div>
   <div id="status" class="info">Escolha um pedido para importar.</div>
 
   <script type="module">
@@ -569,6 +574,23 @@
       } catch(e) {
         st.className='err'; st.textContent='Erro: '+e.message
         btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false})
+      }
+    }
+
+    window.ajustarContador = async (valor) => {
+      const st = document.getElementById('status')
+      document.getElementById('btnContador').disabled = true
+      if (!auth.currentUser) {
+        st.className='info'; st.textContent='🔐 Fazendo login...'
+        try { await signInWithPopup(auth, new GoogleAuthProvider()) }
+        catch(e) { st.className='err'; st.textContent='Erro: '+e.message; document.getElementById('btnContador').disabled=false; return }
+      }
+      try {
+        await setDoc(doc(db,'config','contador'), { pedidos: valor })
+        st.className='ok'; st.textContent='✅ Contador ajustado! Próximo pedido será #' + (valor+1)
+      } catch(e) {
+        st.className='err'; st.textContent='Erro: '+e.message
+        document.getElementById('btnContador').disabled=false
       }
     }
   </script>
