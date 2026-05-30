@@ -58,6 +58,11 @@
     <small>1 item — Total: R$ 188,00</small><br>
     <button onclick="importar10010()" id="btn10010" style="margin-top:8px;padding:10px 20px;font-size:15px;">📥 Importar #10010</button>
   </div>
+  <div style="border:1px solid #ddd;border-radius:10px;padding:16px;margin:12px 0;background:white;">
+    <b>Pedido #10011</b> — Bruno | Jd Vila Formosa — 29/05/2026<br>
+    <small>1 item — Total: R$ 188,00</small><br>
+    <button onclick="importar10011()" id="btn10011" style="margin-top:8px;padding:10px 20px;font-size:15px;">📥 Importar #10011</button>
+  </div>
   <div id="status" class="info">Escolha um pedido para importar.</div>
 
   <script type="module">
@@ -523,6 +528,44 @@
         })
         await setDoc(doc(db,'config','contador'), { pedidos: 10010 })
         st.className='ok'; st.textContent='✅ Pedido #10010 importado!'
+      } catch(e) {
+        st.className='err'; st.textContent='Erro: '+e.message
+        btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false})
+      }
+    }
+
+    window.importar10011 = async () => {
+      const st = document.getElementById('status')
+      const btns = ['btn10002','btn10004','btn10005','btn10007','btn10008','btn10009','btn10010','btn10011']
+      btns.forEach(id => { const b=document.getElementById(id); if(b) b.disabled=true })
+      if (!auth.currentUser) {
+        st.className='info'; st.textContent='🔐 Fazendo login...'
+        try { await signInWithPopup(auth, new GoogleAuthProvider()) }
+        catch(e) { st.className='err'; st.textContent='Erro: '+e.message; btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false}); return }
+      }
+      if (await pedidoExiste(10011)) {
+        st.className='err'; st.textContent='⚠️ Pedido #10011 já existe!'
+        btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false}); return
+      }
+      st.className='info'; st.textContent='⏳ Importando pedido #10011...'
+      try {
+        await addDoc(collection(db,'orcamentos'), {
+          numeroPedido: 10011,
+          id: 1748476801000,
+          data: '29/05/2026 00:00:00',
+          franqueado: 'Bruno',
+          unidade: 'Jd Vila Formosa',
+          total: 188.00,
+          status: 'pendente',
+          observacao: '',
+          uid: auth.currentUser.uid,
+          email: auth.currentUser.email,
+          itens: [
+            { nome:'Massa de Pastel', porcao:'20,000 kg', quantidade:1, preco:188.00 },
+          ]
+        })
+        await setDoc(doc(db,'config','contador'), { pedidos: 10011 })
+        st.className='ok'; st.textContent='✅ Pedido #10011 importado!'
       } catch(e) {
         st.className='err'; st.textContent='Erro: '+e.message
         btns.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false})
