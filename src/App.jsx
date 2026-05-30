@@ -465,12 +465,15 @@ td{padding:8px;border-bottom:1px solid #ddd}
       setOrcamentosSalvos(novos)
       localStorage.setItem('orcamentos_salvos', JSON.stringify(novos))
     }
-    // Limpar carrinho e ir para Meus Pedidos
+    // Limpar carrinho, ir para Meus Pedidos e compartilhar
     setCarrinho([])
     localStorage.removeItem('rascunho_pedido')
     setAba('meus-pedidos')
-    setOrcamentoSalvoMsg(true)
-    setTimeout(() => setOrcamentoSalvoMsg(false), 4000)
+    // Pequeno delay para o estado atualizar antes de gerar imagem
+    setTimeout(async () => {
+      const pedidoParaCompartilhar = { ...orcamento, docId: null }
+      await gerarImagemPedido(pedidoParaCompartilhar)
+    }, 800)
   }
 
 
@@ -894,21 +897,14 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   <span>Total</span>
                   <span style={{ color: '#c0392b' }}>{formatPreco(total)}</span>
                 </div>
-                <button onClick={gerarPDF} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #c0392b, #e74c3c)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>📄 Gerar PDF do Pedido</button>
-                                <div style={{ background: '#f0f7ff', border: '1px solid #bee3f8', borderRadius: 8, padding: '8px 12px', marginBottom: 8, fontSize: 13, color: '#2c5f8a', textAlign: 'center' }}>
-                  {usuario ? `✅ Logado como ${usuario.email}` : '⚠️ Faça login para salvar pedidos'}
-                </div>
-                <button onClick={salvarOrcamento} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #2c3e50, #3d5166)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', marginBottom: 10 }}>💾 Salvar Orçamento</button>
-                {orcamentoSalvoMsg && (
-                  <div style={{ background: '#eafaf1', border: '1px solid #27ae60', borderRadius: 8, padding: '10px 14px', color: '#27ae60', fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>
-                    ✅ Orçamento salvo com sucesso!
+                {!usuario && (
+                  <div style={{ background: '#fff3cd', border: '1px solid #ffc107', borderRadius: 8, padding: '8px 12px', marginBottom: 8, fontSize: 13, color: '#856404', textAlign: 'center' }}>
+                    ⚠️ Faça login para salvar pedidos
                   </div>
                 )}
-                {pedidoGerado && (
-                  <button onClick={compartilharWhatsapp} style={{ width: '100%', padding: 14, background: 'linear-gradient(135deg, #25d366, #128c7e)', color: 'white', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 20 }}>💬</span> Compartilhar via WhatsApp
-                  </button>
-                )}
+                <button onClick={salvarOrcamento} style={{ width: '100%', padding: 16, background: 'linear-gradient(135deg, #25d366, #128c7e)', color: 'white', border: 'none', borderRadius: 8, fontSize: 17, fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                  📲 Salvar e Compartilhar Pedido
+                </button>
               </div>
             </>
           )}
