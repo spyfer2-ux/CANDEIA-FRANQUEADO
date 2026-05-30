@@ -977,26 +977,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
             </div>
           ) : (
             <div>
-              <div style={{ background: 'white', padding: 16, borderRadius: 10, marginBottom: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                <h3 style={{ color: '#c0392b', marginBottom: 12 }}>📝 Registrar Atualização de Preços</h3>
-                <textarea placeholder="Observação (ex: Reajuste de 10% em carnes)" value={novaObs} onChange={e => setNovaObs(e.target.value)}
-                  style={{ width: '100%', padding: 10, border: '1px solid #ddd', borderRadius: 6, minHeight: 80, marginBottom: 8, boxSizing: 'border-box', resize: 'vertical' }}/>
-                <button onClick={registrarAtualizacao} style={{ padding: '10px 20px', background: '#27ae60', color: 'white', border: 'none', borderRadius: 6, fontWeight: 'bold', cursor: 'pointer' }}>Registrar</button>
-              </div>
-              <div style={{ background: 'white', padding: 16, borderRadius: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                <h3 style={{ color: '#c0392b', marginBottom: 12 }}>📅 Histórico de Atualizações</h3>
-                {historico.length === 0 ? (
-                  <p style={{ color: '#888', textAlign: 'center', padding: 20 }}>Nenhuma atualização registrada ainda.</p>
-                ) : (
-                  [...historico].reverse().map(h => (
-                    <div key={h.numero} style={{ padding: '10px 0', borderBottom: '1px solid #f0f0f0' }}>
-                      <div style={{ fontWeight: 'bold', color: '#c0392b' }}>#{h.numero} — {h.data}</div>
-                      <div style={{ color: '#555', marginTop: 4 }}>{h.obs || 'Sem observação'}</div>
-                    </div>
-                  ))
-                )}
-              </div>
-              )}
+
 
               {/* ORÇAMENTOS SALVOS */}
               {abaAdmin === 'pedidos' && (
