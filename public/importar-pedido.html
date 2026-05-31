@@ -68,6 +68,11 @@
     <small>Define o número do próximo pedido</small><br>
     <button onclick="ajustarContador(10014)" id="btnContador" style="margin-top:8px;padding:10px 20px;font-size:15px;background:#f0ad00;color:white;border:none;border-radius:8px;cursor:pointer;">🔢 Próximo pedido = #10015</button>
   </div>
+  <div style="border:1px solid #bee3f8;border-radius:10px;padding:16px;margin:12px 0;background:#ebf8ff;">
+    <b>🔓 Habilitar Fatura — Pedido #10011</b><br>
+    <small>Permite gerar fatura uma vez</small><br>
+    <button onclick="habilitarFatura(10011)" id="btnFatura10011" style="margin-top:8px;padding:10px 20px;font-size:15px;background:#3182ce;color:white;border:none;border-radius:8px;cursor:pointer;">🔓 Habilitar #10011</button>
+  </div>
   <div id="status" class="info">Escolha um pedido para importar.</div>
 
   <script type="module">
@@ -591,6 +596,31 @@
       } catch(e) {
         st.className='err'; st.textContent='Erro: '+e.message
         document.getElementById('btnContador').disabled=false
+      }
+    }
+
+    window.habilitarFatura = async (numeroPedido) => {
+      const st = document.getElementById('status')
+      const btn = document.getElementById('btnFatura'+numeroPedido)
+      if (btn) btn.disabled = true
+      if (!auth.currentUser) {
+        st.className='info'; st.textContent='🔐 Fazendo login...'
+        try { await signInWithPopup(auth, new GoogleAuthProvider()) }
+        catch(e) { st.className='err'; st.textContent='Erro: '+e.message; if(btn) btn.disabled=false; return }
+      }
+      st.className='info'; st.textContent='⏳ Buscando pedido #'+numeroPedido+'...'
+      try {
+        const { getDocs: gd, query: q, collection: col, where: wh, updateDoc: ud } = await import('https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js')
+        const snap = await gd(q(col(db, 'orcamentos'), wh('numeroPedido', '==', numeroPedido)))
+        if (snap.empty) {
+          st.className='err'; st.textContent='❌ Pedido #'+numeroPedido+' não encontrado!'
+          if(btn) btn.disabled=false; return
+        }
+        await ud(snap.docs[0].ref, { faturaGerada: false })
+        st.className='ok'; st.textContent='✅ Fatura do pedido #'+numeroPedido+' habilitada! O botão voltará a aparecer no Admin.'
+      } catch(e) {
+        st.className='err'; st.textContent='Erro: '+e.message
+        if(btn) btn.disabled=false
       }
     }
   </script>
