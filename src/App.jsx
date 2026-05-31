@@ -201,6 +201,8 @@ const ADMIN_EMAILS = ['spyfer2@gmail.com', 'cibellecristianereis@gmail.com', 'jr
 const FATURA_PIX_KEY = '306.987.778-83'
 const FATURA_FAVORECIDO = 'Cibelle Cristiane Reis'
 const FATURA_VENCIMENTO_DIAS = 7
+const MENSALIDADE_VALOR = 119.00
+const MENSALIDADE_DIA_VENC = 15
 const isAdmin = (email) => ADMIN_EMAILS.includes(email?.toLowerCase())
 
 export default function App() {
@@ -227,6 +229,7 @@ export default function App() {
   const [obsAluguel, setObsAluguel] = useState('')
   const [showFormAluguel, setShowFormAluguel] = useState(false)
   const [filtroPedidos, setFiltroPedidos] = useState('todos')
+  const [showMensalidadePopup, setShowMensalidadePopup] = useState(false)
   const [whatsappNums, setWhatsappNums] = useState({})
   const [editandoWpp, setEditandoWpp] = useState(null)
   const [faturaAtiva, setFaturaAtiva] = useState(null)
@@ -523,6 +526,19 @@ td{padding:8px;border-bottom:1px solid #ddd}
       }
     } catch (e) { console.error(e) }
   }
+
+  // Verificar se deve mostrar popup de mensalidade (8 a 15 do mês)
+  useEffect(() => {
+    if (!usuario || isAdmin(usuario.email)) return
+    const hoje = new Date()
+    const dia = hoje.getDate()
+    const mesAno = hoje.getMonth() + '_' + hoje.getFullYear()
+    const jaViu = localStorage.getItem('mensalidade_popup_' + mesAno)
+    if (dia >= 8 && dia <= 15 && !jaViu) {
+      setShowMensalidadePopup(true)
+    }
+  }, [usuario])
+
 
   const isVencido = (o) => {
     if (o.status === 'concluido') return false
@@ -964,6 +980,59 @@ td{padding:8px;border-bottom:1px solid #ddd}
         </div>
       )}
 
+
+      {/* ABA MENSALIDADE */}
+      {aba === 'mensalidade' && !isAdmin(usuario?.email) && (
+        <div style={{ padding: 16 }}>
+          <h2 style={{ color: '#c0392b', margin: '0 0 16px' }}>💳 Mensalidade do Sistema</h2>
+
+          {/* Card principal */}
+          <div style={{ background: 'white', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.1)', marginBottom: 16 }}>
+            <div style={{ background: 'linear-gradient(135deg, #c0392b, #e74c3c)', padding: '20px 16px', color: 'white', textAlign: 'center' }}>
+              <div style={{ fontSize: 13, opacity: 0.9, marginBottom: 4 }}>MENSALIDADE — PORTAL CANDEIAS JR</div>
+              <div style={{ fontSize: 36, fontWeight: 'bold' }}>R$ 119,00</div>
+              <div style={{ fontSize: 13, opacity: 0.9, marginTop: 4 }}>Vencimento todo dia <b>15</b> do mês</div>
+            </div>
+            <div style={{ padding: 16 }}>
+              {/* Próximo vencimento */}
+              {(() => {
+                const hoje = new Date()
+                const venc = new Date(hoje.getFullYear(), hoje.getMonth(), 15)
+                if (hoje.getDate() > 15) venc.setMonth(venc.getMonth() + 1)
+                const diff = Math.ceil((venc - hoje) / (1000*60*60*24))
+                const mes = venc.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })
+                return (
+                  <div style={{ background: diff <= 7 ? '#fff3cd' : '#f8f9fa', border: `1px solid ${diff <= 7 ? '#ffc107' : '#e9ecef'}`, borderRadius: 8, padding: '12px 16px', marginBottom: 16, textAlign: 'center' }}>
+                    <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>PRÓXIMO VENCIMENTO</div>
+                    <div style={{ fontSize: 18, fontWeight: 'bold', color: diff <= 7 ? '#856404' : '#333' }}>
+                      15 de {mes}
+                    </div>
+                    {diff <= 7 && <div style={{ fontSize: 13, color: '#856404', marginTop: 4 }}>⚠️ Vence em {diff} dia{diff !== 1 ? 's' : ''}!</div>}
+                  </div>
+                )
+              })()}
+
+              {/* PIX */}
+              <div style={{ background: '#f0fff4', border: '1px solid #9ae6b4', borderRadius: 8, padding: '14px 16px' }}>
+                <div style={{ fontSize: 13, fontWeight: 'bold', color: '#276749', marginBottom: 8 }}>💠 Pagar via PIX</div>
+                <div style={{ background: 'white', border: '1px solid #ddd', borderRadius: 6, padding: '10px 14px', fontFamily: 'monospace', fontSize: 15, fontWeight: 'bold', textAlign: 'center', letterSpacing: 1, color: '#333', marginBottom: 8 }}>
+                  {FATURA_PIX_KEY}
+                </div>
+                <div style={{ fontSize: 13, color: '#555' }}>👤 Favorecido: <b>{FATURA_FAVORECIDO}</b></div>
+                <button onClick={() => { navigator.clipboard?.writeText(FATURA_PIX_KEY); alert('Chave PIX copiada!') }}
+                  style={{ width: '100%', marginTop: 10, padding: '10px', background: '#38a169', color: 'white', border: 'none', borderRadius: 6, fontWeight: 'bold', fontSize: 14, cursor: 'pointer' }}>
+                  📋 Copiar Chave PIX
+                </button>
+              </div>
+
+              <p style={{ fontSize: 12, color: '#aaa', textAlign: 'center', marginTop: 12 }}>
+                Após o pagamento, envie o comprovante via WhatsApp para o suporte.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ABA ADMIN */}
       {aba === 'admin' && isAdmin(usuario?.email) && (
         <div style={{ padding: 16 }}>
@@ -1087,6 +1156,39 @@ td{padding:8px;border-bottom:1px solid #ddd}
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Popup mensalidade */}
+      {showMensalidadePopup && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div style={{ background: 'white', borderRadius: 16, maxWidth: 360, width: '100%', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
+            <div style={{ background: 'linear-gradient(135deg, #c0392b, #e74c3c)', padding: '20px 16px', color: 'white', textAlign: 'center' }}>
+              <div style={{ fontSize: 32, marginBottom: 4 }}>💳</div>
+              <div style={{ fontSize: 18, fontWeight: 'bold' }}>Mensalidade a Vencer!</div>
+              <div style={{ fontSize: 13, opacity: 0.9 }}>Portal Candeias Jr</div>
+            </div>
+            <div style={{ padding: 20, textAlign: 'center' }}>
+              <div style={{ fontSize: 13, color: '#888', marginBottom: 4 }}>Vencimento dia 15/{String(new Date().getMonth()+1).padStart(2,'0')}/{new Date().getFullYear()}</div>
+              <div style={{ fontSize: 32, fontWeight: 'bold', color: '#c0392b', marginBottom: 16 }}>R$ 119,00</div>
+              <div style={{ background: '#f8f8f8', borderRadius: 8, padding: '10px 14px', marginBottom: 12 }}>
+                <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>Chave PIX</div>
+                <div style={{ fontFamily: 'monospace', fontWeight: 'bold', fontSize: 15 }}>{FATURA_PIX_KEY}</div>
+                <div style={{ fontSize: 12, color: '#555', marginTop: 4 }}>Favorecido: {FATURA_FAVORECIDO}</div>
+              </div>
+              <button onClick={() => { navigator.clipboard?.writeText(FATURA_PIX_KEY); alert('Chave copiada!') }}
+                style={{ width: '100%', padding: '10px', background: '#38a169', color: 'white', border: 'none', borderRadius: 8, fontWeight: 'bold', fontSize: 14, cursor: 'pointer', marginBottom: 8 }}>
+                📋 Copiar Chave PIX
+              </button>
+              <button onClick={() => {
+                const mesAno = new Date().getMonth() + '_' + new Date().getFullYear()
+                localStorage.setItem('mensalidade_popup_' + mesAno, '1')
+                setShowMensalidadePopup(false)
+              }} style={{ width: '100%', padding: '10px', background: '#eee', color: '#555', border: 'none', borderRadius: 8, fontSize: 13, cursor: 'pointer' }}>
+                Ok, já vi — fechar
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
