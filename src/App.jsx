@@ -197,7 +197,7 @@ const UNIDADES = [
 
 
 
-const ADMIN_EMAILS = ['spyfer2@gmail.com', 'maurojr380@gmail.com', 'cibellecristianereis@gmail.com', 'jrmauro380@gmail.com']
+const ADMIN_EMAILS = ['spyfer2@gmail.com', 'cibellecristianereis@gmail.com', 'jrmauro380@gmail.com']
 const FATURA_PIX_KEY = '306.987.778-83'
 const FATURA_FAVORECIDO = 'Cibelle Cristiane Reis'
 const FATURA_VENCIMENTO_DIAS = 7
