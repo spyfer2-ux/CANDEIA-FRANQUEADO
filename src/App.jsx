@@ -230,6 +230,7 @@ export default function App() {
   const [showFormAluguel, setShowFormAluguel] = useState(false)
   const [filtroPedidos, setFiltroPedidos] = useState('todos')
   const [showMensalidadePopup, setShowMensalidadePopup] = useState(false)
+  const [mensalidadePaga, setMensalidadePaga] = useState(false)
   const [whatsappNums, setWhatsappNums] = useState({})
   const [editandoWpp, setEditandoWpp] = useState(null)
   const [faturaAtiva, setFaturaAtiva] = useState(null)
@@ -527,16 +528,31 @@ td{padding:8px;border-bottom:1px solid #ddd}
     } catch (e) { console.error(e) }
   }
 
-  // Verificar se deve mostrar popup de mensalidade (8 a 15 do mês)
+  // Verificar mensalidade
   useEffect(() => {
     if (!usuario || isAdmin(usuario.email)) return
     const hoje = new Date()
     const dia = hoje.getDate()
     const mesAno = hoje.getMonth() + '_' + hoje.getFullYear()
-    const jaViu = localStorage.getItem('mensalidade_popup_' + mesAno)
-    if (dia >= 8 && dia <= 15 && !jaViu) {
+    if (dia < 8 || dia > 15) return
+    const verificar = async () => {
+      // Verificar se admin deu baixa
+      try {
+        const snap = await getDoc(doc(db, 'mensalidades', mesAno + '_' + usuario.uid))
+        if (snap.exists() && snap.data().status === 'pago') {
+          setMensalidadePaga(true)
+          return
+        }
+      } catch(e) {}
+      // Verificar 24h desde último dismiss
+      const ultimoDismiss = localStorage.getItem('mensalidade_dismiss_' + mesAno + '_' + usuario.uid)
+      if (ultimoDismiss) {
+        const diff = Date.now() - parseInt(ultimoDismiss)
+        if (diff < 24 * 60 * 60 * 1000) return // menos de 24h
+      }
       setShowMensalidadePopup(true)
     }
+    verificar()
   }, [usuario])
 
 
@@ -993,6 +1009,9 @@ td{padding:8px;border-bottom:1px solid #ddd}
               <div style={{ fontSize: 36, fontWeight: 'bold' }}>R$ 119,00</div>
               <div style={{ fontSize: 13, opacity: 0.9, marginTop: 4 }}>Vencimento todo dia <b>15</b> do mês</div>
             </div>
+            <div style={{ padding: '10px 16px', background: 'rgba(0,0,0,0.15)', color: 'rgba(255,255,255,0.9)', fontSize: 12, lineHeight: 1.5 }}>
+              Sistema de inserção de pedidos para franqueados e sistema de PDV de funcionamento da unidade
+            </div>
             <div style={{ padding: 16 }}>
               {/* Próximo vencimento */}
               {(() => {
@@ -1047,6 +1066,33 @@ td{padding:8px;border-bottom:1px solid #ddd}
           ) : (
             <div>
 
+
+
+              {/* MENSALIDADES - Admin */}
+              {abaAdmin === 'mensalidades' && (
+                <div>
+                  <h3 style={{ color:'#c0392b', marginBottom:12 }}>💳 Mensalidades — {new Date().toLocaleString('pt-BR',{month:'long',year:'numeric'})}</h3>
+                  <p style={{ color:'#888', fontSize:13, marginBottom:16 }}>Dê baixa após receber o pagamento de R$ 119,00 de cada franqueado.</p>
+                  {orcamentosSalvos.filter((o,i,arr) => arr.findIndex(x => x.uid === o.uid) === i).map(o => {
+                    const mesAno = new Date().getMonth() + '_' + new Date().getFullYear()
+                    const key = mesAno + '_' + o.uid
+                    return (
+                      <div key={o.uid} style={{ background:'white', borderRadius:10, padding:'12px 16px', marginBottom:10, border:'1px solid #eee', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                        <div>
+                          <div style={{ fontWeight:'bold', color:'#333' }}>👤 {o.franqueado}</div>
+                          <div style={{ fontSize:12, color:'#888' }}>{o.unidade}</div>
+                        </div>
+                        <button onClick={async () => {
+                          await setDoc(doc(db,'mensalidades',key), { status:'pago', franqueado:o.franqueado, uid:o.uid, dataPagamento:new Date().toLocaleDateString('pt-BR'), mes:new Date().toLocaleString('pt-BR',{month:'long',year:'numeric'}) })
+                          alert('✅ Mensalidade de ' + o.franqueado + ' marcada como paga!')
+                        }} style={{ padding:'8px 16px', background:'#27ae60', color:'white', border:'none', borderRadius:8, fontWeight:'bold', fontSize:13, cursor:'pointer' }}>
+                          ✅ Dar Baixa
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
 
               {/* ORÇAMENTOS SALVOS */}
               {abaAdmin === 'pedidos' && (
@@ -1182,10 +1228,10 @@ td{padding:8px;border-bottom:1px solid #ddd}
               </button>
               <button onClick={() => {
                 const mesAno = new Date().getMonth() + '_' + new Date().getFullYear()
-                localStorage.setItem('mensalidade_popup_' + mesAno, '1')
+                localStorage.setItem('mensalidade_dismiss_' + mesAno + '_' + usuario.uid, Date.now().toString())
                 setShowMensalidadePopup(false)
               }} style={{ width: '100%', padding: '10px', background: '#eee', color: '#555', border: 'none', borderRadius: 8, fontSize: 13, cursor: 'pointer' }}>
-                Ok, já vi — fechar
+                Ok, já vi — fechar por 24h
               </button>
             </div>
           </div>
