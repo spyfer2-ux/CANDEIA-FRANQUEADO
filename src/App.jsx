@@ -59,7 +59,7 @@ const CATEGORIAS = {
     itens: [
       { id: "escarola", nome: "Escarola", preco: 3.42, porcao: "70g" },
       { id: "laka", nome: "Laka", preco: 6.06, porcao: "100g" },
-      { id: "azeitona", nome: "Balde de Azeitona", preco: 27.5, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 },
+      { id: "azeitona", nome: "Balde de Azeitona", preco: 55.00, porcao: "balde" },
       { id: "tomate-seco", nome: "Tomate Seco", preco: 53.66, porcao: "4kg" },
       { id: "milho-mistura", nome: "Milho Mistura", preco: 0.71, porcao: "40g" },
       { id: "milho-puro", nome: "Milho Puro", preco: 1.65, porcao: "80g" },
