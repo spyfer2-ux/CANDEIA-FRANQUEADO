@@ -1309,7 +1309,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
             <div>
               {/* Sub-abas Admin */}
               <div style={{ display:'flex', gap:8, marginBottom:16 }}>
-                {[['pedidos','📦 Pedidos'],['alugueis','🏠 Aluguéis'],['mensalidades','💳 Mensalidades']].map(([k,l]) => (
+                {[['pedidos','📦 Pedidos'],['mensalidades','💳 Mensalidades']].map(([k,l]) => (
                   <button key={k} onClick={() => setAbaAdmin(k)}
                     style={{ flex:1, padding:'10px 4px', border:'none', borderRadius:8, fontWeight:'bold', fontSize:12, cursor:'pointer',
                       background: abaAdmin===k ? '#c0392b' : '#f5f5f5', color: abaAdmin===k ? 'white' : '#555' }}>
