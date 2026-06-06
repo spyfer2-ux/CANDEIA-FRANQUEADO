@@ -1226,6 +1226,10 @@ td{padding:8px;border-bottom:1px solid #ddd}
                 <div>
                   <h3 style={{ color:'#c0392b', marginBottom:12 }}>💳 Mensalidades — {new Date().toLocaleString('pt-BR',{month:'long',year:'numeric'})}</h3>
                   <p style={{ color:'#888', fontSize:13, marginBottom:16 }}>Dê baixa após receber o pagamento de R$ 119,00 de cada franqueado.</p>
+                  <button onClick={() => setShowMensalidadePopup(true)}
+                    style={{ padding:'8px 16px', background:'#f39c12', color:'white', border:'none', borderRadius:8, fontWeight:'bold', fontSize:13, cursor:'pointer', marginBottom:16 }}>
+                    🧪 Testar Popup Mensalidade
+                  </button>
                   {orcamentosSalvos.filter((o,i,arr) => arr.findIndex(x => x.uid === o.uid) === i).map(o => {
                     const mesAno = new Date().getMonth() + '_' + new Date().getFullYear()
                     const key = mesAno + '_' + o.uid
