@@ -1528,7 +1528,14 @@ td{padding:8px;border-bottom:1px solid #ddd}
             </div>
             <div style={{ padding:20, textAlign:'center' }}>
               <div style={{ fontSize:13, color:'#888', marginBottom:4 }}>Vencimento dia 24/{String(new Date().getMonth()+1).padStart(2,'0')}/{new Date().getFullYear()}</div>
-              <div style={{ fontSize:32, fontWeight:'bold', color:'#1a5276', marginBottom:16 }}>R$ 1.200,00</div>
+              <div style={{ fontSize:32, fontWeight:'bold', color:'#1a5276', marginBottom:12 }}>R$ 1.200,00</div>
+              <div style={{ background:'#eaf4fb', border:'1px solid #aed6f1', borderRadius:8, padding:'10px 14px', marginBottom:12, textAlign:'left' }}>
+                <div style={{ fontSize:12, fontWeight:'bold', color:'#1a5276', marginBottom:4 }}>🏠 Referente a:</div>
+                <div style={{ fontSize:12, color:'#555', lineHeight:1.7 }}>
+                  • Aluguel mensal do estabelecimento<br/>
+                  • Unidade Jd Vila Formosa
+                </div>
+              </div>
               <div style={{ background:'#f8f8f8', borderRadius:8, padding:'10px 14px', marginBottom:12 }}>
                 <div style={{ fontSize:12, color:'#888', marginBottom:4 }}>Chave PIX</div>
                 <div style={{ fontFamily:'monospace', fontWeight:'bold', fontSize:15 }}>{FATURA_PIX_KEY}</div>
