@@ -1324,7 +1324,33 @@ td{padding:8px;border-bottom:1px solid #ddd}
               {abaAdmin === 'mensalidades' && (
                 <div>
                   <h3 style={{ color:'#c0392b', marginBottom:12 }}>💳 Mensalidades — {new Date().toLocaleString('pt-BR',{month:'long',year:'numeric'})}</h3>
-                  <p style={{ color:'#888', fontSize:13, marginBottom:16 }}>Dê baixa após receber o pagamento de R$ 119,00 de cada franqueado.</p>
+                  
+                  {/* Cards de cobrança */}
+                  <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:16 }}>
+                    <div style={{ background:'#fff5f5', border:'1px solid #f5c6c6', borderRadius:10, padding:'12px 16px' }}>
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                        <div>
+                          <div style={{ fontWeight:'bold', color:'#c0392b', fontSize:15 }}>💳 Mensalidade do Sistema</div>
+                          <div style={{ fontSize:12, color:'#888', marginTop:4, lineHeight:1.5 }}>
+                            • App de inserção de pedidos para franqueados<br/>
+                            • App PDV de funcionamento da unidade
+                          </div>
+                        </div>
+                        <div style={{ fontSize:18, fontWeight:'bold', color:'#c0392b', whiteSpace:'nowrap', marginLeft:12 }}>R$ 119,00<div style={{ fontSize:11, color:'#aaa', fontWeight:'normal' }}>todo dia 15</div></div>
+                      </div>
+                    </div>
+                    <div style={{ background:'#eaf4fb', border:'1px solid #aed6f1', borderRadius:10, padding:'12px 16px' }}>
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                        <div>
+                          <div style={{ fontWeight:'bold', color:'#1a5276', fontSize:15 }}>🏠 Aluguel do Estabelecimento</div>
+                          <div style={{ fontSize:12, color:'#888', marginTop:4 }}>Aluguel mensal do estabelecimento</div>
+                        </div>
+                        <div style={{ fontSize:18, fontWeight:'bold', color:'#1a5276', whiteSpace:'nowrap', marginLeft:12 }}>R$ 1.200,00<div style={{ fontSize:11, color:'#aaa', fontWeight:'normal' }}>todo dia 24</div></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p style={{ color:'#888', fontSize:13, marginBottom:12 }}>Dê baixa após receber cada pagamento:</p>
                   <button onClick={() => setShowMensalidadePopup(true)}
                     style={{ padding:'8px 16px', background:'#f39c12', color:'white', border:'none', borderRadius:8, fontWeight:'bold', fontSize:13, cursor:'pointer', marginBottom:16 }}>
                     🧪 Testar Popup Mensalidade
