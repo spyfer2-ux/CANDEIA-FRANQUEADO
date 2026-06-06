@@ -1095,85 +1095,62 @@ td{padding:8px;border-bottom:1px solid #ddd}
       {aba === 'cobrancas' && !isAdmin(usuario?.email) && (
         <div style={{ padding: 16 }}>
           <h2 style={{ color: '#c0392b', margin: '0 0 12px' }}>💰 Cobranças</h2>
-          {/* Sub-abas */}
           <div style={{ display:'flex', gap:8, marginBottom:16 }}>
             {[['mensalidade','💳 Mensalidade'],['royalties','👑 Royalties']].map(([k,l]) => (
               <button key={k} onClick={() => setSubAbaCobranca(k)} style={{ flex:1, padding:'10px', border:'none', borderRadius:8, fontWeight:'bold', fontSize:13, cursor:'pointer', background: subAbaCobranca===k ? '#c0392b' : '#f5f5f5', color: subAbaCobranca===k ? 'white' : '#555' }}>{l}</button>
             ))}
           </div>
 
+          {/* MENSALIDADE */}
           {subAbaCobranca === 'mensalidade' && (
-          <div>
-          <div style={{ background: 'white', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.1)', marginBottom: 16 }}>
-            <div style={{ background: 'linear-gradient(135deg, #c0392b, #e74c3c)', padding: '20px 16px', color: 'white', textAlign: 'center' }}>
-              <div style={{ fontSize: 13, opacity: 0.9, marginBottom: 4 }}>MENSALIDADE — PORTAL CANDEIAS JR</div>
-              <div style={{ fontSize: 36, fontWeight: 'bold' }}>R$ 119,00</div>
-              <div style={{ fontSize: 13, opacity: 0.9, marginTop: 4 }}>Vencimento todo dia <b>15</b> do mês</div>
-          <div style={{ background: 'white', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.1)', marginBottom: 16 }}>
-            <div style={{ background: 'linear-gradient(135deg, #c0392b, #e74c3c)', padding: '20px 16px', color: 'white', textAlign: 'center' }}>
-              <div style={{ fontSize: 13, opacity: 0.9, marginBottom: 4 }}>MENSALIDADE — PORTAL CANDEIAS JR</div>
-              <div style={{ fontSize: 36, fontWeight: 'bold' }}>R$ 119,00</div>
-              <div style={{ fontSize: 13, opacity: 0.9, marginTop: 4 }}>Vencimento todo dia <b>15</b> do mês</div>
-            </div>
-            <div style={{ padding: '10px 16px', background: 'rgba(0,0,0,0.15)', color: 'rgba(255,255,255,0.9)', fontSize: 12, lineHeight: 1.5 }}>
-              Sistema de inserção de pedidos para franqueados e sistema de PDV de funcionamento da unidade
-            </div>
-            <div style={{ padding: 16 }}>
-              {/* Próximo vencimento */}
-              {(() => {
-                const hoje = new Date()
-                const venc = new Date(hoje.getFullYear(), hoje.getMonth(), 15)
-                if (hoje.getDate() > 15) venc.setMonth(venc.getMonth() + 1)
-                const diff = Math.ceil((venc - hoje) / (1000*60*60*24))
-                const mes = venc.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })
-                return (
-                  <div style={{ background: diff <= 7 ? '#fff3cd' : '#f8f9fa', border: `1px solid ${diff <= 7 ? '#ffc107' : '#e9ecef'}`, borderRadius: 8, padding: '12px 16px', marginBottom: 16, textAlign: 'center' }}>
-                    <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>PRÓXIMO VENCIMENTO</div>
-                    <div style={{ fontSize: 18, fontWeight: 'bold', color: diff <= 7 ? '#856404' : '#333' }}>
-                      15 de {mes}
-                    </div>
-                    {diff <= 7 && <div style={{ fontSize: 13, color: '#856404', marginTop: 4 }}>⚠️ Vence em {diff} dia{diff !== 1 ? 's' : ''}!</div>}
+            <div>
+              <div style={{ background:'white', borderRadius:12, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.1)', marginBottom:16 }}>
+                <div style={{ background:'linear-gradient(135deg, #c0392b, #e74c3c)', padding:'20px 16px', color:'white', textAlign:'center' }}>
+                  <div style={{ fontSize:13, opacity:0.9, marginBottom:4 }}>MENSALIDADE — PORTAL CANDEIAS JR</div>
+                  <div style={{ fontSize:36, fontWeight:'bold' }}>R$ 119,00</div>
+                  <div style={{ fontSize:13, opacity:0.9, marginTop:4 }}>Vencimento todo dia <b>15</b> do mês</div>
+                  <div style={{ padding:'8px 16px', background:'rgba(0,0,0,0.15)', color:'rgba(255,255,255,0.9)', fontSize:12, lineHeight:1.5, marginTop:8 }}>
+                    Sistema de inserção de pedidos para franqueados e sistema de PDV de funcionamento da unidade
                   </div>
-                )
-              })()}
-
-              {/* PIX */}
-              <div style={{ background: '#f0fff4', border: '1px solid #9ae6b4', borderRadius: 8, padding: '14px 16px' }}>
-                <div style={{ fontSize: 13, fontWeight: 'bold', color: '#276749', marginBottom: 8 }}>💠 Pagar via PIX</div>
-                <div style={{ background: 'white', border: '1px solid #ddd', borderRadius: 6, padding: '10px 14px', fontFamily: 'monospace', fontSize: 15, fontWeight: 'bold', textAlign: 'center', letterSpacing: 1, color: '#333', marginBottom: 8 }}>
-                  {FATURA_PIX_KEY}
                 </div>
-                <div style={{ fontSize: 13, color: '#555' }}>👤 Favorecido: <b>{FATURA_FAVORECIDO}</b></div>
-                <button onClick={() => { navigator.clipboard?.writeText(FATURA_PIX_KEY); alert('Chave PIX copiada!') }}
-                  style={{ width: '100%', marginTop: 10, padding: '10px', background: '#38a169', color: 'white', border: 'none', borderRadius: 6, fontWeight: 'bold', fontSize: 14, cursor: 'pointer' }}>
-                  📋 Copiar Chave PIX
-                </button>
-              </div>
-
-              {/* Enviar comprovante */}
-              <div style={{ marginTop: 16 }}>
-                {comprovanteEnviado ? (
-                  <div style={{ background: '#e8f8f2', border: '1px solid #27ae60', borderRadius: 8, padding: '12px 16px', textAlign: 'center' }}>
-                    <div style={{ fontSize: 24, marginBottom: 4 }}>✅</div>
-                    <div style={{ fontWeight: 'bold', color: '#27ae60' }}>Comprovante enviado!</div>
-                    <div style={{ fontSize: 12, color: '#555', marginTop: 4 }}>Aguardando confirmação do administrador.</div>
+                <div style={{ padding:16 }}>
+                  {(() => {
+                    const hoje = new Date(), venc = new Date(hoje.getFullYear(), hoje.getMonth(), 15)
+                    if (hoje.getDate() > 15) venc.setMonth(venc.getMonth()+1)
+                    const diff = Math.ceil((venc-hoje)/(1000*60*60*24))
+                    return (
+                      <div style={{ background:diff<=7?'#fff3cd':'#f8f9fa', border:`1px solid ${diff<=7?'#ffc107':'#e9ecef'}`, borderRadius:8, padding:'12px 16px', marginBottom:16, textAlign:'center' }}>
+                        <div style={{ fontSize:12, color:'#888', marginBottom:4 }}>PRÓXIMO VENCIMENTO</div>
+                        <div style={{ fontSize:18, fontWeight:'bold', color:diff<=7?'#856404':'#333' }}>15 de {venc.toLocaleString('pt-BR',{month:'long',year:'numeric'})}</div>
+                        {diff<=7 && <div style={{ fontSize:13, color:'#856404', marginTop:4 }}>⚠️ Vence em {diff} dia{diff!==1?'s':''}!</div>}
+                      </div>
+                    )
+                  })()}
+                  <div style={{ background:'#f0fff4', border:'1px solid #9ae6b4', borderRadius:8, padding:'14px 16px', marginBottom:12 }}>
+                    <div style={{ fontSize:13, fontWeight:'bold', color:'#276749', marginBottom:8 }}>💠 Pagar via PIX</div>
+                    <div style={{ background:'white', border:'1px solid #ddd', borderRadius:6, padding:'10px 14px', fontFamily:'monospace', fontSize:15, fontWeight:'bold', textAlign:'center', letterSpacing:1, marginBottom:8 }}>{FATURA_PIX_KEY}</div>
+                    <div style={{ fontSize:13, color:'#555' }}>👤 Favorecido: <b>{FATURA_FAVORECIDO}</b></div>
+                    <button onClick={() => { navigator.clipboard?.writeText(FATURA_PIX_KEY); alert('Chave PIX copiada!') }}
+                      style={{ width:'100%', marginTop:10, padding:'10px', background:'#38a169', color:'white', border:'none', borderRadius:6, fontWeight:'bold', fontSize:14, cursor:'pointer' }}>
+                      📋 Copiar Chave PIX
+                    </button>
                   </div>
-                ) : (
-                  <div>
-                    <div style={{ fontSize: 13, color: '#555', marginBottom: 8, textAlign: 'center' }}>Após pagar, envie o comprovante:</div>
-                    <label style={{ display: 'block', width: '100%', padding: '12px', background: '#c0392b', color: 'white', border: 'none', borderRadius: 8, fontWeight: 'bold', fontSize: 14, cursor: 'pointer', textAlign: 'center', boxSizing: 'border-box' }}>
+                  {comprovanteEnviado ? (
+                    <div style={{ background:'#e8f8f2', border:'1px solid #27ae60', borderRadius:8, padding:'12px 16px', textAlign:'center' }}>
+                      <div style={{ fontSize:24, marginBottom:4 }}>✅</div>
+                      <div style={{ fontWeight:'bold', color:'#27ae60' }}>Comprovante enviado!</div>
+                      <div style={{ fontSize:12, color:'#555', marginTop:4 }}>Aguardando confirmação do administrador.</div>
+                    </div>
+                  ) : (
+                    <label style={{ display:'block', width:'100%', padding:'12px', background:'#c0392b', color:'white', border:'none', borderRadius:8, fontWeight:'bold', fontSize:14, cursor:'pointer', textAlign:'center', boxSizing:'border-box' }}>
                       {enviandoComprovante ? '⏳ Enviando...' : '📎 Enviar Comprovante'}
-                      <input type="file" accept="image/*" capture="environment" style={{ display: 'none' }}
+                      <input type="file" accept="image/*" capture="environment" style={{ display:'none' }}
                         onChange={e => e.target.files[0] && enviarComprovante(e.target.files[0])} />
                     </label>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-
-          </div>
-          </div>
           )}
 
           {/* ROYALTIES */}
@@ -1183,10 +1160,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
                 <div style={{ background:'white', borderRadius:12, padding:24, textAlign:'center', boxShadow:'0 2px 12px rgba(0,0,0,0.1)' }}>
                   <div style={{ fontSize:40, marginBottom:12 }}>🎉</div>
                   <div style={{ fontSize:18, fontWeight:'bold', color:'#27ae60', marginBottom:8 }}>Você está em período de isenção!</div>
-                  <div style={{ fontSize:14, color:'#555', marginBottom:16 }}>
-                    Os royalties da marca começam a ser cobrados a partir de<br/>
-                    <b>07 de agosto de 2026</b>
-                  </div>
+                  <div style={{ fontSize:14, color:'#555', marginBottom:16 }}>Os royalties da marca começam em <b>07 de agosto de 2026</b></div>
                   <div style={{ background:'#f0fff4', border:'1px solid #9ae6b4', borderRadius:8, padding:'12px 16px', display:'inline-block' }}>
                     <div style={{ fontSize:12, color:'#276749' }}>Valor após isenção</div>
                     <div style={{ fontSize:28, fontWeight:'bold', color:'#276749' }}>R$ 1.874,00/mês</div>
@@ -1194,26 +1168,13 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   <p style={{ fontSize:12, color:'#aaa', marginTop:12 }}>Royalties referentes ao uso da marca Candeias Jr.</p>
                 </div>
               ) : (
-                <div style={{ background:'white', borderRadius:12, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.1)', marginBottom:16 }}>
+                <div style={{ background:'white', borderRadius:12, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.1)' }}>
                   <div style={{ background:'linear-gradient(135deg, #2c3e50, #3d5166)', padding:'20px 16px', color:'white', textAlign:'center' }}>
                     <div style={{ fontSize:13, opacity:0.9, marginBottom:4 }}>ROYALTIES — MARCA CANDEIAS JR</div>
                     <div style={{ fontSize:36, fontWeight:'bold' }}>R$ 1.874,00</div>
                     <div style={{ fontSize:13, opacity:0.9, marginTop:4 }}>Vencimento todo dia <b>15</b> do mês</div>
                   </div>
                   <div style={{ padding:16 }}>
-                    {(() => {
-                      const hoje = new Date()
-                      const venc = new Date(hoje.getFullYear(), hoje.getMonth(), 15)
-                      if (hoje.getDate() > 15) venc.setMonth(venc.getMonth()+1)
-                      const diff = Math.ceil((venc-hoje)/(1000*60*60*24))
-                      return (
-                        <div style={{ background: diff<=7 ? '#fff3cd' : '#f8f9fa', border:`1px solid ${diff<=7 ? '#ffc107' : '#e9ecef'}`, borderRadius:8, padding:'12px 16px', marginBottom:16, textAlign:'center' }}>
-                          <div style={{ fontSize:12, color:'#888', marginBottom:4 }}>PRÓXIMO VENCIMENTO</div>
-                          <div style={{ fontSize:18, fontWeight:'bold', color: diff<=7 ? '#856404' : '#333' }}>15 de {venc.toLocaleString('pt-BR',{month:'long',year:'numeric'})}</div>
-                          {diff<=7 && <div style={{ fontSize:13, color:'#856404', marginTop:4 }}>⚠️ Vence em {diff} dia{diff!==1?'s':''}!</div>}
-                        </div>
-                      )
-                    })()}
                     <div style={{ background:'#f0f4ff', border:'1px solid #b2c0f8', borderRadius:8, padding:'14px 16px', marginBottom:16 }}>
                       <div style={{ fontSize:13, fontWeight:'bold', color:'#2c3e50', marginBottom:8 }}>💠 Pagar via PIX</div>
                       <div style={{ background:'white', border:'1px solid #ddd', borderRadius:6, padding:'10px 14px', fontFamily:'monospace', fontSize:15, fontWeight:'bold', textAlign:'center', letterSpacing:1, marginBottom:8 }}>{FATURA_PIX_KEY}</div>
@@ -1242,7 +1203,6 @@ td{padding:8px;border-bottom:1px solid #ddd}
             </div>
           )}
         </div>
-      </div>
       )}
 
       {/* ABA ADMIN */}
