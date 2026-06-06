@@ -1348,6 +1348,18 @@ td{padding:8px;border-bottom:1px solid #ddd}
                         <div style={{ fontSize:18, fontWeight:'bold', color:'#1a5276', whiteSpace:'nowrap', marginLeft:12 }}>R$ 1.200,00<div style={{ fontSize:11, color:'#aaa', fontWeight:'normal' }}>todo dia 24</div></div>
                       </div>
                     </div>
+                    <div style={{ background:'#f5eef8', border:'1px solid #d7bde2', borderRadius:10, padding:'12px 16px' }}>
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                        <div>
+                          <div style={{ fontWeight:'bold', color:'#6c3483', fontSize:15 }}>👑 Royalties da Marca</div>
+                          <div style={{ fontSize:12, color:'#888', marginTop:4 }}>
+                            Uso da marca Candeias Jr<br/>
+                            <span style={{ color:'#27ae60', fontWeight:'bold' }}>Isenção até 07/08/2026</span>
+                          </div>
+                        </div>
+                        <div style={{ fontSize:18, fontWeight:'bold', color:'#6c3483', whiteSpace:'nowrap', marginLeft:12 }}>R$ 1.874,00<div style={{ fontSize:11, color:'#aaa', fontWeight:'normal' }}>todo dia 15</div></div>
+                      </div>
+                    </div>
                   </div>
 
                   <p style={{ color:'#888', fontSize:13, marginBottom:12 }}>Dê baixa após receber cada pagamento:</p>
