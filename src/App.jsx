@@ -1137,7 +1137,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
 
 
       {/* ABA COBRANÇAS */}
-      {aba === 'cobrancas' && !isAdmin(usuario?.email) && (
+      {aba === 'cobrancas' && (
         <div style={{ padding: 16 }}>
           <h2 style={{ color: '#c0392b', margin: '0 0 12px' }}>💰 Cobranças</h2>
           <div style={{ display:'flex', gap:8, marginBottom:16 }}>
