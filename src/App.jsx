@@ -220,8 +220,6 @@ export default function App() {
   const [categoriaAtiva, setCategoriaAtiva] = useState('carnes')
   const [quantidades, setQuantidades] = useState({})
   const [busca, setBusca] = useState('')
-  const [adminPin, setAdminPin] = useState('')
-  const [adminLogado, setAdminLogado] = useState(false)
   const [baixaAtiva, setBaixaAtiva] = useState(null)
   const [obsAtual, setObsAtual] = useState('')
   const [abaAdmin, setAbaAdmin] = useState('pedidos') // 'pedidos' | 'alugueis' | 'precos'
@@ -245,7 +243,6 @@ export default function App() {
   const faturaRef = useRef(null)
   const [pedidoImagemAtivo, setPedidoImagemAtivo] = useState(null)
   const pedidoImagemRef = useRef(null)
-  const [pinErro, setPinErro] = useState(false)
   const [historico, setHistorico] = useState(() => {
     try { return JSON.parse(localStorage.getItem('historico_precos') || '[]') }
     catch { return [] }
@@ -420,10 +417,6 @@ td{padding:8px;border-bottom:1px solid #ddd}
     window.open(url, '_blank')
   }
 
-  const loginAdmin = () => {
-    if (adminPin === ADMIN_PIN) { setAdminLogado(true); setPinErro(false) }
-    else { setPinErro(true) }
-  }
 
   const registrarAtualizacao = () => {
     const novo = { numero: historico.length + 1, data: new Date().toLocaleString('pt-BR'), obs: novaObs }
@@ -1208,15 +1201,6 @@ td{padding:8px;border-bottom:1px solid #ddd}
       {/* ABA ADMIN */}
       {aba === 'admin' && isAdmin(usuario?.email) && (
         <div style={{ padding: 16 }}>
-          {!adminLogado ? (
-            <div style={{ maxWidth: 360, margin: '40px auto', background: 'white', padding: 24, borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }}>
-              <h3 style={{ textAlign: 'center', marginBottom: 20, color: '#c0392b' }}>🔒 Área Admin</h3>
-              <input type="password" placeholder="PIN de acesso" value={adminPin} onChange={e => setAdminPin(e.target.value)} onKeyPress={e => e.key === 'Enter' && loginAdmin()}
-                style={{ width: '100%', padding: 12, border: `1px solid ${pinErro ? '#e74c3c' : '#ddd'}`, borderRadius: 6, fontSize: 16, marginBottom: 8, boxSizing: 'border-box' }}/>
-              {pinErro && <p style={{ color: '#e74c3c', fontSize: 13, marginBottom: 8 }}>PIN incorreto</p>}
-              <button onClick={loginAdmin} style={{ width: '100%', padding: 12, background: '#c0392b', color: 'white', border: 'none', borderRadius: 6, fontSize: 16, fontWeight: 'bold', cursor: 'pointer' }}>Entrar</button>
-            </div>
-          ) : (
             <div>
 
 
