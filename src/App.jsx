@@ -231,6 +231,9 @@ export default function App() {
   const [filtroPedidos, setFiltroPedidos] = useState('todos')
   const [showMensalidadePopup, setShowMensalidadePopup] = useState(false)
   const [mensalidadePaga, setMensalidadePaga] = useState(false)
+  const [enviandoComprovante, setEnviandoComprovante] = useState(false)
+  const [comprovanteEnviado, setComprovanteEnviado] = useState(false)
+  const [mensalidadesAdmin, setMensalidadesAdmin] = useState({})
   const [whatsappNums, setWhatsappNums] = useState({})
   const [editandoWpp, setEditandoWpp] = useState(null)
   const [faturaAtiva, setFaturaAtiva] = useState(null)
@@ -539,9 +542,9 @@ td{padding:8px;border-bottom:1px solid #ddd}
       // Verificar se admin deu baixa
       try {
         const snap = await getDoc(doc(db, 'mensalidades', mesAno + '_' + usuario.uid))
-        if (snap.exists() && snap.data().status === 'pago') {
-          setMensalidadePaga(true)
-          return
+        if (snap.exists()) {
+          if (snap.data().status === 'pago') { setMensalidadePaga(true); return }
+          if (snap.data().comprovante) setComprovanteEnviado(true)
         }
       } catch(e) {}
       // Verificar 24h desde último dismiss
@@ -638,6 +641,49 @@ td{padding:8px;border-bottom:1px solid #ddd}
     ].join(nl)
     const num = numero.replace(/\D/g,'')
     window.open(`https://wa.me/55${num}?text=${encodeURIComponent(msg)}`, '_blank')
+  }
+
+
+  const enviarComprovante = async (file) => {
+    if (!file || !usuario) return
+    setEnviandoComprovante(true)
+    try {
+      // Comprimir imagem via canvas
+      const img = new Image()
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        img.onload = async () => {
+          const canvas = document.createElement('canvas')
+          const MAX = 800
+          let w = img.width, h = img.height
+          if (w > MAX) { h = h * MAX / w; w = MAX }
+          if (h > MAX) { w = w * MAX / h; h = MAX }
+          canvas.width = w; canvas.height = h
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+          const base64 = canvas.toDataURL('image/jpeg', 0.7)
+          const mesAno = new Date().getMonth() + '_' + new Date().getFullYear()
+          const key = mesAno + '_' + usuario.uid
+          await setDoc(doc(db, 'mensalidades', key), {
+            status: 'aguardando',
+            franqueado: franqueado.nome || usuario.displayName || usuario.email,
+            unidade: franqueado.unidade || '—',
+            uid: usuario.uid,
+            email: usuario.email,
+            mes: new Date().toLocaleString('pt-BR', { month: 'long', year: 'numeric' }),
+            dataEnvio: new Date().toLocaleDateString('pt-BR'),
+            comprovante: base64
+          })
+          setComprovanteEnviado(true)
+          setEnviandoComprovante(false)
+        }
+        img.src = e.target.result
+      }
+      reader.readAsDataURL(file)
+    } catch(e) {
+      console.error(e)
+      alert('Erro ao enviar: ' + e.message)
+      setEnviandoComprovante(false)
+    }
   }
 
 
@@ -1044,9 +1090,25 @@ td{padding:8px;border-bottom:1px solid #ddd}
                 </button>
               </div>
 
-              <p style={{ fontSize: 12, color: '#aaa', textAlign: 'center', marginTop: 12 }}>
-                Após o pagamento, envie o comprovante via WhatsApp para o suporte.
-              </p>
+              {/* Enviar comprovante */}
+              <div style={{ marginTop: 16 }}>
+                {comprovanteEnviado ? (
+                  <div style={{ background: '#e8f8f2', border: '1px solid #27ae60', borderRadius: 8, padding: '12px 16px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 24, marginBottom: 4 }}>✅</div>
+                    <div style={{ fontWeight: 'bold', color: '#27ae60' }}>Comprovante enviado!</div>
+                    <div style={{ fontSize: 12, color: '#555', marginTop: 4 }}>Aguardando confirmação do administrador.</div>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ fontSize: 13, color: '#555', marginBottom: 8, textAlign: 'center' }}>Após pagar, envie o comprovante:</div>
+                    <label style={{ display: 'block', width: '100%', padding: '12px', background: '#c0392b', color: 'white', border: 'none', borderRadius: 8, fontWeight: 'bold', fontSize: 14, cursor: 'pointer', textAlign: 'center', boxSizing: 'border-box' }}>
+                      {enviandoComprovante ? '⏳ Enviando...' : '📎 Enviar Comprovante'}
+                      <input type="file" accept="image/*" capture="environment" style={{ display: 'none' }}
+                        onChange={e => e.target.files[0] && enviarComprovante(e.target.files[0])} />
+                    </label>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -1082,12 +1144,30 @@ td{padding:8px;border-bottom:1px solid #ddd}
                           <div style={{ fontWeight:'bold', color:'#333' }}>👤 {o.franqueado}</div>
                           <div style={{ fontSize:12, color:'#888' }}>{o.unidade}</div>
                         </div>
-                        <button onClick={async () => {
-                          await setDoc(doc(db,'mensalidades',key), { status:'pago', franqueado:o.franqueado, uid:o.uid, dataPagamento:new Date().toLocaleDateString('pt-BR'), mes:new Date().toLocaleString('pt-BR',{month:'long',year:'numeric'}) })
-                          alert('✅ Mensalidade de ' + o.franqueado + ' marcada como paga!')
-                        }} style={{ padding:'8px 16px', background:'#27ae60', color:'white', border:'none', borderRadius:8, fontWeight:'bold', fontSize:13, cursor:'pointer' }}>
-                          ✅ Dar Baixa
-                        </button>
+                        {(() => {
+                          const mesAno = new Date().getMonth() + '_' + new Date().getFullYear()
+                          const key = mesAno + '_' + o.uid
+                          return (
+                            <div style={{ display:'flex', flexDirection:'column', gap:6, alignItems:'flex-end' }}>
+                              {mensalidadesAdmin[key]?.comprovante && (
+                                <img src={mensalidadesAdmin[key].comprovante} alt="comprovante"
+                                  onClick={() => window.open(mensalidadesAdmin[key].comprovante)}
+                                  style={{ width:60, height:60, objectFit:'cover', borderRadius:6, cursor:'pointer', border:'2px solid #27ae60' }} />
+                              )}
+                              {mensalidadesAdmin[key]?.status === 'pago' ? (
+                                <span style={{ fontSize:12, color:'#27ae60', fontWeight:'bold' }}>✅ Pago em {mensalidadesAdmin[key].dataPagamento}</span>
+                              ) : (
+                                <button onClick={async () => {
+                                  const dados = mensalidadesAdmin[key] || {}
+                                  await setDoc(doc(db,'mensalidades',key), { ...dados, status:'pago', franqueado:o.franqueado, uid:o.uid, dataPagamento:new Date().toLocaleDateString('pt-BR'), mes:new Date().toLocaleString('pt-BR',{month:'long',year:'numeric'}) })
+                                  setMensalidadesAdmin(prev => ({...prev, [key]: {...(prev[key]||{}), status:'pago', dataPagamento:new Date().toLocaleDateString('pt-BR')}}))
+                                }} style={{ padding:'8px 14px', background:'#27ae60', color:'white', border:'none', borderRadius:8, fontWeight:'bold', fontSize:13, cursor:'pointer' }}>
+                                  {mensalidadesAdmin[key]?.comprovante ? '✅ Confirmar Pago' : '✅ Dar Baixa'}
+                                </button>
+                              )}
+                            </div>
+                          )
+                        })()}
                       </div>
                     )
                   })}
