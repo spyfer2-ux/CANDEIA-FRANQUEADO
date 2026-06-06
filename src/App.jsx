@@ -1173,6 +1173,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
           </div>
 
           </div>
+          </div>
           )}
 
           {/* ROYALTIES */}
@@ -1241,6 +1242,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
             </div>
           )}
         </div>
+      </div>
       )}
 
       {/* ABA ADMIN */}
