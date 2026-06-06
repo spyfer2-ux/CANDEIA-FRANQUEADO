@@ -205,6 +205,8 @@ const MENSALIDADE_VALOR = 119.00
 const MENSALIDADE_DIA_VENC = 15
 const ROYALTIES_VALOR = 1874.00
 const ROYALTIES_INICIO = new Date(2026, 7, 7) // 7 de agosto de 2026
+const ALUGUEL_VALOR = 1200.00
+const ALUGUEL_DIA_VENC = 24
 const isAdmin = (email) => ADMIN_EMAILS.includes(email?.toLowerCase())
 
 export default function App() {
@@ -236,6 +238,9 @@ export default function App() {
   const [subAbaCobranca, setSubAbaCobranca] = useState('mensalidade')
   const [royaltiesEnviado, setRoyaltiesEnviado] = useState(false)
   const [royaltiesPago, setRoyaltiesPago] = useState(false)
+  const [showAluguelPopup, setShowAluguelPopup] = useState(false)
+  const [aluguelEnviado, setAluguelEnviado] = useState(false)
+  const [aluguelPago, setAluguelPago] = useState(false)
   const [mensalidadesAdmin, setMensalidadesAdmin] = useState({})
   const [whatsappNums, setWhatsappNums] = useState({})
   const [editandoWpp, setEditandoWpp] = useState(null)
@@ -545,6 +550,24 @@ td{padding:8px;border-bottom:1px solid #ddd}
           if (snap.data().comprovante) setComprovanteEnviado(true)
         }
       } catch(e) {}
+      // Verificar aluguel (popup dia 17-24)
+      const diaAluguel = hoje.getDate()
+      if (diaAluguel >= 17 && diaAluguel <= 24) {
+        try {
+          const snapA = await getDoc(doc(db, 'alugueis_franq', mesAno + '_' + usuario.uid))
+          if (snapA.exists()) {
+            if (snapA.data().status === 'pago') setAluguelPago(true)
+            else if (snapA.data().comprovante) setAluguelEnviado(true)
+          }
+          if (!snapA.exists() || snapA.data().status !== 'pago') {
+            const ultimoDismissA = localStorage.getItem('aluguel_dismiss_' + mesAno + '_' + usuario.uid)
+            if (!ultimoDismissA || Date.now() - parseInt(ultimoDismissA) >= 24*60*60*1000) {
+              setShowAluguelPopup(true)
+            }
+          }
+        } catch(e) {}
+      }
+
       // Verificar royalties
       try {
         const snapR = await getDoc(doc(db, 'royalties', mesAno + '_' + usuario.uid))
@@ -690,6 +713,35 @@ td{padding:8px;border-bottom:1px solid #ddd}
       alert('Erro ao enviar: ' + e.message)
       setEnviandoComprovante(false)
     }
+  }
+
+
+  const enviarComprovanteAluguel = async (file) => {
+    if (!file || !usuario) return
+    try {
+      const img = new Image(), reader = new FileReader()
+      reader.onload = async (e) => {
+        img.onload = async () => {
+          const canvas = document.createElement('canvas')
+          const MAX = 800; let w = img.width, h = img.height
+          if (w > MAX) { h = h*MAX/w; w = MAX }
+          if (h > MAX) { w = w*MAX/h; h = MAX }
+          canvas.width = w; canvas.height = h
+          canvas.getContext('2d').drawImage(img,0,0,w,h)
+          const base64 = canvas.toDataURL('image/jpeg',0.7)
+          const mesAno = new Date().getMonth()+'_'+new Date().getFullYear()
+          await setDoc(doc(db,'alugueis_franq',mesAno+'_'+usuario.uid), {
+            status:'aguardando', franqueado:franqueado.nome||usuario.displayName||usuario.email,
+            unidade:franqueado.unidade||'—', uid:usuario.uid, email:usuario.email,
+            mes:new Date().toLocaleString('pt-BR',{month:'long',year:'numeric'}),
+            dataEnvio:new Date().toLocaleDateString('pt-BR'), comprovante:base64
+          })
+          setAluguelEnviado(true)
+        }
+        img.src = e.target.result
+      }
+      reader.readAsDataURL(file)
+    } catch(e) { alert('Erro: '+e.message) }
   }
 
 
@@ -1089,7 +1141,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
         <div style={{ padding: 16 }}>
           <h2 style={{ color: '#c0392b', margin: '0 0 12px' }}>💰 Cobranças</h2>
           <div style={{ display:'flex', gap:8, marginBottom:16 }}>
-            {[['mensalidade','💳 Mensalidade'],['royalties','👑 Royalties']].map(([k,l]) => (
+            {[['mensalidade','💳 Mensalidade'],['aluguel','🏠 Aluguel'],['royalties','👑 Royalties']].map(([k,l]) => (
               <button key={k} onClick={() => setSubAbaCobranca(k)} style={{ flex:1, padding:'10px', border:'none', borderRadius:8, fontWeight:'bold', fontSize:13, cursor:'pointer', background: subAbaCobranca===k ? '#c0392b' : '#f5f5f5', color: subAbaCobranca===k ? 'white' : '#555' }}>{l}</button>
             ))}
           </div>
@@ -1102,8 +1154,12 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   <div style={{ fontSize:13, opacity:0.9, marginBottom:4 }}>MENSALIDADE — PORTAL CANDEIAS JR</div>
                   <div style={{ fontSize:36, fontWeight:'bold' }}>R$ 119,00</div>
                   <div style={{ fontSize:13, opacity:0.9, marginTop:4 }}>Vencimento todo dia <b>15</b> do mês</div>
-                  <div style={{ padding:'8px 16px', background:'rgba(0,0,0,0.15)', color:'rgba(255,255,255,0.9)', fontSize:12, lineHeight:1.5, marginTop:8 }}>
-                    Sistema de inserção de pedidos para franqueados e sistema de PDV de funcionamento da unidade
+                  <div style={{ padding:'8px 16px', background:'rgba(0,0,0,0.2)', color:'rgba(255,255,255,0.9)', fontSize:11, lineHeight:1.6, marginTop:8 }}>
+                    📋 <b>O que está incluso:</b><br/>
+                    • Sistema de inserção de pedidos para franqueados<br/>
+                    • Sistema de PDV de funcionamento da unidade<br/>
+                    • Controle de estoque e histórico de pedidos<br/>
+                    • Geração de faturas e recibos
                   </div>
                 </div>
                 <div style={{ padding:16 }}>
@@ -1139,6 +1195,55 @@ td{padding:8px;border-bottom:1px solid #ddd}
                       {enviandoComprovante ? '⏳ Enviando...' : '📎 Enviar Comprovante'}
                       <input type="file" accept="image/*" capture="environment" style={{ display:'none' }}
                         onChange={e => e.target.files[0] && enviarComprovante(e.target.files[0])} />
+                    </label>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ALUGUEL */}
+          {subAbaCobranca === 'aluguel' && (
+            <div>
+              <div style={{ background:'white', borderRadius:12, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.1)', marginBottom:16 }}>
+                <div style={{ background:'linear-gradient(135deg, #1a5276, #2471a3)', padding:'20px 16px', color:'white', textAlign:'center' }}>
+                  <div style={{ fontSize:13, opacity:0.9, marginBottom:4 }}>ALUGUEL DO ESTABELECIMENTO</div>
+                  <div style={{ fontSize:36, fontWeight:'bold' }}>R$ 1.200,00</div>
+                  <div style={{ fontSize:13, opacity:0.9, marginTop:4 }}>Vencimento todo dia <b>24</b> do mês</div>
+                </div>
+                <div style={{ padding:16 }}>
+                  {(() => {
+                    const hoje = new Date(), venc = new Date(hoje.getFullYear(), hoje.getMonth(), 24)
+                    if (hoje.getDate() > 24) venc.setMonth(venc.getMonth()+1)
+                    const diff = Math.ceil((venc-hoje)/(1000*60*60*24))
+                    return (
+                      <div style={{ background:diff<=7?'#fff3cd':'#f8f9fa', border:`1px solid ${diff<=7?'#ffc107':'#e9ecef'}`, borderRadius:8, padding:'12px 16px', marginBottom:16, textAlign:'center' }}>
+                        <div style={{ fontSize:12, color:'#888', marginBottom:4 }}>PRÓXIMO VENCIMENTO</div>
+                        <div style={{ fontSize:18, fontWeight:'bold', color:diff<=7?'#856404':'#333' }}>24 de {venc.toLocaleString('pt-BR',{month:'long',year:'numeric'})}</div>
+                        {diff<=7 && <div style={{ fontSize:13, color:'#856404', marginTop:4 }}>⚠️ Vence em {diff} dia{diff!==1?'s':''}!</div>}
+                      </div>
+                    )
+                  })()}
+                  <div style={{ background:'#eaf4fb', border:'1px solid #aed6f1', borderRadius:8, padding:'14px 16px', marginBottom:12 }}>
+                    <div style={{ fontSize:13, fontWeight:'bold', color:'#1a5276', marginBottom:8 }}>💠 Pagar via PIX</div>
+                    <div style={{ background:'white', border:'1px solid #ddd', borderRadius:6, padding:'10px 14px', fontFamily:'monospace', fontSize:15, fontWeight:'bold', textAlign:'center', letterSpacing:1, marginBottom:8 }}>{FATURA_PIX_KEY}</div>
+                    <div style={{ fontSize:13, color:'#555' }}>👤 Favorecido: <b>{FATURA_FAVORECIDO}</b></div>
+                    <button onClick={() => { navigator.clipboard?.writeText(FATURA_PIX_KEY); alert('Chave copiada!') }}
+                      style={{ width:'100%', marginTop:10, padding:'10px', background:'#1a5276', color:'white', border:'none', borderRadius:6, fontWeight:'bold', fontSize:14, cursor:'pointer' }}>
+                      📋 Copiar Chave PIX
+                    </button>
+                  </div>
+                  {aluguelEnviado ? (
+                    <div style={{ background:'#e8f8f2', border:'1px solid #27ae60', borderRadius:8, padding:'12px 16px', textAlign:'center' }}>
+                      <div style={{ fontSize:24, marginBottom:4 }}>✅</div>
+                      <div style={{ fontWeight:'bold', color:'#27ae60' }}>Comprovante enviado!</div>
+                      <div style={{ fontSize:12, color:'#555', marginTop:4 }}>Aguardando confirmação.</div>
+                    </div>
+                  ) : (
+                    <label style={{ display:'block', width:'100%', padding:'12px', background:'#1a5276', color:'white', border:'none', borderRadius:8, fontWeight:'bold', fontSize:14, cursor:'pointer', textAlign:'center', boxSizing:'border-box' }}>
+                      📎 Enviar Comprovante
+                      <input type="file" accept="image/*" capture="environment" style={{ display:'none' }}
+                        onChange={e => e.target.files[0] && enviarComprovanteAluguel(e.target.files[0])} />
                     </label>
                   )}
                 </div>
@@ -1371,6 +1476,39 @@ td{padding:8px;border-bottom:1px solid #ddd}
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Popup aluguel */}
+      {showAluguelPopup && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', zIndex:2001, display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
+          <div style={{ background:'white', borderRadius:16, maxWidth:360, width:'100%', overflow:'hidden', boxShadow:'0 8px 32px rgba(0,0,0,0.3)' }}>
+            <div style={{ background:'linear-gradient(135deg,#1a5276,#2471a3)', padding:'20px 16px', color:'white', textAlign:'center' }}>
+              <div style={{ fontSize:32, marginBottom:4 }}>🏠</div>
+              <div style={{ fontSize:18, fontWeight:'bold' }}>Aluguel a Vencer!</div>
+              <div style={{ fontSize:13, opacity:0.9 }}>Estabelecimento Candeias Jr</div>
+            </div>
+            <div style={{ padding:20, textAlign:'center' }}>
+              <div style={{ fontSize:13, color:'#888', marginBottom:4 }}>Vencimento dia 24/{String(new Date().getMonth()+1).padStart(2,'0')}/{new Date().getFullYear()}</div>
+              <div style={{ fontSize:32, fontWeight:'bold', color:'#1a5276', marginBottom:16 }}>R$ 1.200,00</div>
+              <div style={{ background:'#f8f8f8', borderRadius:8, padding:'10px 14px', marginBottom:12 }}>
+                <div style={{ fontSize:12, color:'#888', marginBottom:4 }}>Chave PIX</div>
+                <div style={{ fontFamily:'monospace', fontWeight:'bold', fontSize:15 }}>{FATURA_PIX_KEY}</div>
+                <div style={{ fontSize:12, color:'#555', marginTop:4 }}>Favorecido: {FATURA_FAVORECIDO}</div>
+              </div>
+              <button onClick={() => { navigator.clipboard?.writeText(FATURA_PIX_KEY); alert('Chave copiada!') }}
+                style={{ width:'100%', padding:'10px', background:'#1a5276', color:'white', border:'none', borderRadius:8, fontWeight:'bold', fontSize:14, cursor:'pointer', marginBottom:8 }}>
+                📋 Copiar Chave PIX
+              </button>
+              <button onClick={() => {
+                const mesAno = new Date().getMonth()+'_'+new Date().getFullYear()
+                localStorage.setItem('aluguel_dismiss_'+mesAno+'_'+usuario.uid, Date.now().toString())
+                setShowAluguelPopup(false)
+              }} style={{ width:'100%', padding:'10px', background:'#eee', color:'#555', border:'none', borderRadius:8, fontSize:13, cursor:'pointer' }}>
+                Ok, já vi — fechar por 24h
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
