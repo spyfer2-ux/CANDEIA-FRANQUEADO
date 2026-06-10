@@ -1508,6 +1508,42 @@ td{padding:8px;border-bottom:1px solid #ddd}
                         </div>
                       </div>
                     ))}
+
+                    {/* Ranking de itens mais pedidos */}
+                    {pedidosMes.length > 0 && (() => {
+                      const itensTotais = {}
+                      pedidosMes.forEach(o => {
+                        (o.itens||[]).forEach(item => {
+                          const k = item.nome
+                          if (!itensTotais[k]) itensTotais[k] = { nome:item.nome, porcao:item.porcao, qtd:0, valor:0 }
+                          itensTotais[k].qtd += item.quantidade
+                          itensTotais[k].valor += item.preco * item.quantidade
+                        })
+                      })
+                      const ranking = Object.values(itensTotais).sort((a,b) => b.qtd - a.qtd).slice(0,10)
+                      return (
+                        <div style={{ background:'white', borderRadius:10, border:'1px solid #eee', overflow:'hidden', marginBottom:12 }}>
+                          <div style={{ background:'#2c3e50', padding:'10px 16px', color:'white' }}>
+                            <span style={{ fontWeight:'bold', fontSize:14 }}>🏆 Top 10 — Itens Mais Pedidos no Mês</span>
+                          </div>
+                          {ranking.map((item, i) => (
+                            <div key={item.nome} style={{ display:'flex', alignItems:'center', gap:10, padding:'9px 16px', borderBottom:'1px solid #f5f5f5' }}>
+                              <span style={{ fontSize:16, fontWeight:'bold', color: i===0?'#f39c12':i===1?'#95a5a6':i===2?'#e67e22':'#bbb', minWidth:24, textAlign:'center' }}>
+                                {i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}º`}
+                              </span>
+                              <div style={{ flex:1 }}>
+                                <div style={{ fontSize:13, fontWeight:'bold', color:'#333' }}>{item.nome}</div>
+                                <div style={{ fontSize:11, color:'#aaa' }}>{item.porcao}</div>
+                              </div>
+                              <div style={{ textAlign:'right' }}>
+                                <div style={{ fontSize:14, fontWeight:'bold', color:'#c0392b' }}>×{item.qtd}</div>
+                                <div style={{ fontSize:11, color:'#888' }}>{item.valor.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    })()}
                   </div>
                 )
               })()}
