@@ -47,7 +47,7 @@ const CATEGORIAS = {
       { id: "apresuntado", nome: "Apresuntado", preco: 1.52, porcao: "60g" , vendaPorKg: true, kgBase: 0.06 },
       { id: "mussarela", nome: "Mussarela", preco: 2.87, porcao: "60g" , vendaPorKg: true, kgBase: 0.06 },
       { id: "salsicha", nome: "Salsicha", preco: 1.0, porcao: "unidade" },
-      { id: "bisnaga-catupiry", nome: "Catupiry", preco: 40.83, porcao: "1,5kg", vendaPorKg: true, kgBase: 1.5 },
+      { id: "bisnaga-catupiry", nome: "Catupiry", preco: 47.96, porcao: "1,5kg", vendaPorKg: true, kgBase: 1.5 },
       { id: "bisnaga-cheddar", nome: "Cheddar", preco: 13.5, porcao: "1,2kg" },
     ]
   },
