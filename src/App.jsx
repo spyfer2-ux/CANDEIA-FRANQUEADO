@@ -1309,7 +1309,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
             <div>
               {/* Sub-abas Admin */}
               <div style={{ display:'flex', gap:8, marginBottom:16 }}>
-                {[['pedidos','📦 Pedidos'],['mensalidades','💳 Mensalidades']].map(([k,l]) => (
+                {[['pedidos','📦 Pedidos'],['mensalidades','💳 Mensalidades'],['fechamento','📊 Fechamento']].map(([k,l]) => (
                   <button key={k} onClick={() => setAbaAdmin(k)}
                     style={{ flex:1, padding:'10px 4px', border:'none', borderRadius:8, fontWeight:'bold', fontSize:12, cursor:'pointer',
                       background: abaAdmin===k ? '#c0392b' : '#f5f5f5', color: abaAdmin===k ? 'white' : '#555' }}>
@@ -1405,6 +1405,112 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   })}
                 </div>
               )}
+
+
+              {/* FECHAMENTO MENSAL */}
+              {abaAdmin === 'fechamento' && (() => {
+                const hoje = new Date()
+                const mesAtual = hoje.getMonth()
+                const anoAtual = hoje.getFullYear()
+                const nomeMes = hoje.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })
+
+                // Filtrar pedidos do mês atual
+                const pedidosMes = orcamentosSalvos.filter(o => {
+                  try {
+                    const partes = o.data?.split(' ')[0]?.split('/')
+                    if (!partes || partes.length < 3) return false
+                    return parseInt(partes[1])-1 === mesAtual && parseInt(partes[2]) === anoAtual
+                  } catch { return false }
+                })
+
+                // Agrupar por franqueado
+                const porFranqueado = {}
+                pedidosMes.forEach(o => {
+                  const key = (o.franqueado || 'Desconhecido') + ' — ' + (o.unidade || '')
+                  if (!porFranqueado[key]) porFranqueado[key] = { pedidos: [], total: 0, franqueado: o.franqueado, unidade: o.unidade }
+                  porFranqueado[key].pedidos.push(o)
+                  porFranqueado[key].total += o.total || 0
+                })
+
+                const totalGeral = pedidosMes.reduce((acc, o) => acc + (o.total || 0), 0)
+                const totalCobranças = 119 + 1200 + (hoje >= ROYALTIES_INICIO ? 1874 : 0)
+
+                return (
+                  <div>
+                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+                      <h3 style={{ color:'#c0392b', margin:0 }}>📊 Fechamento — {nomeMes}</h3>
+                    </div>
+
+                    {/* Resumo geral */}
+                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:16 }}>
+                      <div style={{ background:'linear-gradient(135deg,#c0392b,#e74c3c)', borderRadius:10, padding:'14px 16px', color:'white', textAlign:'center' }}>
+                        <div style={{ fontSize:11, opacity:0.9, marginBottom:4 }}>TOTAL EM PEDIDOS</div>
+                        <div style={{ fontSize:20, fontWeight:'bold' }}>{totalGeral.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</div>
+                        <div style={{ fontSize:11, opacity:0.8, marginTop:2 }}>{pedidosMes.length} pedido{pedidosMes.length!==1?'s':''}</div>
+                      </div>
+                      <div style={{ background:'linear-gradient(135deg,#1a5276,#2471a3)', borderRadius:10, padding:'14px 16px', color:'white', textAlign:'center' }}>
+                        <div style={{ fontSize:11, opacity:0.9, marginBottom:4 }}>COBRANÇAS DO MÊS</div>
+                        <div style={{ fontSize:20, fontWeight:'bold' }}>{totalCobranças.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</div>
+                        <div style={{ fontSize:11, opacity:0.8, marginTop:2 }}>Sistema + Aluguel{hoje >= ROYALTIES_INICIO ? ' + Royalties' : ''}</div>
+                      </div>
+                    </div>
+
+                    {/* Total previsto */}
+                    <div style={{ background:'#eafaf1', border:'2px solid #27ae60', borderRadius:10, padding:'14px 16px', marginBottom:16, textAlign:'center' }}>
+                      <div style={{ fontSize:12, color:'#276749', marginBottom:4 }}>💰 PREVISÃO TOTAL DO MÊS</div>
+                      <div style={{ fontSize:26, fontWeight:'bold', color:'#27ae60' }}>
+                        {(totalGeral + totalCobranças).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+                      </div>
+                      <div style={{ fontSize:11, color:'#888', marginTop:4 }}>Pedidos + Cobranças fixas</div>
+                    </div>
+
+                    {/* Breakdown cobranças */}
+                    <div style={{ background:'white', borderRadius:10, padding:'12px 16px', marginBottom:16, border:'1px solid #eee' }}>
+                      <div style={{ fontSize:12, fontWeight:'bold', color:'#555', marginBottom:10 }}>COBRANÇAS FIXAS</div>
+                      {[
+                        ['💳 Mensalidade Sistema', 119],
+                        ['🏠 Aluguel Estabelecimento', 1200],
+                        ...(hoje >= ROYALTIES_INICIO ? [['👑 Royalties Marca', 1874]] : [['👑 Royalties (isenção)', 0]])
+                      ].map(([label, val]) => (
+                        <div key={label} style={{ display:'flex', justifyContent:'space-between', padding:'5px 0', borderBottom:'1px solid #f5f5f5', fontSize:13 }}>
+                          <span style={{ color:'#555' }}>{label}</span>
+                          <span style={{ fontWeight:'bold', color: val === 0 ? '#27ae60' : '#333' }}>{val === 0 ? 'Isento' : val.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Por franqueado */}
+                    {Object.keys(porFranqueado).length === 0 ? (
+                      <p style={{ color:'#aaa', textAlign:'center', padding:20 }}>Nenhum pedido este mês ainda.</p>
+                    ) : Object.entries(porFranqueado).map(([key, dados]) => (
+                      <div key={key} style={{ background:'white', borderRadius:10, marginBottom:12, border:'1px solid #eee', overflow:'hidden' }}>
+                        <div style={{ background:'#fdf0ef', padding:'10px 16px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                          <div>
+                            <div style={{ fontWeight:'bold', color:'#c0392b' }}>👤 {dados.franqueado}</div>
+                            <div style={{ fontSize:12, color:'#888' }}>{dados.unidade} · {dados.pedidos.length} pedido{dados.pedidos.length!==1?'s':''}</div>
+                          </div>
+                          <div style={{ fontSize:18, fontWeight:'bold', color:'#c0392b' }}>
+                            {dados.total.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+                          </div>
+                        </div>
+                        <div style={{ padding:'8px 16px' }}>
+                          {dados.pedidos.map(p => (
+                            <div key={p.id} style={{ display:'flex', justifyContent:'space-between', fontSize:12, padding:'3px 0', color:'#666', borderBottom:'1px solid #f9f9f9' }}>
+                              <span>#{p.numeroPedido} — {p.data?.split(' ')[0]}</span>
+                              <span style={{ display:'flex', gap:8, alignItems:'center' }}>
+                                <span style={{ padding:'1px 6px', borderRadius:8, fontSize:10, fontWeight:'bold', background: p.status==='concluido'?'#27ae60':p.status==='parcial'?'#f39c12':'#e0e0e0', color: p.status==='concluido'||p.status==='parcial'?'white':'#888' }}>
+                                  {p.status==='concluido'?'✅':p.status==='parcial'?'🔶':'⏳'}
+                                </span>
+                                <b>{p.total?.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</b>
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })()}
 
               {/* ORÇAMENTOS SALVOS */}
               {abaAdmin === 'pedidos' && (
