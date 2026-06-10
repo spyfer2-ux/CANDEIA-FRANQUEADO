@@ -73,6 +73,11 @@
     <small>Permite gerar fatura uma vez</small><br>
     <button onclick="habilitarFatura(10011)" id="btnFatura10011" style="margin-top:8px;padding:10px 20px;font-size:15px;background:#3182ce;color:white;border:none;border-radius:8px;cursor:pointer;">🔓 Habilitar #10011</button>
   </div>
+  <div style="border:2px solid #e74c3c;border-radius:10px;padding:16px;margin:12px 0;background:#fff5f5;">
+    <b>↩️ Reverter Pedido #10015 para Aberto</b><br>
+    <small>Bruno — Jd Vila Formosa — Baixa dada por engano</small><br>
+    <button onclick="reverterPedido(10015)" id="btnReverter10015" style="margin-top:8px;padding:10px 20px;font-size:15px;background:#e74c3c;color:white;border:none;border-radius:8px;cursor:pointer;">↩️ Reverter #10015</button>
+  </div>
   <div id="status" class="info">Escolha um pedido para importar.</div>
 
   <script type="module">
@@ -618,6 +623,28 @@
         }
         await ud(snap.docs[0].ref, { faturaGerada: false })
         st.className='ok'; st.textContent='✅ Fatura do pedido #'+numeroPedido+' habilitada! O botão voltará a aparecer no Admin.'
+      } catch(e) {
+        st.className='err'; st.textContent='Erro: '+e.message
+        if(btn) btn.disabled=false
+      }
+    }
+
+    window.reverterPedido = async (numeroPedido) => {
+      const st = document.getElementById('status')
+      const btn = document.getElementById('btnReverter'+numeroPedido)
+      if (btn) btn.disabled = true
+      if (!auth.currentUser) {
+        st.className='info'; st.textContent='🔐 Fazendo login...'
+        try { await signInWithPopup(auth, new GoogleAuthProvider()) }
+        catch(e) { st.className='err'; st.textContent='Erro: '+e.message; if(btn) btn.disabled=false; return }
+      }
+      st.className='info'; st.textContent='⏳ Buscando pedido #'+numeroPedido+'...'
+      try {
+        const { getDocs: gd, query: q, collection: col, where: wh, updateDoc: ud } = await import('https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js')
+        const snap = await gd(q(col(db,'orcamentos'), wh('numeroPedido','==', numeroPedido)))
+        if (snap.empty) { st.className='err'; st.textContent='❌ Pedido não encontrado!'; if(btn) btn.disabled=false; return }
+        await ud(snap.docs[0].ref, { status:'pendente', observacao:'', dataVencimento: snap.docs[0].data().dataVencimento || '' })
+        st.className='ok'; st.textContent='✅ Pedido #'+numeroPedido+' revertido para ABERTO!'
       } catch(e) {
         st.className='err'; st.textContent='Erro: '+e.message
         if(btn) btn.disabled=false
