@@ -1702,7 +1702,8 @@ td{padding:8px;border-bottom:1px solid #ddd}
               </button>
               <button onClick={() => {
                 const mesAno = new Date().getMonth()+'_'+new Date().getFullYear()
-                localStorage.setItem('vencimentos_dismiss_'+mesAno+'_'+usuario.uid, Date.now().toString())
+                const tipoKey = window._vencimentosPopupData?.[0]?.tipo || ''
+                localStorage.setItem('vencimentos_dismiss_'+mesAno+'_'+tipoKey+'_'+usuario.uid, Date.now().toString())
                 setShowVencimentosPopup(false)
               }} style={{ width:'100%', padding:'10px', background:'#eee', color:'#555', border:'none', borderRadius:8, fontSize:13, cursor:'pointer' }}>
                 Ok, ciente — fechar por 24h
