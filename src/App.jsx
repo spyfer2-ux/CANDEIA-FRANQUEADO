@@ -239,6 +239,7 @@ export default function App() {
   const [royaltiesEnviado, setRoyaltiesEnviado] = useState(false)
   const [royaltiesPago, setRoyaltiesPago] = useState(false)
   const [showAluguelPopup, setShowAluguelPopup] = useState(false)
+  const [showVencimentosPopup, setShowVencimentosPopup] = useState(false)
   const [aluguelEnviado, setAluguelEnviado] = useState(false)
   const [aluguelPago, setAluguelPago] = useState(false)
   const [mensalidadesAdmin, setMensalidadesAdmin] = useState({})
@@ -1363,9 +1364,14 @@ td{padding:8px;border-bottom:1px solid #ddd}
                   </div>
 
                   <p style={{ color:'#888', fontSize:13, marginBottom:12 }}>Dê baixa após receber cada pagamento:</p>
-                  <button onClick={() => setShowMensalidadePopup(true)}
-                    style={{ padding:'8px 16px', background:'#f39c12', color:'white', border:'none', borderRadius:8, fontWeight:'bold', fontSize:13, cursor:'pointer', marginBottom:16 }}>
-                    🧪 Testar Popup Mensalidade
+                  <button onClick={() => {
+                      window._vencimentosPopupData = [
+                        { tipo:'💳 Mensalidade do Sistema', valor:'R$ 119,00', dias:5, data: new Date(new Date().getFullYear(), new Date().getMonth(), 15).toLocaleDateString('pt-BR') },
+                        { tipo:'🏠 Aluguel do Estabelecimento', valor:'R$ 1.200,00', dias:14, data: new Date(new Date().getFullYear(), new Date().getMonth(), 24).toLocaleDateString('pt-BR') },
+                      ]
+                      setShowVencimentosPopup(true)
+                    }} style={{ padding:'8px 16px', background:'#f39c12', color:'white', border:'none', borderRadius:8, fontWeight:'bold', fontSize:13, cursor:'pointer', marginBottom:16 }}>
+                    🧪 Testar Popup de Vencimentos
                   </button>
                   {orcamentosSalvos.filter((o,i,arr) => arr.findIndex(x => x.uid === o.uid) === i).map(o => {
                     const mesAno = new Date().getMonth() + '_' + new Date().getFullYear()
@@ -1656,6 +1662,53 @@ td{padding:8px;border-bottom:1px solid #ddd}
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Popup combinado de vencimentos */}
+      {showVencimentosPopup && window._vencimentosPopupData && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:2002, display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
+          <div style={{ background:'white', borderRadius:16, maxWidth:380, width:'100%', overflow:'hidden', boxShadow:'0 8px 32px rgba(0,0,0,0.3)' }}>
+            <div style={{ background:'linear-gradient(135deg,#c0392b,#e74c3c)', padding:'20px 16px', color:'white', textAlign:'center' }}>
+              <div style={{ fontSize:32, marginBottom:4 }}>⚠️</div>
+              <div style={{ fontSize:18, fontWeight:'bold' }}>Cobranças a Vencer!</div>
+              <div style={{ fontSize:13, opacity:0.9 }}>Confira os vencimentos próximos</div>
+            </div>
+            <div style={{ padding:20 }}>
+              {window._vencimentosPopupData.map((v,i) => (
+                <div key={i} style={{ background: v.dias===0?'#fdecea':v.dias<=3?'#fff3cd':'#f8f9fa', border:`1px solid ${v.dias===0?'#f5c6c6':v.dias<=3?'#ffc107':'#e9ecef'}`, borderRadius:10, padding:'12px 14px', marginBottom:10 }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                    <div>
+                      <div style={{ fontWeight:'bold', fontSize:14, color:'#333' }}>{v.tipo}</div>
+                      <div style={{ fontSize:12, color:'#888', marginTop:2 }}>Vence em {v.data}</div>
+                    </div>
+                    <div style={{ textAlign:'right' }}>
+                      <div style={{ fontWeight:'bold', fontSize:16, color:'#c0392b' }}>{v.valor}</div>
+                      <div style={{ fontSize:11, color: v.dias===0?'#e74c3c':v.dias<=3?'#e67e22':'#888', fontWeight:'bold' }}>
+                        {v.dias===0?'VENCE HOJE':v.dias===1?'amanhã':`em ${v.dias} dias`}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <div style={{ background:'#f8f8f8', borderRadius:8, padding:'10px 14px', marginBottom:12, textAlign:'center' }}>
+                <div style={{ fontSize:11, color:'#888', marginBottom:4 }}>Chave PIX para pagamento</div>
+                <div style={{ fontFamily:'monospace', fontWeight:'bold' }}>{FATURA_PIX_KEY}</div>
+                <div style={{ fontSize:11, color:'#555', marginTop:2 }}>Favorecido: {FATURA_FAVORECIDO}</div>
+              </div>
+              <button onClick={() => { navigator.clipboard?.writeText(FATURA_PIX_KEY); alert('Chave copiada!') }}
+                style={{ width:'100%', padding:'10px', background:'#27ae60', color:'white', border:'none', borderRadius:8, fontWeight:'bold', fontSize:14, cursor:'pointer', marginBottom:8 }}>
+                📋 Copiar Chave PIX
+              </button>
+              <button onClick={() => {
+                const mesAno = new Date().getMonth()+'_'+new Date().getFullYear()
+                localStorage.setItem('vencimentos_dismiss_'+mesAno+'_'+usuario.uid, Date.now().toString())
+                setShowVencimentosPopup(false)
+              }} style={{ width:'100%', padding:'10px', background:'#eee', color:'#555', border:'none', borderRadius:8, fontSize:13, cursor:'pointer' }}>
+                Ok, ciente — fechar por 24h
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
