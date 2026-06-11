@@ -83,7 +83,7 @@ const CATEGORIAS = {
       { id: "massa-pastel", nome: "Massa de Pastel", preco: 47.00, porcao: "pacote 5kg", vendaPorKg: true, kgBase: 5.0 },
       { id: "batata-congelada-350", nome: "Batata Frita P", preco: 4.62, porcao: "325g" },
       { id: "batata-congelada-625", nome: "Batata Frita G", preco: 8.25, porcao: "650g" },
-      { id: "pure", nome: "Purê", preco: 8.45, porcao: "500g" },
+      { id: "pure", nome: "Purê", preco: 15.50, porcao: "kg", vendaPorKg: true, kgBase: 1.0 },
       { id: "saco-pao-hot-dog", nome: "Pão Hot Dog", preco: 13.50, porcao: "10 unid." },
     ]
   },
