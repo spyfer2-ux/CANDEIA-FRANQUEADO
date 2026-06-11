@@ -334,12 +334,9 @@ export default function App() {
       const precoKg = item.preco / (item.kgBase || 1)
       const precoFinal = parseFloat((precoKg * kgDigitado).toFixed(2))
       const porcaoLabel = kgDigitado.toFixed(3).replace('.', ',') + ' kg'
-      const existente = carrinho.find(c => c.id === item.id + '-' + catKey)
-      if (existente) {
-        setCarrinho(carrinho.map(c => c.id === item.id + '-' + catKey ? { ...c, quantidade: c.quantidade + 1, porcao: porcaoLabel, preco: precoFinal } : c))
-      } else {
-        setCarrinho([...carrinho, { id: item.id + '-' + catKey, nome: item.nome, porcao: porcaoLabel, preco: precoFinal, quantidade: 1, categoria: catInfo.nome }])
-      }
+      // vendaPorKg: sempre cria novo item separado (fracionamento de produção)
+      const novoId = item.id + '-' + catKey + '-' + Date.now()
+      setCarrinho([...carrinho, { id: novoId, nome: item.nome, porcao: porcaoLabel, preco: precoFinal, quantidade: 1, categoria: catInfo.nome }])
       setQuantidades({ ...quantidades, [item.id]: '' })
       return
     }
