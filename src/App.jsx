@@ -861,11 +861,17 @@ td{padding:8px;border-bottom:1px solid #ddd}
                         <div key={item.id + item.catKey} style={{ background: '#fafafa', borderRadius: 8, padding: 12, borderLeft: `4px solid ${item.catCor}`, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
                           <div style={{ fontWeight: 'bold', fontSize: 14 }}>{item.nome}</div>
                           <div style={{ fontSize: 11, color: '#888', marginBottom: 6 }}>{item.catNome} · {item.porcao}</div>
-                          <div style={{ fontSize: 16, fontWeight: 'bold', color: item.catCor, marginBottom: 8 }}>{formatPreco(item.preco)}</div>
+                          <div style={{ fontSize: 16, fontWeight: 'bold', color: item.catCor, marginBottom: 8 }}>
+                            {item.vendaPorKg ? `R$ ${(item.preco/(item.kgBase||1)).toFixed(2).replace('.',',')} / kg` : formatPreco(item.preco)}
+                          </div>
                           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                            <button onClick={() => setQuantidades({...quantidades, [item.id]: Math.max(1,(quantidades[item.id]||1)-1)})} style={{ width: 28, height: 28, border: `1px solid ${item.catCor}`, borderRadius: 4, background: 'white', color: item.catCor, fontWeight: 'bold' }}>-</button>
-                            <input type="text" inputMode="numeric" pattern="[0-9]*" value={quantidades[item.id] === '' ? '' : (quantidades[item.id] ?? 1)} onChange={e => { const v = e.target.value; setQuantidades({...quantidades, [item.id]: v === '' ? '' : Math.max(1, parseInt(v)||1)}) }} style={{ width: 44, textAlign: 'center', padding: '3px', border: '1px solid #ddd', borderRadius: 4, fontSize: 13 }}/>
-                            <button onClick={() => setQuantidades({...quantidades, [item.id]: (quantidades[item.id]||1)+1})} style={{ width: 28, height: 28, border: `1px solid ${item.catCor}`, borderRadius: 4, background: 'white', color: item.catCor, fontWeight: 'bold' }}>+</button>
+                            {item.vendaPorKg ? (
+                              <><input type="number" step="0.001" min="0.001" value={quantidades[item.id] ?? ''} onChange={e => setQuantidades({...quantidades, [item.id]: e.target.value})} placeholder="ex: 1.500" style={{ width: 90, textAlign: 'center', padding: '4px', border: `1.5px solid ${item.catCor}`, borderRadius: 4, fontSize: 13 }}/><span style={{fontSize:12,color:'#888'}}>kg</span></>
+                            ) : (
+                              <><button onClick={() => setQuantidades({...quantidades, [item.id]: Math.max(1,(quantidades[item.id]||1)-1)})} style={{ width: 28, height: 28, border: `1px solid ${item.catCor}`, borderRadius: 4, background: 'white', color: item.catCor, fontWeight: 'bold' }}>-</button>
+                              <input type="text" inputMode="numeric" value={quantidades[item.id] === '' ? '' : (quantidades[item.id] ?? 1)} onChange={e => { const v = e.target.value; setQuantidades({...quantidades, [item.id]: v === '' ? '' : Math.max(1, parseInt(v)||1)}) }} style={{ width: 44, textAlign: 'center', padding: '3px', border: '1px solid #ddd', borderRadius: 4, fontSize: 13 }}/>
+                              <button onClick={() => setQuantidades({...quantidades, [item.id]: (quantidades[item.id]||1)+1})} style={{ width: 28, height: 28, border: `1px solid ${item.catCor}`, borderRadius: 4, background: 'white', color: item.catCor, fontWeight: 'bold' }}>+</button></>
+                            )}
                             <button onClick={() => { adicionarAoCarrinho(item, item.catKey); setBusca('') }} style={{ flex: 1, padding: '6px', background: item.catCor, color: 'white', border: 'none', borderRadius: 6, fontWeight: 'bold', fontSize: 12, cursor: 'pointer' }}>Adicionar</button>
                           </div>
                         </div>
