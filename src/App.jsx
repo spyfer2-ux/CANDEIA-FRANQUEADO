@@ -877,17 +877,18 @@ td{padding:8px;border-bottom:1px solid #ddd}
             )}
           </div>
 
-          {/* Categorias nav */}
-          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 16, paddingBottom: 4 }}>
+          {/* Categorias nav - esconder durante busca */}
+          {!busca.trim() && <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 16, paddingBottom: 4 }}>
             {catKeys.map(cat => {
               const c = CATEGORIAS[cat]
               return (
                 <button key={cat} onClick={() => setCategoriaAtiva(cat)} style={{ padding: '8px 14px', borderRadius: 20, border: `2px solid ${c.cor}`, background: categoriaAtiva === cat ? c.cor : 'white', color: categoriaAtiva === cat ? 'white' : c.cor, fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: 13, transition: 'all 0.2s', cursor: 'pointer' }}>{c.nome}</button>
               )
             })}
-          </div>
+          </div>}
 
-          {/* Itens da categoria */}
+          {/* Itens da categoria - esconder durante busca */}
+          {!busca.trim() && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
             {CATEGORIAS[categoriaAtiva].itens.map(item => {
               const cat = CATEGORIAS[categoriaAtiva]
@@ -920,6 +921,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
               )
             })}
           </div>
+          )}
         </div>
       )}
 
