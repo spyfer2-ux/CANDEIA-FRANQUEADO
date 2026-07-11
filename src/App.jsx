@@ -36,7 +36,7 @@ const CATEGORIAS = {
     cor: "#8e44ad",
     corBg: "#faf2fe",
     unidade: "pacote",
-    itens: [{ id: "batata-congelada-625", nome: "Batata Frita G", preco: 8.25, porcao: "650g" },{ id: "batata-congelada-350", nome: "Batata Frita P", preco: 4.62, porcao: "325g" },{ id: "massa-pastel", nome: "Massa de Pastel", preco: 47.00, porcao: "pacote 5kg", vendaPorKg: true, kgBase: 5.0 },{ id: "pure", nome: "Purê", preco: 15.50, porcao: "kg", vendaPorKg: true, kgBase: 1.0 },
+    itens: [{ id: "batata-congelada-625", nome: "Batata Frita G", preco: 8.25, porcao: "650g" },{ id: "batata-congelada-350", nome: "Batata Frita P", preco: 4.62, porcao: "325g" },{ id: "massa-pastel", nome: "Massa de Pastel", preco: 47.00, porcao: "pacote 5kg", vendaPorKg: true, kgBase: 5.0 },{ id: "pao-hot-dog", nome: "Pão de Hot Dog", preco: 14.50, porcao: "pacote" },{ id: "pure", nome: "Purê", preco: 15.50, porcao: "kg", vendaPorKg: true, kgBase: 1.0 },
     ]
   },
   doces: {
