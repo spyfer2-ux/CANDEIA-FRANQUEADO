@@ -134,6 +134,11 @@ export default function App() {
   const [aluguelEnviado, setAluguelEnviado] = useState(false)
   const [aluguelPago, setAluguelPago] = useState(false)
   const [mensalidadesAdmin, setMensalidadesAdmin] = useState({})
+  const [boletos, setBoletos] = useState([])
+  const [novoBoleto, setNovoBoleto] = useState({ descricao: '', valor: '', recorrencia: 'avulso', vencimento: '' })
+  const [showFormBoleto, setShowFormBoleto] = useState(false)
+  const [boletoImagemAtivo, setBoletoImagemAtivo] = useState(null)
+  const boletoRef = useRef(null)
   const [whatsappNums, setWhatsappNums] = useState({})
   const [editandoWpp, setEditandoWpp] = useState(null)
   const [faturaAtiva, setFaturaAtiva] = useState(null)
@@ -666,6 +671,62 @@ td{padding:8px;border-bottom:1px solid #ddd}
       }
       reader.readAsDataURL(file)
     } catch(e) { alert('Erro: ' + e.message) }
+  }
+
+
+  const salvarBoleto = async () => {
+    if (!novoBoleto.descricao || !novoBoleto.valor) return
+    try {
+      const boleto = {
+        ...novoBoleto,
+        valor: parseFloat(novoBoleto.valor),
+        criadoEm: Date.now(),
+        dataEmissao: new Date().toLocaleDateString('pt-BR'),
+        status: 'pendente',
+        observacao: ''
+      }
+      const ref = await addDoc(collection(db, 'boletos_avulsos'), boleto)
+      setBoletos(prev => [{ docId: ref.id, ...boleto }, ...prev])
+      setNovoBoleto({ descricao: '', valor: '', recorrencia: 'avulso', vencimento: '' })
+      setShowFormBoleto(false)
+    } catch(e) { alert('Erro: ' + e.message) }
+  }
+
+  const darBaixaBoleto = async (b) => {
+    try {
+      await updateDoc(doc(db, 'boletos_avulsos', b.docId), { status: 'pago', dataPagamento: new Date().toLocaleDateString('pt-BR') })
+      setBoletos(prev => prev.map(x => x.docId === b.docId ? { ...x, status: 'pago', dataPagamento: new Date().toLocaleDateString('pt-BR') } : x))
+    } catch(e) { console.error(e) }
+  }
+
+  const excluirBoleto = async (b) => {
+    if (!window.confirm('Excluir este boleto?')) return
+    try {
+      await deleteDoc(doc(db, 'boletos_avulsos', b.docId))
+      setBoletos(prev => prev.filter(x => x.docId !== b.docId))
+    } catch(e) { console.error(e) }
+  }
+
+  const gerarImagemBoleto = async (b) => {
+    setBoletoImagemAtivo(b)
+    await new Promise(r => setTimeout(r, 400))
+    if (!boletoRef.current) return
+    try {
+      const canvas = await html2canvas(boletoRef.current, { scale: 2, backgroundColor: '#ffffff' })
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], `boleto-${b.docId}.png`, { type: 'image/png' })
+        if (navigator.share && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: b.descricao, text: `Cobrança: ${b.descricao} — R$ ${b.valor?.toFixed(2).replace('.',',')}` })
+        } else {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url; a.download = `boleto-${b.docId}.png`
+          document.body.appendChild(a); a.click(); document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+        }
+        setBoletoImagemAtivo(null)
+      }, 'image/png')
+    } catch(e) { console.error(e); setBoletoImagemAtivo(null) }
   }
 
 
@@ -1206,7 +1267,7 @@ td{padding:8px;border-bottom:1px solid #ddd}
             <div>
               {/* Sub-abas Admin */}
               <div style={{ display:'flex', gap:8, marginBottom:16 }}>
-                {[['pedidos','📦 Pedidos'],['mensalidades','💳 Mensalidades'],['fechamento','📊 Fechamento']].map(([k,l]) => (
+                {[['pedidos','📦 Pedidos'],['mensalidades','💳 Mensalidades'],['boletos','📄 Boletos'],['fechamento','📊 Fechamento']].map(([k,l]) => (
                   <button key={k} onClick={() => setAbaAdmin(k)}
                     style={{ flex:1, padding:'10px 4px', border:'none', borderRadius:8, fontWeight:'bold', fontSize:12, cursor:'pointer',
                       background: abaAdmin===k ? '#c0392b' : '#f5f5f5', color: abaAdmin===k ? 'white' : '#555' }}>
@@ -1308,6 +1369,100 @@ td{padding:8px;border-bottom:1px solid #ddd}
                 </div>
               )}
 
+
+
+              {/* BOLETOS AVULSOS */}
+              {abaAdmin === 'boletos' && (
+                <div>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+                    <h3 style={{ color:'#c0392b', margin:0 }}>📄 Boletos Avulsos</h3>
+                    <button onClick={() => setShowFormBoleto(!showFormBoleto)}
+                      style={{ padding:'8px 16px', background:'#c0392b', color:'white', border:'none', borderRadius:8, fontWeight:'bold', cursor:'pointer', fontSize:13 }}>
+                      {showFormBoleto ? '✕ Cancelar' : '+ Novo Boleto'}
+                    </button>
+                  </div>
+
+                  {showFormBoleto && (
+                    <div style={{ background:'white', borderRadius:10, padding:16, marginBottom:16, border:'1px solid #f0f0f0' }}>
+                      <div style={{ marginBottom:10 }}>
+                        <label style={{ fontSize:12, color:'#888', display:'block', marginBottom:4 }}>📝 Descrição</label>
+                        <input type="text" placeholder="Ex: Manutenção equipamentos" value={novoBoleto.descricao}
+                          onChange={e => setNovoBoleto(p => ({...p, descricao: e.target.value}))}
+                          style={{ width:'100%', padding:'9px 12px', border:'1px solid #ddd', borderRadius:6, fontSize:14, boxSizing:'border-box' }} />
+                      </div>
+                      <div style={{ display:'flex', gap:8, marginBottom:10 }}>
+                        <div style={{ flex:1 }}>
+                          <label style={{ fontSize:12, color:'#888', display:'block', marginBottom:4 }}>💰 Valor (R$)</label>
+                          <input type="number" step="0.01" placeholder="0,00" value={novoBoleto.valor}
+                            onChange={e => setNovoBoleto(p => ({...p, valor: e.target.value}))}
+                            style={{ width:'100%', padding:'9px 12px', border:'1px solid #ddd', borderRadius:6, fontSize:14, boxSizing:'border-box' }} />
+                        </div>
+                        <div style={{ flex:1 }}>
+                          <label style={{ fontSize:12, color:'#888', display:'block', marginBottom:4 }}>⏰ Vencimento</label>
+                          <input type="date" value={novoBoleto.vencimento}
+                            onChange={e => setNovoBoleto(p => ({...p, vencimento: e.target.value}))}
+                            style={{ width:'100%', padding:'9px 12px', border:'1px solid #ddd', borderRadius:6, fontSize:14, boxSizing:'border-box' }} />
+                        </div>
+                      </div>
+                      <div style={{ marginBottom:12 }}>
+                        <label style={{ fontSize:12, color:'#888', display:'block', marginBottom:4 }}>🔄 Recorrência</label>
+                        <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                          {[['avulso','📄 Avulso'],['semanal','📅 Semanal'],['quinzenal','🗓️ Quinzenal'],['mensal','📆 Mensal']].map(([k,l]) => (
+                            <button key={k} onClick={() => setNovoBoleto(p => ({...p, recorrencia: k}))}
+                              style={{ padding:'8px 14px', border:'none', borderRadius:8, cursor:'pointer', fontWeight:'bold', fontSize:13,
+                                background: novoBoleto.recorrencia===k ? '#c0392b' : '#f5f5f5', color: novoBoleto.recorrencia===k ? 'white' : '#555' }}>
+                              {l}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <button onClick={salvarBoleto}
+                        style={{ width:'100%', padding:12, background:'#c0392b', color:'white', border:'none', borderRadius:8, fontWeight:'bold', fontSize:15, cursor:'pointer' }}>
+                        💾 Gerar Boleto
+                      </button>
+                    </div>
+                  )}
+
+                  {boletos.length === 0 ? (
+                    <p style={{ color:'#aaa', textAlign:'center', padding:30 }}>Nenhum boleto gerado ainda.</p>
+                  ) : boletos.map(b => (
+                    <div key={b.docId} style={{ border:`2px solid ${b.status==='pago'?'#27ae60':'#e74c3c'}`, borderRadius:10, marginBottom:12, overflow:'hidden' }}>
+                      <div style={{ background:b.status==='pago'?'#eafaf1':'#fff5f5', padding:'12px 16px', display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+                        <div>
+                          <div style={{ fontWeight:'bold', color:'#333', fontSize:14 }}>{b.descricao}</div>
+                          <div style={{ fontSize:12, color:'#888', marginTop:2 }}>
+                            📅 {b.dataEmissao} · 
+                            <span style={{ marginLeft:4, padding:'1px 6px', background:'#e8e8e8', borderRadius:6, fontSize:11 }}>
+                              {b.recorrencia==='avulso'?'📄 Avulso':b.recorrencia==='semanal'?'📅 Semanal':b.recorrencia==='quinzenal'?'🗓️ Quinzenal':'📆 Mensal'}
+                            </span>
+                            {b.vencimento && <span style={{ marginLeft:4, color:'#e74c3c' }}>· vence {new Date(b.vencimento).toLocaleDateString('pt-BR')}</span>}
+                          </div>
+                        </div>
+                        <div style={{ textAlign:'right' }}>
+                          <div style={{ fontWeight:'bold', color:'#c0392b', fontSize:18 }}>R$ {b.valor?.toFixed(2).replace('.',',')}</div>
+                          <span style={{ fontSize:11, padding:'2px 8px', borderRadius:10, fontWeight:'bold', background:b.status==='pago'?'#27ae60':'#e74c3c', color:'white' }}>
+                            {b.status==='pago'?'✅ Pago':'⏳ Pendente'}
+                          </span>
+                        </div>
+                      </div>
+                      <div style={{ padding:'10px 16px', display:'flex', gap:8 }}>
+                        <button onClick={() => gerarImagemBoleto(b)}
+                          style={{ flex:1, padding:'9px', background:'#25d366', color:'white', border:'none', borderRadius:6, fontWeight:'bold', fontSize:13, cursor:'pointer' }}>
+                          📲 Gerar e Compartilhar
+                        </button>
+                        {b.status !== 'pago' && (
+                          <button onClick={() => darBaixaBoleto(b)}
+                            style={{ flex:1, padding:'9px', background:'#27ae60', color:'white', border:'none', borderRadius:6, fontWeight:'bold', fontSize:13, cursor:'pointer' }}>
+                            ✅ Dar Baixa
+                          </button>
+                        )}
+                        <button onClick={() => excluirBoleto(b)}
+                          style={{ padding:'9px 12px', background:'#fee', color:'#e74c3c', border:'none', borderRadius:6, cursor:'pointer', fontSize:16 }}>✕</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* FECHAMENTO MENSAL */}
               {abaAdmin === 'fechamento' && (() => {
@@ -1677,6 +1832,42 @@ td{padding:8px;border-bottom:1px solid #ddd}
               }} style={{ width: '100%', padding: '10px', background: '#eee', color: '#555', border: 'none', borderRadius: 8, fontSize: 13, cursor: 'pointer' }}>
                 Ok, já vi — fechar por 24h
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Card invisível para imagem do boleto */}
+      {boletoImagemAtivo && (
+        <div style={{ position:'fixed', left:-9999, top:0, zIndex:-1 }}>
+          <div ref={boletoRef} style={{ width:580, background:'white', fontFamily:'Arial,sans-serif', padding:0, color:'#222', borderRadius:12, overflow:'hidden' }}>
+            <div style={{ background:'linear-gradient(135deg,#c0392b,#e74c3c)', color:'white', padding:'20px 24px', textAlign:'center' }}>
+              <div style={{ fontSize:11, opacity:0.8, letterSpacing:2, marginBottom:4 }}>CANDEIAS JR — COBRANÇA AVULSA</div>
+              <div style={{ fontSize:22, fontWeight:'bold' }}>{boletoImagemAtivo.descricao}</div>
+              <div style={{ fontSize:13, opacity:0.9, marginTop:4 }}>Emitido em {boletoImagemAtivo.dataEmissao}</div>
+            </div>
+            <div style={{ padding:'20px 24px' }}>
+              <div style={{ display:'flex', justifyContent:'space-between', marginBottom:16 }}>
+                <div style={{ background:'#f8f8f8', borderRadius:8, padding:'12px 16px', flex:1, marginRight:8, textAlign:'center' }}>
+                  <div style={{ fontSize:11, color:'#888', marginBottom:4 }}>RECORRÊNCIA</div>
+                  <div style={{ fontWeight:'bold', fontSize:15 }}>{boletoImagemAtivo.recorrencia==='avulso'?'Avulso':boletoImagemAtivo.recorrencia==='semanal'?'Semanal':boletoImagemAtivo.recorrencia==='quinzenal'?'Quinzenal':'Mensal'}</div>
+                </div>
+                {boletoImagemAtivo.vencimento && (
+                  <div style={{ background:'#fff3cd', borderRadius:8, padding:'12px 16px', flex:1, textAlign:'center' }}>
+                    <div style={{ fontSize:11, color:'#888', marginBottom:4 }}>VENCIMENTO</div>
+                    <div style={{ fontWeight:'bold', fontSize:15, color:'#856404' }}>{new Date(boletoImagemAtivo.vencimento).toLocaleDateString('pt-BR')}</div>
+                  </div>
+                )}
+              </div>
+              <div style={{ background:'#fdf0ef', border:'2px solid #c0392b', borderRadius:10, padding:'16px', textAlign:'center', marginBottom:16 }}>
+                <div style={{ fontSize:12, color:'#888', marginBottom:4 }}>VALOR A PAGAR</div>
+                <div style={{ fontSize:32, fontWeight:'bold', color:'#c0392b' }}>R$ {boletoImagemAtivo.valor?.toFixed(2).replace('.',',')}</div>
+              </div>
+              <div style={{ background:'#f9f9f9', border:'1px solid #ddd', borderRadius:8, padding:'14px 16px' }}>
+                <div style={{ fontSize:13, fontWeight:'bold', color:'#555', marginBottom:8 }}>💠 Pagamento via PIX</div>
+                <div style={{ background:'white', border:'1px solid #ddd', borderRadius:6, padding:'10px', fontFamily:'monospace', fontSize:16, fontWeight:'bold', textAlign:'center', letterSpacing:2, marginBottom:6 }}>{FATURA_PIX_KEY}</div>
+                <div style={{ fontSize:12, color:'#555' }}>Favorecido: {FATURA_FAVORECIDO}</div>
+              </div>
             </div>
           </div>
         </div>
