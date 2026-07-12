@@ -60,7 +60,7 @@ const CATEGORIAS = {
     cor: "#2980b9",
     corBg: "#f0f7ff",
     unidade: "unidade",
-    itens: [{ id: "caixa-grande", nome: "Caixa Grande", preco: 2.46, porcao: "un" },{ id: "caixa-media", nome: "Caixa Média", preco: 2.09, porcao: "un" },{ id: "saco-grecepell-1kg", nome: "Saco Grecepell 1kg", preco: 55.00, porcao: "500 unidades" },{ id: "saco-grecepell-2kg", nome: "Saco Grecepell 2kg", preco: 74.25, porcao: "500 unidades" },{ id: "ketchup-heinz", nome: "Sachê Ketchup Heinz", preco: 25.30, porcao: "cx unidade" },{ id: "maionese-heinz", nome: "Sachê Maionese Heinz", preco: 25.30, porcao: "cx unidade" },{ id: "mostarda-heinz", nome: "Sachê Mostarda Heinz", preco: 25.30, porcao: "cx unidade" }]
+    itens: [{ id: "caixa-grande", nome: "Caixa Grande", preco: 2.46, porcao: "un" },{ id: "caixa-media", nome: "Caixa Média", preco: 2.09, porcao: "un" },{ id: "saco-grecepell-1kg", nome: "Saco Grecepell 1kg", preco: 0.11, porcao: "unidade" },{ id: "saco-grecepell-2kg", nome: "Saco Grecepell 2kg", preco: 0.15, porcao: "unidade" },{ id: "ketchup-heinz", nome: "Sachê Ketchup Heinz", preco: 25.30, porcao: "cx unidade" },{ id: "maionese-heinz", nome: "Sachê Maionese Heinz", preco: 25.30, porcao: "cx unidade" },{ id: "mostarda-heinz", nome: "Sachê Mostarda Heinz", preco: 25.30, porcao: "cx unidade" }]
   }
 }
 
