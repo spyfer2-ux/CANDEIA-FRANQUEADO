@@ -12,7 +12,7 @@ const CATEGORIAS = {
     cor: "#e74c3c",
     corBg: "#fdf2f2",
     unidade: "gramas",
-    itens: [{ id: "atum", nome: "Atum", preco: 5.0, porcao: "70g" },{ id: "bacon-mistura", nome: "Bacon Mistura", preco: 2.68, porcao: "20g" },{ id: "bacon-puro", nome: "Bacon Puro", preco: 4.47, porcao: "30g" },{ id: "berinjela", nome: "Berinjela", preco: 3.56, porcao: "90g" },{ id: "calabresa", nome: "Calabresa", preco: 1.78, porcao: "50g" },{ id: "carne-louca-lanche", nome: "Carne Louca Lanche", preco: 10.96, porcao: "160g" },{ id: "carne-louca-mistura", nome: "Carne Louca Mistura", preco: 4.13, porcao: "60g" },{ id: "carne-louca-pura", nome: "Carne Louca Pura", preco: 7.24, porcao: "100g" },{ id: "carne-mistura", nome: "Carne Mistura", preco: 3.6, porcao: "50g" },{ id: "carne-pura", nome: "Carne Pura", preco: 5.16, porcao: "70g" },{ id: "carne-seca-mistura", nome: "Carne Seca Mistura", preco: 7.78, porcao: "40g" },{ id: "frango-mistura", nome: "Frango Mistura", preco: 2.48, porcao: "50g" },{ id: "frango-puro", nome: "Frango Puro", preco: 3.19, porcao: "70g" },{ id: "misturinha", nome: "Misturinha", preco: 0.80, porcao: "40g" },{ id: "palmito-mistura", nome: "Palmito Mistura", preco: 2.34, porcao: "70g" },{ id: "palmito-puro", nome: "Palmito Puro", preco: 5.15, porcao: "150g" },{ id: "portuguesa", nome: "Portuguesa", preco: 3.05, porcao: "50g" },{ id: "salame", nome: "Salame", preco: 4.55, porcao: "50g" },
+    itens: [{ id: "atum", nome: "Atum", preco: 5.04, porcao: "70g" },{ id: "bacon-mistura", nome: "Bacon Mistura", preco: 2.72, porcao: "20g" },{ id: "bacon-puro", nome: "Bacon Puro", preco: 4.82, porcao: "30g" },{ id: "berinjela", nome: "Berinjela", preco: 3.56, porcao: "90g" },{ id: "calabresa", nome: "Calabresa", preco: 1.82, porcao: "50g" },{ id: "carne-louca-lanche", nome: "Carne Louca Lanche", preco: 11.31, porcao: "160g" },{ id: "carne-louca-mistura", nome: "Carne Louca Mistura", preco: 4.17, porcao: "60g" },{ id: "carne-louca-pura", nome: "Carne Louca Pura", preco: 7.59, porcao: "100g" },{ id: "carne-mistura", nome: "Carne Mistura", preco: 3.64, porcao: "50g" },{ id: "carne-pura", nome: "Carne Pura", preco: 5.2, porcao: "70g" },{ id: "carne-seca-mistura", nome: "Carne Seca Mistura", preco: 7.82, porcao: "40g" },{ id: "frango-mistura", nome: "Frango Mistura", preco: 2.52, porcao: "50g" },{ id: "frango-puro", nome: "Frango Puro", preco: 3.54, porcao: "70g" },{ id: "misturinha", nome: "Misturinha", preco: 0.80, porcao: "40g" },{ id: "palmito-mistura", nome: "Palmito Mistura", preco: 2.69, porcao: "70g" },{ id: "palmito-puro", nome: "Palmito Puro", preco: 5.15, porcao: "150g" },{ id: "portuguesa", nome: "Portuguesa", preco: 3.05, porcao: "50g" },{ id: "salame", nome: "Salame", preco: 4.9, porcao: "50g" },
     ]
   },
   frios: {
@@ -28,7 +28,7 @@ const CATEGORIAS = {
     cor: "#27ae60",
     corBg: "#f2fdf5",
     unidade: "gramas",
-    itens: [{ id: "azeitona", nome: "Balde de Azeitona", preco: 55.00, porcao: "balde" },{ id: "brocolis", nome: "Brócolis", preco: 4.79, porcao: "70g" },{ id: "ervilha", nome: "Ervilha", preco: 0.75, porcao: "un" },{ id: "escarola", nome: "Escarola", preco: 3.42, porcao: "70g" },{ id: "laka", nome: "Laka", preco: 6.06, porcao: "100g" },{ id: "milho-mistura", nome: "Milho Mistura", preco: 0.71, porcao: "40g" },{ id: "milho-puro", nome: "Milho Puro", preco: 1.65, porcao: "80g" },{ id: "oregano", nome: "Orégano", preco: 14.60, porcao: "500g" },{ id: "tomate-seco", nome: "Tomate Seco", preco: 53.66, porcao: "4kg" },
+    itens: [{ id: "azeitona", nome: "Balde de Azeitona", preco: 55.00, porcao: "balde" },{ id: "brocolis", nome: "Brócolis", preco: 5.14, porcao: "70g" },{ id: "ervilha", nome: "Ervilha", preco: 0.75, porcao: "un" },{ id: "escarola", nome: "Escarola", preco: 3.42, porcao: "70g" },{ id: "laka", nome: "Laka", preco: 6.06, porcao: "100g" },{ id: "milho-mistura", nome: "Milho Mistura", preco: 0.71, porcao: "40g" },{ id: "milho-puro", nome: "Milho Puro", preco: 1.65, porcao: "80g" },{ id: "oregano", nome: "Orégano", preco: 14.60, porcao: "500g" },{ id: "tomate-seco", nome: "Tomate Seco", preco: 53.66, porcao: "4kg" },
     ]
   },
   massas: {
@@ -36,7 +36,7 @@ const CATEGORIAS = {
     cor: "#8e44ad",
     corBg: "#faf2fe",
     unidade: "pacote",
-    itens: [{ id: "batata-congelada-625", nome: "Batata Frita G", preco: 8.25, porcao: "650g" },{ id: "batata-congelada-350", nome: "Batata Frita P", preco: 4.62, porcao: "325g" },{ id: "massa-pastel", nome: "Massa de Pastel", preco: 47.00, porcao: "pacote 5kg", vendaPorKg: true, kgBase: 5.0 },{ id: "pao-hot-dog", nome: "Pão de Hot Dog", preco: 14.50, porcao: "pacote" },{ id: "pure", nome: "Purê", preco: 15.50, porcao: "kg", vendaPorKg: true, kgBase: 1.0 },
+    itens: [{ id: "batata-congelada-625", nome: "Batata Frita G", preco: 8.6, porcao: "650g" },{ id: "batata-congelada-350", nome: "Batata Frita P", preco: 4.62, porcao: "325g" },{ id: "massa-pastel", nome: "Massa de Pastel", preco: 47.00, porcao: "pacote 5kg", vendaPorKg: true, kgBase: 5.0 },{ id: "pao-hot-dog", nome: "Pão de Hot Dog", preco: 14.50, porcao: "pacote" },{ id: "pure", nome: "Purê", preco: 15.50, porcao: "kg", vendaPorKg: true, kgBase: 1.0 },
     ]
   },
   doces: {
@@ -60,7 +60,7 @@ const CATEGORIAS = {
     cor: "#2980b9",
     corBg: "#f0f7ff",
     unidade: "unidade",
-    itens: [{ id: "caixa-grande", nome: "Caixa Grande", preco: 2.46, porcao: "un" },{ id: "caixa-media", nome: "Caixa Média", preco: 2.09, porcao: "un" },{ id: "saco-grecepell-1kg", nome: "Saco Grecepell 1kg", preco: 0.11, porcao: "unidade" },{ id: "saco-grecepell-2kg", nome: "Saco Grecepell 2kg", preco: 0.15, porcao: "unidade" },{ id: "ketchup-heinz", nome: "Sachê Ketchup Heinz", preco: 25.30, porcao: "cx unidade" },{ id: "maionese-heinz", nome: "Sachê Maionese Heinz", preco: 25.30, porcao: "cx unidade" },{ id: "mostarda-heinz", nome: "Sachê Mostarda Heinz", preco: 25.30, porcao: "cx unidade" }]
+    itens: [{ id: "caixa-grande", nome: "Caixa Grande", preco: 2.5, porcao: "un" },{ id: "caixa-media", nome: "Caixa Média", preco: 2.13, porcao: "un" },{ id: "saco-grecepell-1kg", nome: "Saco Grecepell 1kg", preco: 0.11, porcao: "unidade" },{ id: "saco-grecepell-2kg", nome: "Saco Grecepell 2kg", preco: 0.15, porcao: "unidade" },{ id: "ketchup-heinz", nome: "Sachê Ketchup Heinz", preco: 25.65, porcao: "cx unidade" },{ id: "maionese-heinz", nome: "Sachê Maionese Heinz", preco: 25.30, porcao: "cx unidade" },{ id: "mostarda-heinz", nome: "Sachê Mostarda Heinz", preco: 25.65, porcao: "cx unidade" }]
   }
 }
 
