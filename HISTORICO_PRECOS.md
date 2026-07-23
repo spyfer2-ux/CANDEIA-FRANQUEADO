@@ -58,6 +58,16 @@ Meta: +R$130/mês no Grupo 1 e +R$150/mês no Grupo 2. Aumento uniforme por grup
 
 ---
 
+## Ajuste avulso de 23/07/2026 — Chocolate Branco
+
+Ajuste pontual de preço (não vinculado às metas por grupo):
+
+| Insumo | Preço antigo | Preço novo |
+|--------|-------------|-----------|
+| Chocolate Branco (1kg, venda por kg) | R$ 39,00 | R$ 43,00 |
+
+---
+
 ## Observações importantes
 - Os valores de "Un/mês" e "Ganho/mês" são estimativas baseadas na média do período analisado; a receita real varia conforme os pedidos.
 - Para recalcular no futuro: exporte os pedidos da coleção `orcamentos`, agregue por nome de insumo (quantidade e receita), ordene por receita e defina o aumento pelo volume mensal de cada grupo.
