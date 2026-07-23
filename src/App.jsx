@@ -44,7 +44,7 @@ const CATEGORIAS = {
     cor: "#e67e22",
     corBg: "#fef5ec",
     unidade: "unidade",
-    itens: [{ id: "chocolate-leite", nome: "Chocolate ao Leite", preco: 44.0, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 },{ id: "chocolate-branco", nome: "Chocolate Branco", preco: 39.0, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 },{ id: "chocolate-cremoso", nome: "Chocolate Cremoso Gourmet", preco: 45.00, porcao: "kg", vendaPorKg: true, kgBase: 1.0 },{ id: "doce-leite", nome: "Doce de Leite", preco: 135.0, porcao: "balde 4,8kg" , vendaPorKg: true, kgBase: 4.8 },{ id: "goiabada", nome: "Goiabada", preco: 1.30, porcao: "100g" },
+    itens: [{ id: "chocolate-leite", nome: "Chocolate ao Leite", preco: 44.0, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 },{ id: "chocolate-branco", nome: "Chocolate Branco", preco: 43.0, porcao: "1kg" , vendaPorKg: true, kgBase: 1.0 },{ id: "chocolate-cremoso", nome: "Chocolate Cremoso Gourmet", preco: 45.00, porcao: "kg", vendaPorKg: true, kgBase: 1.0 },{ id: "doce-leite", nome: "Doce de Leite", preco: 135.0, porcao: "balde 4,8kg" , vendaPorKg: true, kgBase: 4.8 },{ id: "goiabada", nome: "Goiabada", preco: 1.30, porcao: "100g" },
     ]
   },
   salgados: {
