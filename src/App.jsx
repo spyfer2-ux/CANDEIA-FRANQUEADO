@@ -28,7 +28,7 @@ const CATEGORIAS = {
     cor: "#27ae60",
     corBg: "#f2fdf5",
     unidade: "gramas",
-    itens: [{ id: "azeitona", nome: "Balde de Azeitona", preco: 55.00, porcao: "balde" },{ id: "brocolis", nome: "Brócolis", preco: 5.14, porcao: "70g" },{ id: "ervilha", nome: "Ervilha", preco: 0.75, porcao: "un" },{ id: "escarola", nome: "Escarola", preco: 3.42, porcao: "70g" },{ id: "laka", nome: "Laka", preco: 6.06, porcao: "100g" },{ id: "milho-mistura", nome: "Milho Mistura", preco: 0.71, porcao: "40g" },{ id: "milho-puro", nome: "Milho Puro", preco: 1.65, porcao: "80g" },{ id: "oregano", nome: "Orégano", preco: 14.60, porcao: "500g" },{ id: "tomate-seco", nome: "Tomate Seco", preco: 53.66, porcao: "4kg" },
+    itens: [{ id: "azeitona", nome: "Balde de Azeitona", preco: 55.00, porcao: "balde" },{ id: "brocolis", nome: "Brócolis", preco: 5.14, porcao: "70g" },{ id: "ervilha", nome: "Ervilha", preco: 0.85, porcao: "un" },{ id: "escarola", nome: "Escarola", preco: 3.42, porcao: "70g" },{ id: "laka", nome: "Laka", preco: 6.06, porcao: "100g" },{ id: "milho-mistura", nome: "Milho Mistura", preco: 0.71, porcao: "40g" },{ id: "milho-puro", nome: "Milho Puro", preco: 1.65, porcao: "80g" },{ id: "oregano", nome: "Orégano", preco: 14.60, porcao: "500g" },{ id: "tomate-seco", nome: "Tomate Seco", preco: 53.66, porcao: "4kg" },
     ]
   },
   massas: {
